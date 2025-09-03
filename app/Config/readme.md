@@ -1,0 +1,1 @@
+configuraciones globales a nivel de aplicacion, conexion a base de datos

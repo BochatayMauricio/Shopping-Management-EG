@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="2;url=Pages/Client Portal/clientPortal.php">
+    <meta http-equiv="refresh" content="2;url=public/Pages/Client Portal/clientPortal.php">
     <title>Shopping Rosario - Sistema de Promociones</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
