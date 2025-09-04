@@ -1,5 +1,4 @@
 <?php
-    session_start();
     include_once __DIR__ . '/../../app/Services/login.services.php';
     include_once __DIR__ . '/../../app/Services/alert.service.php';
 

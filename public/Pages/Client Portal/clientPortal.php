@@ -1,13 +1,8 @@
 <?php
 include_once '../../../app/Services/login.services.php';
-
+session_start();
 $user = getCurrentUser();
 
-echo '<center>';
-if ($user) {
-    echo '<p>Bienvenido, ' . htmlspecialchars($user['name']) . '!</p>';
-} else {
-    echo '<p>Usuario no autenticado.</p>';
-}
-echo '</center>';
+include_once __DIR__ . '/../../Components/navbar/NavBar.php';
 ?>
+

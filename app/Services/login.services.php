@@ -34,11 +34,15 @@ function authenticateUser($userName, $password) {
         return false;
     }
 
-    if ($result && $result->num_rows > 0) {
-        return $result->fetch_assoc();
-    }
+    if($result->num_rows == 0){
+        return false;
+    } 
 
-    return false; // Cambiar null por false para ser consistente
+    session_start();
+    $userLogued = $result->fetch_assoc();
+    $_SESSION['user'] = $userLogued;
+    mysqli_close($CONNECTION);
+    return $userLogued;
 }
 
 function getCurrentUser(){

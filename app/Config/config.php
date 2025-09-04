@@ -17,5 +17,9 @@ $dbname = "shopping_management";
 $dbport = 3306;
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
+if ($CONNECTION->connect_error) {
+    die("Connection failed: " . $CONNECTION->connect_error);
+}
+
 
 ?>
