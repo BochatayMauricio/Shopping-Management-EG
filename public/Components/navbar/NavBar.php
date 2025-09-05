@@ -17,7 +17,7 @@ if(isset($_GET) && isset($_GET['action'])) {
     
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Shopping Rosario</a>
+            <a class="navbar-brand" href="">Shopping Rosario</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -26,16 +26,42 @@ if(isset($_GET) && isset($_GET['action'])) {
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="#">Inicio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Tiendas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Ofertas</a>
-                </li>
+                <?php if(!$user): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Promociones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contacto</a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($user && $user['userType'] === 'client'): ?>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tiendas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Ofertas</a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($user && $user['userType'] === 'admin'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Gestion Locales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Validar Cuentas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Solicitudes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Novedades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Reportes</a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($user): ?>
-                    <li class="nav-item dropdown">
-                       
+                    <li class="nav-item-dropdown dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             
                             <div class="user-avatar me-2">
@@ -44,7 +70,7 @@ if(isset($_GET) && isset($_GET['action'])) {
                             
                             <div class="user-info">
                                 <span class="user-name"><?php echo htmlspecialchars($user['userName']); ?></span>
-                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['userCategory']); ?></small>
+                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['userType']).'-'.htmlspecialchars($user['userCategory']); ?></small>
                             </div>
                         </a>
                         <ul class="dropdown-menu">
@@ -55,7 +81,6 @@ if(isset($_GET) && isset($_GET['action'])) {
                         </ul>
                     </li>
                 <?php endif; ?>
-
                 <?php
                 if (!$user):
                 ?>
