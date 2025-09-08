@@ -1,4 +1,7 @@
 <?php 
+    if (!class_exists('AlertService')) {
+        include_once __DIR__ . '/../../../app/Services/alert.service.php';
+    }
     AlertService::render(); 
 ?>
 
