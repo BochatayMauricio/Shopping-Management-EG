@@ -1,6 +1,8 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
 .navbar{
     background-color: rgb(48, 48, 48) !important;
-
 }
 
 .nav-item{

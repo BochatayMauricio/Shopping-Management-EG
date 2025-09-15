@@ -1,0 +1,207 @@
+*{
+    font-family: 'Poppins', sans-serif;
+   
+}
+
+/* Sección Carrusel */
+.promo-carousel {
+  position: relative;
+  width: auto;
+  padding: 2rem 0;
+  margin: 15px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  font-style: italic;
+  color: #f5f5f5;
+  text-decoration: underline;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+/* Contenedor visible (centrado) */
+.carousel-wrapper {
+ position: relative;
+  max-width: 1500px;   /* ancho máximo del carrusel */
+  margin: 0 auto;      /* centrado horizontal */
+  overflow: hidden;    /* oculta overflow lateral */
+}
+
+/* Carrusel de tarjetas */
+.carousel-container {
+display: flex;              /* organiza en fila */
+  flex-wrap: nowrap;          /* NO se permite salto de línea */
+  gap: 1.2rem;                  /* espacio entre tarjetas */
+  transition: transform 0.5s ease;
+  will-change: transform;
+}
+
+/* Tarjetas */
+.carousel-card {
+   flex: 0 0 calc(33.333% - 1rem); /* 3 tarjetas visibles */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 25px 0;
+}
+
+.carousel-card img {
+   width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.carousel-card h3 {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.carousel-card p {
+  font-size: 0.95rem;
+  padding: 0 1rem 1rem;
+  color: #555;
+}
+
+.carousel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Botones de navegación */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1rem;
+  height: 100%;
+  width: 140px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: background 0.3s ease;
+  z-index: 5;
+  border-radius: 15px;
+}
+
+.carousel-btn:hover {
+    background: linear-gradient(135deg, #495ba8 0%, #51336e 100%);
+}
+
+
+.carousel-btn.next {
+  right: 0.2px; /* separado del borde */
+}
+
+/* Sección de búsqueda */
+.search-promo {
+  max-width: auto;
+  margin: 15px 0;
+  padding: 2rem;
+   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   border-radius: 15px;
+}
+
+
+/* Formulario de búsqueda */
+form#searchForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  background: #f1f1f1;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #0077cc;
+  box-shadow: 0 0 5px rgba(0, 119, 204, 0.4);
+  outline: none;
+}
+
+/* Botón de búsqueda */
+form#searchForm .btn-primary {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+form#searchForm .btn-primary:hover {
+  background: #005fa3;
+  transform: translateY(-2px);
+}
+
+/* Resultados */
+.search-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 1420px) {
+  .carousel-card {
+    flex: 0 0 calc(50% - 1rem); /* 👈 2 tarjetas visibles en tablets */
+  }
+  .carousel-btn {
+    width: 40px;
+    padding: 0.6rem 0.8rem;
+    font-size: 1.2rem;
+  }
+    .search-results .carousel-card {
+    flex: 0 0 calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 600px) {
+  .carousel-card {
+    flex: 0 0 100%; /* 👈 1 tarjeta visible en móviles */
+  }
+  .carousel-btn {
+    width: 20px;
+    padding: 0.6rem 0.8rem;
+    font-size: 1.2rem;
+  }
+  .search-results .carousel-card {
+    flex: 0 0 100%;
+  }
+}

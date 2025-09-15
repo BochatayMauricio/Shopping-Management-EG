@@ -1,0 +1,16 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+
+body {
+  padding-bottom: 70px; /* Ajusta según la altura del footer */
+}
