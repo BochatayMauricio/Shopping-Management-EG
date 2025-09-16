@@ -17,7 +17,7 @@
       </li>
       <?php if(!$user): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Promociones</a>
+                        <a class="nav-link" href="#">Locales</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
@@ -47,27 +47,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Reportes</a>
-                    </li>
-                <?php endif; ?>
-                <?php if ($user): ?>
-                    <li class="nav-item-dropdown dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            
-                            <div class="user-avatar me-2">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            
-                            <div class="user-info">
-                                <span class="user-name"><?php echo htmlspecialchars($user['userName']); ?></span>
-                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['userType']).'-'.htmlspecialchars($user['userCategory']); ?></small>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt me-2"></i>Solicitudes</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
-                        </ul>
                     </li>
                 <?php endif; ?>
     </ul>

@@ -17,8 +17,10 @@ function registerUser($userName, $password) {
         AlertService::warning('El nombre de usuario ya existe.');
         return false; // Usuario ya existe
     }
+    // Hashear la contraseña antes de guardarla
+    $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
 
-    $query="INSERT INTO users (userName, userPassword, userType, userCategory) VALUES ('$userName', '$password', 'client', 'inicial')";
+    $query="INSERT INTO users (userName, userPassword, userType, userCategory) VALUES ('$userName', '$passwordHashed', 'client', 'inicial')";
     $result = mysqli_query($CONNECTION, $query);
     if (!$result) {
         AlertService::error("Error: " . mysqli_error($CONNECTION));

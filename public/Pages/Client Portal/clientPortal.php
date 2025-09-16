@@ -10,7 +10,7 @@ $user = getCurrentUser();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal del Cliente</title>
-  <link rel="stylesheet" href="/Shopping-Management-EG/public/pages/Client Portal/clientPortal.css">
+  <link rel="stylesheet" href="/Gestion Shopping/public/pages/Client Portal/clientPortal.css">
   <!-- Agregar otros estilos o librerías aquí -->
 </head>
 

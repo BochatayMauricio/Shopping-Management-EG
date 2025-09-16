@@ -25,7 +25,8 @@ function authenticateUser($userName, $password) {
     }
     
     $userName = strtolower($userName);
-    $query = "SELECT * FROM users WHERE userName = '$userName' AND userPassword = '$password'";
+    $query = "SELECT * FROM users WHERE userName = '$userName'";
+
     $result = mysqli_query($CONNECTION, $query);
     
     // Debug: verificar errores de consulta
@@ -38,11 +39,16 @@ function authenticateUser($userName, $password) {
         return false;
     } 
 
+    // Verificar la contraseña
+    $user = $result->fetch_assoc();
+    if (!password_verify($password, $user['userPassword'])) {
+        return false; // Contraseña incorrecta
+    }
+
     session_start();
-    $userLogued = $result->fetch_assoc();
-    $_SESSION['user'] = $userLogued;
+    $_SESSION['user'] = $user;
     mysqli_close($CONNECTION);
-    return $userLogued;
+    return $user;
 }
 
 function getCurrentUser(){

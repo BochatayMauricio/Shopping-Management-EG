@@ -12,7 +12,7 @@ date_default_timezone_set(TIMEZONE);
  */
 $hostname = "localhost";
 $username = "root";
-$password = "";
+$password = "root";
 $dbname = "shopping_management";
 $dbport = 3306;
 
@@ -20,6 +20,4 @@ $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
     die("Connection failed: " . $CONNECTION->connect_error);
 }
-
-
 ?>
