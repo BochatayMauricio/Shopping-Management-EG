@@ -1,36 +1,18 @@
 /* Estilos personalizados para la página de Stores */
 
-/* Estilos para solucionar conflictos con el navbar */
-body {
-    margin: 0;
-    padding: 0;
+/* Estilos específicos para el área de contenido, sin afectar navbar */
+.main-content {
+    margin-top: 20px;
+    min-height: calc(100vh - 80px);
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
 }
 
-/* Asegurar que el contenido principal no se superponga con el navbar */
-.main-content {
-    margin-top: 20px;
-    min-height: calc(100vh - 80px);
-}
-
-/* Sobrescribir estilos del navbar que pueden causar conflictos */
+/* Contenedor principal */
 .main-content .container {
     position: relative;
     z-index: 1;
-}
-
-/* Asegurar que los dropdowns del navbar funcionen correctamente */
-.navbar .dropdown-menu {
-    z-index: 1050;
-}
-
-/* Resetear cualquier posicionamiento que pueda interferir */
-.main-content .nav-item,
-.main-content .btn-session,
-.main-content .dropdown {
-    position: static !important;
 }
 
 /* Asegurar que los filtros se vean bien */
@@ -40,18 +22,18 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Mejorar el espaciado y la tipografía */
+/* Mejorar el espaciado y la tipografía del contenido */
 .main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
     color: #333;
 }
 
-/* Asegurar que los badges se vean correctamente */
-.badge {
+/* Estilos para badges dentro del contenido */
+.main-content .badge {
     font-size: 0.75em;
 }
 
-/* Mejorar la apariencia de los botones */
-.btn {
+/* Estilos para botones dentro del contenido */
+.main-content .btn {
     border-radius: 6px;
     font-weight: 500;
 }
@@ -78,12 +60,6 @@ body {
     --transition: all 0.3s ease;
 }
 
-/* Estilos generales del body */
-body {
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-}
 
 /* Header personalizado */
 header {
@@ -117,16 +93,16 @@ header h1 {
     transform: scale(1.05);
 }
 
-/* Estilos para los badges */
-.badge {
+/* Estilos para los badges dentro del contenido */
+.main-content .badge {
     font-size: 0.75rem;
     padding: 0.5rem 0.75rem;
     border-radius: 1rem;
     font-weight: 500;
 }
 
-/* Estilos para los botones de filtro */
-.btn-sm {
+/* Estilos para los botones de filtro dentro del contenido */
+.main-content .btn-sm {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
     border-radius: 1.5rem;
@@ -135,43 +111,43 @@ header h1 {
     font-weight: 500;
 }
 
-.btn-outline-primary:hover {
+.main-content .btn-outline-primary:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.25);
 }
 
-.btn-outline-secondary:hover {
+.main-content .btn-outline-secondary:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(108, 117, 125, 0.25);
 }
 
-.btn-outline-success:hover {
+.main-content .btn-outline-success:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(25, 135, 84, 0.25);
 }
 
-.btn-outline-info:hover {
+.main-content .btn-outline-info:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(13, 202, 240, 0.25);
 }
 
-.btn-outline-warning:hover {
+.main-content .btn-outline-warning:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(255, 193, 7, 0.25);
 }
 
-.btn-outline-danger:hover {
+.main-content .btn-outline-danger:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(220, 53, 69, 0.25);
 }
 
-.btn-outline-dark:hover {
+.main-content .btn-outline-dark:hover {
     transform: translateY(-1px);
     box-shadow: 0 0.25rem 0.5rem rgba(33, 37, 41, 0.25);
 }
 
-/* Estilos para el buscador */
-.form-control:focus {
+/* Estilos para el buscador dentro del contenido */
+.main-content .form-control:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
@@ -216,15 +192,15 @@ header h1 {
     opacity: 0.8;
 }
 
-/* Estilos para cards de filtros */
-.card {
+/* Estilos para cards dentro del contenido */
+.main-content .card {
     border: none;
     border-radius: 1rem;
     box-shadow: var(--box-shadow-sm);
     transition: var(--transition);
 }
 
-.card:hover {
+.main-content .card:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 }
 
@@ -233,8 +209,8 @@ footer {
     background: linear-gradient(135deg, var(--dark-color) 0%, #343a40 100%) !important;
 }
 
-/* Animaciones para los badges de categoría */
-.badge {
+/* Animaciones para los badges de categoría dentro del contenido */
+.main-content .badge {
     animation: fadeIn 0.5s ease-in-out;
 }
 
@@ -349,9 +325,9 @@ footer {
     transform: scale(1.1);
 }
 
-/* Mejoras para la accesibilidad */
-.btn:focus,
-.form-control:focus {
+/* Mejoras para la accesibilidad dentro del contenido */
+.main-content .btn:focus,
+.main-content .form-control:focus {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
@@ -361,13 +337,13 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Estilos para los enlaces */
-a {
+/* Estilos para los enlaces dentro del contenido */
+.main-content a {
     text-decoration: none;
     transition: var(--transition);
 }
 
-a:hover {
+.main-content a:hover {
     text-decoration: underline;
 }
 

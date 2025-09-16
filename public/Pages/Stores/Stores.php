@@ -13,7 +13,7 @@ $stores = [
         'location' => 'Planta Baja - Local 15',
         'phone' => '(341) 555-0101',
         'hours' => '10:00 - 22:00',
-        'image' => 'https://via.placeholder.com/300x200/ff6b35/ffffff?text=McDonald\'s',
+        'image' => 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://mcdonalds.com.ar',
         'featured' => true
     ],
@@ -25,7 +25,7 @@ $stores = [
         'location' => 'Primer Piso - Local 25',
         'phone' => '(341) 555-0102',
         'hours' => '10:00 - 21:00',
-        'image' => 'https://via.placeholder.com/300x200/2d3436/ffffff?text=Zara',
+        'image' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://zara.com',
         'featured' => false
     ],
@@ -37,7 +37,7 @@ $stores = [
         'location' => 'Planta Baja - Local 8',
         'phone' => '(341) 555-0103',
         'hours' => '12:00 - 23:00',
-        'image' => 'https://via.placeholder.com/300x200/74b9ff/ffffff?text=Freddo',
+        'image' => 'https://images.unsplash.com/photo-1488900128323-21503983a07e?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://freddo.com.ar',
         'featured' => true
     ],
@@ -49,20 +49,8 @@ $stores = [
         'location' => 'Planta Baja - Local 12',
         'phone' => '(341) 555-0104',
         'hours' => '07:00 - 22:00',
-        'image' => 'https://via.placeholder.com/300x200/00b894/ffffff?text=Starbucks',
+        'image' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://starbucks.com.ar',
-        'featured' => false
-    ],
-    [
-        'id' => 5,
-        'name' => 'H&M',
-        'category' => 'ropa',
-        'description' => 'Moda accesible para toda la familia con las últimas tendencias.',
-        'location' => 'Primer Piso - Local 30',
-        'phone' => '(341) 555-0105',
-        'hours' => '10:00 - 21:00',
-        'image' => 'https://via.placeholder.com/300x200/e17055/ffffff?text=H%26M',
-        'website' => 'https://hm.com',
         'featured' => false
     ],
     [
@@ -73,7 +61,7 @@ $stores = [
         'location' => 'Food Court - Local F2',
         'phone' => '(341) 555-0106',
         'hours' => '10:00 - 22:00',
-        'image' => 'https://via.placeholder.com/300x200/fd79a8/ffffff?text=Burger+King',
+        'image' => 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://burgerking.com.ar',
         'featured' => false
     ],
@@ -85,7 +73,7 @@ $stores = [
         'location' => 'Food Court - Local F5',
         'phone' => '(341) 555-0107',
         'hours' => '11:00 - 23:00',
-        'image' => 'https://via.placeholder.com/300x200/fdcb6e/ffffff?text=Grido',
+        'image' => 'https://images.unsplash.com/photo-1497671954146-59a89ff626ff?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://grido.com.ar',
         'featured' => true
     ],
@@ -97,7 +85,7 @@ $stores = [
         'location' => 'Primer Piso - Local 18',
         'phone' => '(341) 555-0108',
         'hours' => '10:00 - 21:00',
-        'image' => 'https://via.placeholder.com/300x200/636e72/ffffff?text=Nike',
+        'image' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://nike.com',
         'featured' => false
     ],
@@ -109,7 +97,7 @@ $stores = [
         'location' => 'Food Court - Local F1',
         'phone' => '(341) 555-0109',
         'hours' => '11:00 - 21:00',
-        'image' => 'https://via.placeholder.com/300x200/a29bfe/ffffff?text=La+Salteña',
+        'image' => 'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => '#',
         'featured' => true
     ],
@@ -121,7 +109,7 @@ $stores = [
         'location' => 'Planta Baja - Local 20',
         'phone' => '(341) 555-0110',
         'hours' => '08:00 - 21:00',
-        'image' => 'https://via.placeholder.com/300x200/6c5ce7/ffffff?text=Havanna',
+        'image' => 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=250&fit=crop&crop=center&q=80',
         'website' => 'https://havanna.com.ar',
         'featured' => false
     ]
@@ -195,13 +183,11 @@ function getCategoryColor($category) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Locales - Shopping Rosario</title>
-
     
-    <!-- CSS personalizado para stores -->
+    <!-- Solo cargar el CSS personalizado, el navbar se encarga del resto -->
     <link rel="stylesheet" href="stores.css">
 </head>
 <body>
-    <!-- Incluir navbar (que ya incluye Bootstrap y Font Awesome) -->
     <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
     
     <div class="main-content">
@@ -370,68 +356,6 @@ function getCategoryColor($category) {
                                            class="btn btn-primary btn-sm flex-fill">
                                             <i class="fas fa-external-link-alt me-1"></i>
                                             Ver promociones
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Modal de detalles del local -->
-                    <div class="modal fade" id="storeModal<?php echo $store['id']; ?>" tabindex="-1" aria-labelledby="storeModalLabel<?php echo $store['id']; ?>" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="storeModalLabel<?php echo $store['id']; ?>">
-                                        <i class="<?php echo getCategoryIcon($store['category']); ?> me-2"></i>
-                                        <?php echo htmlspecialchars($store['name']); ?>
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <img src="<?php echo $store['image']; ?>" 
-                                                 class="img-fluid rounded" 
-                                                 alt="<?php echo htmlspecialchars($store['name']); ?>">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6 class="text-primary">Descripción</h6>
-                                            <p><?php echo htmlspecialchars($store['description']); ?></p>
-                                            
-                                            <h6 class="text-primary mt-4">Información de contacto</h6>
-                                            <div class="info-list">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-map-marker-alt text-primary me-3" style="width: 20px;"></i>
-                                                    <span><?php echo htmlspecialchars($store['location']); ?></span>
-                                                </div>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-clock text-success me-3" style="width: 20px;"></i>
-                                                    <span><?php echo htmlspecialchars($store['hours']); ?></span>
-                                                </div>
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-phone text-info me-3" style="width: 20px;"></i>
-                                                    <span><?php echo htmlspecialchars($store['phone']); ?></span>
-                                                </div>
-                                                <?php if ($store['website'] !== '#'): ?>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-globe text-warning me-3" style="width: 20px;"></i>
-                                                    <a href="<?php echo $store['website']; ?>" target="_blank" class="text-decoration-none">
-                                                        Visitar sitio web
-                                                        <i class="fas fa-external-link-alt ms-1 small"></i>
-                                                    </a>
-                                                </div>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    <?php if ($store['website'] !== '#'): ?>
-                                        <a href="<?php echo $store['website']; ?>" target="_blank" class="btn btn-primary">
-                                            <i class="fas fa-external-link-alt me-1"></i>
-                                            Visitar sitio web
                                         </a>
                                     <?php endif; ?>
                                 </div>

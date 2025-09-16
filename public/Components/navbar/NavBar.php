@@ -22,11 +22,11 @@ if(isset($_GET) && isset($_GET['action'])) {
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+                    <a class="nav-link active" aria-current="page" href="../../Pages/Client Portal/clientPortal.php">Inicio</a>
                 </li>
                 <?php if(!$user): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Locales</a>
+                        <a class="nav-link" href="../../Pages/Stores/Stores.php">Locales</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
@@ -35,10 +35,10 @@ if(isset($_GET) && isset($_GET['action'])) {
                 <?php if ($user && $user['userType'] === 'client'): ?>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Tiendas</a>
+                        <a class="nav-link" href="../../Pages/Stores/Stores.php">Tiendas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Ofertas</a>
+                        <a class="nav-link" href="#">Promociones</a>
                     </li>
                 <?php endif; ?>
                 <?php if ($user && $user['userType'] === 'admin'): ?>
