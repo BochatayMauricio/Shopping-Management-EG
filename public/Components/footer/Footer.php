@@ -1,4 +1,6 @@
 <footer class="bg-dark text-white py-3 mt-5">
+    <link rel="stylesheet" href="Shopping-Management-EG\public\Components\footer\footer.css">
+
     <div class="container-fluid">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -13,7 +15,7 @@
                     </li>
                     <?php if(!$user): ?>
                         <li class="nav-item me-3">
-                            <a class="nav-link text-white" href="#">Locales</a>
+                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
                         </li>
                         <li class="nav-item me-3">
                             <a class="nav-link text-white" href="#">Contacto</a>

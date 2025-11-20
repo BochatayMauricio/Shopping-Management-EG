@@ -1,7 +1,24 @@
 <?php
+// Incluir servicios y iniciar sesión
 include_once '../../../app/Services/login.services.php';
 session_start();
 $user = getCurrentUser();
+
+// =========================================================================
+// LÓGICA DE DATOS (SIMULACIÓN DE BASE DE DATOS)
+// =========================================================================
+
+// Simulación de la base de datos de Promociones con el campo 'rubro'
+$allPromotions = [
+    ['local' => 'Tienda A', 'discount' => 30, 'description' => 'Descuento especial en productos de verano', 'image' => '../../../assets/local1.jpg', 'rubro' => 'ropa'],
+    ['local' => 'Tienda B', 'discount' => 20, 'description' => 'Ofertas flash solo por hoy', 'image' => '../../../assets/local2.jpg', 'rubro' => 'tecnologia'],
+    ['local' => 'Tienda C', 'discount' => 50, 'description' => 'Hasta 50% off en marcas seleccionadas', 'image' => '../../../assets/local3.jpg', 'rubro' => 'gastronomia'],
+    ['local' => 'Tienda D', 'discount' => 15, 'description' => 'Promoción limitada de temporada', 'image' => '../../../assets/local1.jpg', 'rubro' => 'ropa'],
+    ['local' => 'Tienda E', 'discount' => 45, 'description' => '2x1 en toda la sección infantil', 'image' => '../../../assets/local2.jpg', 'rubro' => 'servicios'],
+    ['local' => 'Tienda F', 'discount' => 10, 'description' => 'Regalo exclusivo con tu compra', 'image' => '../../../assets/local3.jpg', 'rubro' => 'hogar'],
+];
+
+// No hay lógica de filtrado ya que se eliminó la búsqueda.
 ?>
 
 <!DOCTYPE html>
@@ -9,93 +26,66 @@ $user = getCurrentUser();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal del Cliente</title>
-  <link rel="stylesheet" href="/Gestion Shopping/public/pages/Client Portal/clientPortal.css">
-  <!-- Agregar otros estilos o librerías aquí -->
-</head>
+  <title>Portal de Promociones</title>
+  <link rel="stylesheet" href="clientPortal.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
 
-<body style="background-color: #002a47;">
+<body style="background-color: #ffffff;">
 
-  <!-- Navbar -->
   <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
 
-
+<header class="main-banner">
+    <div class="banner-content">
+        <h1>PROMOSHOP</h1>
+        <p>Tu guía diaria de ofertas y novedades exclusivas.</p>
+    </div>
+</header>
+<section class="news-section">
+    <h2 class="section-title">Últimas Novedades y Eventos</h2>
+    <div class="news-container">
+        <div class="news-card">
+            <h3>Noche de Compras Extrema</h3>
+            <p>¡Horario extendido hasta las 23:00hs con descuentos adicionales en tiendas seleccionadas!</p>
+            <span class="news-date">20 de Noviembre</span>
+        </div>
+        <div class="news-card">
+            <h3>Apertura: Local de Cafetería Premium</h3>
+            <p>Descubre el nuevo espacio de relax en el segundo piso. ¡Café gratis la primera hora!</p>
+            <span class="news-date">15 de Noviembre</span>
+        </div>
+        <div class="news-card">
+            <h3>Sorteo Semanal</h3>
+            <p>Participa en el sorteo de un voucher de $10.000 llenando nuestro formulario.</p>
+            <span class="news-date">10 de Noviembre</span>
+        </div>
+    </div>
+</section>
 <section class="promo-carousel">
-    <h2 class="section-title">Promociones más llamativas</h2>
-     <!-- Botón Prev -->
-    <button class="carousel-btn prev">&#10094;</button>
+    <h2 class="section-title">Promociones Destacadas</h2>
+    
     <div class="carousel-wrapper" id="carousel">
-    <!-- Contenedor Carrusel -->
-    <div class="carousel-container" >
-    
-      <!-- Tarjeta 1 -->
-      <div class="carousel-card">
-        <img src="../../../assets/local1.jpg" alt="Promo 1">
-        <h3>Promo 1</h3>
-        <p>Descuentos increíbles en productos seleccionados.</p>
-      </div>
+        <div class="carousel-container">
+        
+        <?php foreach ($allPromotions as $promo): 
+             // Generar clase de rubro para el color dinámico
+            $rubroClass = 'card-rubro-' . strtolower($promo['rubro']); 
+        ?>
+            <div class="carousel-card <?= htmlspecialchars($rubroClass) ?>">
+              <img src="<?= htmlspecialchars($promo['image']) ?>" alt="<?= htmlspecialchars($promo['local']) ?>">
+              <h3><?= htmlspecialchars($promo['local']) ?></h3>
+              <p><?= htmlspecialchars($promo['description']) ?></p>
+              <p><strong><?= htmlspecialchars($promo['discount']) ?>% OFF</strong></p>
+            </div>
+        <?php endforeach; ?>
 
-      <!-- Tarjeta 2 -->
-      <div class="carousel-card">
-        <img src="../../../assets/local2.jpg" alt="Promo 2">
-        <h3>Promo 2</h3>
-        <p>Ofertas flash disponibles solo por hoy.</p>
-      </div>
-
-      <!-- Tarjeta 3 -->
-      <div class="carousel-card">
-        <img src="../../../assets/local3.jpg" alt="Promo 3">
-        <h3>Promo 3</h3>
-        <p>Conocé las nuevas tiendas que se suman.</p>
-      </div>
-
-      <!-- Tarjeta 4 -->
-      <div class="carousel-card">
-        <img src="../../../assets/local1.jpg" alt="Promo 4">
-        <h3>Promo 4</h3>
-        <p>Regalos y premios con tus compras.</p>
-      </div>
-
-      <!-- Tarjeta 5 -->
-      <div class="carousel-card">
-        <img src="../../../assets/local1.jpg" alt="Promo 5">
-        <h3>Promo 5</h3>
-        <p>Hasta 50% off en marcas seleccionadas.</p>
-      </div>
-
+        </div>
     </div>
-    </div>
-    <!-- Botón Next -->
-    <button class="carousel-btn next">&#10095;</button>
-    
-  </section>
-  <section class="search-promo">
-  <h2 class="section-title">Buscar Promoción</h2>
-
-  <form id="searchForm">
-    <div class="form-group">
-      <label for="localName">Nombre del local:</label>
-      <input type="text" id="localName" placeholder="Ej: Tienda XYZ">
-    </div>
-
-    <div class="form-group">
-      <label for="discount">Porcentaje de descuento mínimo:</label>
-      <input type="number" id="discount" placeholder="Ej: 20" min="0" max="100">
-    </div>
-
-    <button type="submit" class="btn-primary">Buscar</button>
-  </form>
-
-  <div class="search-results" id="searchResults">
-    <!-- Aquí se mostrarán las promociones filtradas -->
-  </div>
 </section>
 
-  <!-- Footer -->
   <footer class="navbar navbar-expand-lg navbar-dark bg-dark">
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
   </footer>
-  <script src="clientPortal.js"></script>
 
 </body>
 </html>

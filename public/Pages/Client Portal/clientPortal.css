@@ -1,207 +1,261 @@
-*{
-    font-family: 'Poppins', sans-serif;
-   
+/* Estilos Sóbrios con Banner y Tarjetas de Color por Rubro */
+
+:root {
+    --primary-color: #004d99; /* Azul marino oscuro para acentos (elegante) */
+    --secondary-color: #4a4a4a; /* Gris oscuro para texto */
+    --danger-color: #dc3545; /* Rojo para descuentos */
+    --background-color: #ffffff; 
+    --card-background: #fdfdfd; 
+    --border-color: #e0e0e0; 
+    --box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Sombra de profundidad */
+    --box-shadow-hover: 0 12px 20px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al hacer hover */
+    --box-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
+    --transition: all 0.3s ease;
+    --border-radius: 8px;
+
+    /* --- COLORES DE RUBRO --- */
+    --rubro-ropa: #009688;     
+    --rubro-tecnologia: #9C27B0; 
+    --rubro-gastronomia: #FF9800; 
+    --rubro-servicios: #2196F3; 
+    --rubro-hogar: #795548; 
 }
 
-/* Sección Carrusel */
-.promo-carousel {
-  position: relative;
-  width: auto;
-  padding: 2rem 0;
-  margin: 15px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 15px;
+/* Base */
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--background-color) !important;
+    color: var(--secondary-color);
+}
+
+/* --- BANNER PRINCIPAL --- */
+.main-banner {
+    position: relative;
+    height: 350px; 
+    /* ¡Asegúrate de que esta imagen exista y sea grande para que el blur se vea bien! */
+    background: url('../../../assets/shopping_bg.jpg') center/cover no-repeat; 
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.main-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Aplicar blur y oscurecimiento al pseudo-elemento para que el texto sea claro */
+    background: inherit;
+    filter: blur(5px) brightness(0.7);
+    transform: scale(1.02); 
+    z-index: 1;
+}
+
+/* El contenido del banner (Texto) */
+.banner-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+}
+
+.banner-content h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.banner-content p {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-top: 10px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+
+/* --- TÍTULOS DE SECCIÓN --- */
+.promo-carousel, .news-section {
+    padding: 2rem 0;
+    margin: 25px auto;
+    max-width: 1500px;
 }
 
 .section-title {
-  text-align: center;
+  text-align: left;
   margin-bottom: 1.5rem;
-  font-size: 2rem;
-  font-weight: bold;
-  font-style: italic;
-  color: #f5f5f5;
-  text-decoration: underline;
-  text-shadow: 2px 2px 4px #000000;
+  padding: 0 20px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary-color); 
 }
 
-/* Contenedor visible (centrado) */
+
+/* --- SECCIÓN NOVEDADES Y EVENTOS --- */
+.news-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 0 20px;
+}
+
+.news-card {
+    background-color: var(--card-background);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--box-shadow-sm);
+    transition: var(--transition);
+}
+
+.news-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.news-card h3 {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+}
+
+.news-card p {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.news-date {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+
+/* --- CARRUSEL (ÁREA DE PROMOCIONES DESTACADAS) --- */
 .carousel-wrapper {
- position: relative;
-  max-width: 1500px;   /* ancho máximo del carrusel */
-  margin: 0 auto;      /* centrado horizontal */
-  overflow: hidden;    /* oculta overflow lateral */
+  max-width: 1500px;
+  margin: 0 auto;
+  overflow-x: scroll;
+  padding: 0 20px 20px 20px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory; 
 }
 
-/* Carrusel de tarjetas */
 .carousel-container {
-display: flex;              /* organiza en fila */
-  flex-wrap: nowrap;          /* NO se permite salto de línea */
-  gap: 1.2rem;                  /* espacio entre tarjetas */
-  transition: transform 0.5s ease;
-  will-change: transform;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.5rem;
 }
 
-/* Tarjetas */
+/* Tarjetas (Diseño de Profundidad y Color de Rubro) */
 .carousel-card {
-   flex: 0 0 calc(33.333% - 1rem); /* 3 tarjetas visibles */
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+   flex: 0 0 calc(33.333% - 1.2rem); 
+   min-width: 300px;
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow); /* Sombra de profundidad */
   overflow: hidden;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: 25px 0;
+  transition: var(--transition);
+  margin: 0;
+  scroll-snap-align: start;
+  
+  /* Barra de color del rubro por defecto */
+  border-left: 5px solid var(--border-color); 
 }
 
 .carousel-card img {
    width: 100%;
   height: 200px;
   object-fit: cover;
+  transition: var(--transition);
 }
 
 .carousel-card h3 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin: 0.5rem 0;
+  color: var(--secondary-color);
+  font-weight: 600;
 }
 
 .carousel-card p {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   padding: 0 1rem 1rem;
-  color: #555;
+  color: #777;
+}
+
+.carousel-card strong {
+    color: var(--danger-color);
+    font-size: 1rem;
 }
 
 .carousel-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transform: translateY(-4px); 
+  box-shadow: var(--box-shadow-hover); /* Sombra más profunda al hacer hover */
+  border-color: var(--border-color); 
 }
 
-/* Botones de navegación */
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1rem;
-  height: 100%;
-  width: 140px;
-  cursor: pointer;
-  font-size: 1.5rem;
-  transition: background 0.3s ease;
-  z-index: 5;
-  border-radius: 15px;
+.carousel-card:hover img {
+    transform: scale(1.03);
 }
 
-.carousel-btn:hover {
-    background: linear-gradient(135deg, #495ba8 0%, #51336e 100%);
+/* CLASES PARA LA BARRA DE COLOR POR RUBRO (border-left-color) */
+.card-rubro-ropa {
+    border-left-color: var(--rubro-ropa);
 }
-
-
-.carousel-btn.next {
-  right: 0.2px; /* separado del borde */
+.card-rubro-tecnologia {
+    border-left-color: var(--rubro-tecnologia);
 }
-
-/* Sección de búsqueda */
-.search-promo {
-  max-width: auto;
-  margin: 15px 0;
-  padding: 2rem;
-   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-   border-radius: 15px;
+.card-rubro-gastronomia {
+    border-left-color: var(--rubro-gastronomia);
 }
-
-
-/* Formulario de búsqueda */
-form#searchForm {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  align-items: flex-end;
-  margin-bottom: 2rem;
-  background: #f1f1f1;
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.card-rubro-servicios {
+    border-left-color: var(--rubro-servicios);
 }
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-}
-
-.form-group label {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
-}
-
-.form-group input {
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  transition: border 0.3s, box-shadow 0.3s;
-}
-
-.form-group input:focus {
-  border-color: #0077cc;
-  box-shadow: 0 0 5px rgba(0, 119, 204, 0.4);
-  outline: none;
-}
-
-/* Botón de búsqueda */
-form#searchForm .btn-primary {
-  padding: 0.7rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  background: #0077cc;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-form#searchForm .btn-primary:hover {
-  background: #005fa3;
-  transform: translateY(-2px);
-}
-
-/* Resultados */
-.search-results {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
+.card-rubro-hogar {
+    border-left-color: var(--rubro-hogar);
 }
 
 /* Responsive */
 @media (max-width: 1420px) {
   .carousel-card {
-    flex: 0 0 calc(50% - 1rem); /* 👈 2 tarjetas visibles en tablets */
-  }
-  .carousel-btn {
-    width: 40px;
-    padding: 0.6rem 0.8rem;
-    font-size: 1.2rem;
-  }
-    .search-results .carousel-card {
     flex: 0 0 calc(50% - 1rem);
   }
 }
 
 @media (max-width: 600px) {
   .carousel-card {
-    flex: 0 0 100%; /* 👈 1 tarjeta visible en móviles */
-  }
-  .carousel-btn {
-    width: 20px;
-    padding: 0.6rem 0.8rem;
-    font-size: 1.2rem;
-  }
-  .search-results .carousel-card {
     flex: 0 0 100%;
   }
+  .news-container {
+      grid-template-columns: 1fr;
+      padding: 0 10px;
+  }
+  .section-title {
+      font-size: 1.5rem;
+      padding: 0 10px;
+  }
+  .banner-content h1 {
+      font-size: 2.5rem;
+  }
+}
+
+/* Ocultar barra de desplazamiento en el carrusel */
+.carousel-wrapper::-webkit-scrollbar {
+    display: none;
+}
+.carousel-wrapper {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
