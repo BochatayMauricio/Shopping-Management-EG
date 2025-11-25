@@ -1,0 +1,128 @@
+/* Variables Globales de Colores - Shopping Management EG */
+
+:root {
+    /* Colores Primarios */
+    --primary-color: #1a1a1a;
+    --primary-light: #3a3a3a;
+    --primary-dark: #000000;
+    --primary-gradient: linear-gradient(45deg, #1a1a1a 0%, #4a4a4a 100%);
+    
+    /* Colores Secundarios */
+    --secondary-color: #2d2d2d;
+    --secondary-light: #4a4a4a;
+    --secondary-dark: #0d0d0d;
+    
+    /* Colores de Acento */
+    --accent-color: #5a5a5a;
+    --accent-light: #7a7a7a;
+    --accent-dark: #3a3a3a;
+    
+    /* Colores de Estado */
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    
+    /* Colores Neutros */
+    --dark-color: #1a1a1a;
+    --dark-gray: #2d2d2d;
+    --medium-gray: #5a5a5a;
+    --light-gray: #e9ecef;
+    --lighter-gray: #f8f9fa;
+    --white: #ffffff;
+    
+    /* Colores de Fondo */
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --bg-dark: #1a1a1a;
+    
+    /* Colores de Texto */
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-light: #ffffff;
+    
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 50%;
+    
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+}
+
+/* Estilos Globales Básicos */
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Utilidades de Colores */
+.bg-primary-gradient {
+    background: var(--primary-gradient);
+}
+
+.text-primary-color {
+    color: var(--primary-color);
+}
+
+.text-secondary-color {
+    color: var(--secondary-color);
+}
+
+.border-primary {
+    border-color: var(--primary-color);
+}
+
+/* Utilidades de Botones */
+.btn-primary-custom {
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    transition: var(--transition-normal);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Utilidades de Cards */
+.card-custom {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+}
+
+.card-custom:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+}

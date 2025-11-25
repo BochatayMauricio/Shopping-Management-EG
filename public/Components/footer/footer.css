@@ -3,8 +3,8 @@
 }
 
 footer {
-    background-color: #343a40 !important;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    background: var(--primary-gradient) !important;
+    box-shadow: var(--shadow-md);
     width: 100% !important;
     padding: 1rem 0;
 }
@@ -38,13 +38,13 @@ footer .navbar-nav.footer-nav .nav-link {
 }
 
 footer .nav-link {
-    color: #ffffff !important;
+    color: var(--white) !important;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
+    transition: var(--transition-normal);
 }
 
 footer .nav-link:hover {
-    color: #007bff !important;
+    color: var(--medium-gray) !important;
 }
 
 footer .navbar-text {

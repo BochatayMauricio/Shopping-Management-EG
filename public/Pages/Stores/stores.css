@@ -1,405 +1,311 @@
-/* Estilos personalizados para la página de Stores */
-
-/* Estilos específicos para el área de contenido, sin afectar navbar */
-.main-content {
-    margin-top: 20px;
-    min-height: calc(100vh - 80px);
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
+/* General Styles */
+* {
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Contenedor principal */
-.main-content .container {
+body {
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+/* Filters Section */
+.filters-section {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+/* Search Form */
+.search-form {
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-box i.fa-search {
+    position: absolute;
+    left: 1rem;
+    color: var(--medium-gray);
     z-index: 1;
 }
 
-/* Asegurar que los filtros se vean bien */
-.filters-section {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.search-input {
+    flex: 1;
+    padding: 0.6rem 7rem 0.6rem 2.75rem;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition-normal);
+    background: var(--lighter-gray);
 }
 
-/* Mejorar el espaciado y la tipografía del contenido */
-.main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
-    color: #333;
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--white);
 }
 
-/* Estilos para badges dentro del contenido */
-.main-content .badge {
-    font-size: 0.75em;
+
+.clear-search {
+    position: absolute;
+    right: 0.5rem;
+    background: var(--danger-color);
+    color: var(--white);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: var(--transition-normal);
 }
 
-/* Estilos para botones dentro del contenido */
-.main-content .btn {
-    border-radius: 6px;
+.clear-search:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-btn {
+    padding: 0.5rem 1.5rem;
+    border: 2px solid var(--light-gray);
+    background: var(--white);
+    color: var(--text-primary);
+    border-radius: 25px;
+    font-size: 0.9rem;
     font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: var(--transition-normal);
 }
 
-/* Asegurar compatibilidad con modales */
-.modal {
-    z-index: 1060;
+.filter-btn:hover {
+    border-color: var(--medium-gray);
+    color: var(--dark-gray);
+    transform: translateY(-2px);
 }
 
-/* Variables CSS */
-:root {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --success-color: #198754;
-    --info-color: #0dcaf0;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
-    --border-radius: 0.375rem;
-    --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-    --transition: all 0.3s ease;
+.filter-btn.active {
+    background: var(--primary-gradient);
+    border-color: var(--primary-dark);
+    color: var(--text-light);
 }
 
-
-/* Header personalizado */
-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%) !important;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+/* Stores Grid */
+.stores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
 
-header h1 {
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-
-/* Estilos para las cards de locales */
+/* Store Card */
 .store-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #dee2e6;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: white;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+    display: flex;
+    flex-direction: column;
 }
 
 .store-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
 }
 
-.store-card .card-img-top {
-    transition: var(--transition);
+/* Store Card Header */
+.store-card-header {
+    padding: 1.5rem;
+    background: var(--primary-gradient);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.store-card:hover .card-img-top {
-    transform: scale(1.05);
+.store-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Estilos para los badges dentro del contenido */
-.main-content .badge {
-    font-size: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 1rem;
-    font-weight: 500;
+.store-icon i {
+    font-size: 1.5rem;
+    color: var(--text-light);
 }
 
-/* Estilos para los botones de filtro dentro del contenido */
-.main-content .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-    border-radius: 1.5rem;
-    transition: var(--transition);
-    border-width: 1px;
-    font-weight: 500;
+.store-category {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-dark);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
 }
 
-.main-content .btn-outline-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.25);
+/* Store Card Body */
+.store-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
 }
 
-.main-content .btn-outline-secondary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(108, 117, 125, 0.25);
+.store-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
 }
 
-.main-content .btn-outline-success:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(25, 135, 84, 0.25);
-}
-
-.main-content .btn-outline-info:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(13, 202, 240, 0.25);
-}
-
-.main-content .btn-outline-warning:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(255, 193, 7, 0.25);
-}
-
-.main-content .btn-outline-danger:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(220, 53, 69, 0.25);
-}
-
-.main-content .btn-outline-dark:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0.25rem 0.5rem rgba(33, 37, 41, 0.25);
-}
-
-/* Estilos para el buscador dentro del contenido */
-.main-content .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-/* Estilos para la información de la tienda */
 .store-info {
-    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-.store-info i {
-    width: 16px;
-    text-align: center;
-}
-
-/* Estilos para los modals */
-.modal-content {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: var(--box-shadow-lg);
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
-    color: white;
-    border-radius: 1rem 1rem 0 0;
-    border-bottom: none;
-}
-
-.modal-header .btn-close {
-    filter: invert(1);
-}
-
-.modal-body {
-    padding: 2rem;
-}
-
-.info-list {
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
     font-size: 0.95rem;
 }
 
-.info-list i {
-    opacity: 0.8;
+.info-item i {
+    width: 20px;
+    color: var(--medium-gray);
 }
 
-/* Estilos para cards dentro del contenido */
-.main-content .card {
+/* Store Card Footer */
+.store-card-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+}
+
+.btn-promotions {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-gradient);
+    color: var(--text-light);
     border: none;
-    border-radius: 1rem;
-    box-shadow: var(--box-shadow-sm);
-    transition: var(--transition);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-normal);
 }
 
-.main-content .card:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+.btn-promotions:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-light);
 }
 
-/* Estilos para el footer */
-footer {
-    background: linear-gradient(135deg, var(--dark-color) 0%, #343a40 100%) !important;
+.btn-promotions i {
+    font-size: 1.1rem;
 }
 
-/* Animaciones para los badges de categoría dentro del contenido */
-.main-content .badge {
-    animation: fadeIn 0.5s ease-in-out;
+/* No Stores Message */
+.no-stores {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.no-stores i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
 }
 
-/* Estilos responsivos */
+.no-stores p {
+    font-size: 1.2rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    .page-title {
+        font-size: 2rem;
     }
     
-    header h1 {
-        font-size: 1.5rem;
+    .page-subtitle {
+        font-size: 1rem;
     }
     
-    .d-flex.flex-wrap.gap-2 {
-        gap: 0.5rem !important;
+    .stores-grid {
+        grid-template-columns: 1fr;
     }
     
-    .btn-sm {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .store-card .card-img-top {
-        height: 150px !important;
-    }
-    
-    .modal-body {
-        padding: 1rem;
+    .filter-buttons {
+        justify-content: flex-start;
     }
 }
 
 @media (max-width: 576px) {
-    .d-grid.gap-2.d-md-flex {
-        gap: 0.5rem !important;
+    .main-content {
+        padding: 1rem 0;
     }
     
-    .btn-sm {
-        font-size: 0.75rem;
+    .page-title {
+        font-size: 1.75rem;
     }
     
-    .store-info {
-        font-size: 0.8rem;
+    .filters-section {
+        padding: 1rem;
     }
     
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.25rem 0.5rem;
-    }
-}
-
-/* Estilos para estados de carga y transiciones */
-.store-card {
-    opacity: 0;
-    animation: slideInUp 0.6s ease-out forwards;
-}
-
-.store-card:nth-child(1) { animation-delay: 0.1s; }
-.store-card:nth-child(2) { animation-delay: 0.2s; }
-.store-card:nth-child(3) { animation-delay: 0.3s; }
-.store-card:nth-child(4) { animation-delay: 0.4s; }
-.store-card:nth-child(5) { animation-delay: 0.5s; }
-.store-card:nth-child(6) { animation-delay: 0.6s; }
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Estilos para el estado de "sin resultados" */
-.card.text-center {
-    border: 2px dashed #dee2e6;
-    background-color: #fafafa;
-}
-
-.card.text-center:hover {
-    border-color: var(--primary-color);
-    background-color: #f8f9ff;
-}
-
-/* Estilos para destacar la búsqueda */
-.form-control[name="search"]:focus {
-    background-color: #fff;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-/* Estilos para los iconos */
-.fas, .far {
-    transition: var(--transition);
-}
-
-.store-card:hover .fas,
-.store-card:hover .far {
-    transform: scale(1.1);
-}
-
-/* Mejoras para la accesibilidad dentro del contenido */
-.main-content .btn:focus,
-.main-content .form-control:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-/* Estilos para el scroll suave */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Estilos para los enlaces dentro del contenido */
-.main-content a {
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.main-content a:hover {
-    text-decoration: underline;
-}
-
-/* Mejoras visuales para los badges de cantidad */
-.badge.bg-light {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.25rem 0.4rem;
-    border-radius: 0.75rem;
-    margin-left: 0.25rem;
-}
-
-/* Estilos especiales para locales destacados */
-.store-card:has(.badge.bg-warning) {
-    border-left: 4px solid var(--warning-color);
-}
-
-/* Efectos de hover mejorados */
-.card-footer .btn:hover {
-    transform: translateY(-2px);
-}
-
-/* Estilos para el grid responsivo */
-.row.g-4 {
-    --bs-gutter-x: 1.5rem;
-    --bs-gutter-y: 1.5rem;
-}
-
-@media (max-width: 768px) {
-    .row.g-4 {
-        --bs-gutter-x: 1rem;
-        --bs-gutter-y: 1rem;
-    }
-}
-
-/* Estilos finales para pulir la apariencia */
-.text-muted {
-    color: #6c757d !important;
-}
-
-.text-white-50 {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Animación sutil para el header */
-header {
-    animation: slideInDown 0.8s ease-out;
-}
-
-@keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .filter-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
     }
 }

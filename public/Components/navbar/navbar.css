@@ -2,7 +2,7 @@
     font-family: 'Poppins', sans-serif;
 }
 .navbar{
-    background-color: rgb(48, 48, 48) !important;
+    background: var(--primary-gradient) !important;
 }
 
 .nav-item{
@@ -18,14 +18,14 @@
 }
 
 .navbar-brand{
-    color: white !important;
+    color: var(--white) !important;
     font-weight: bold;
     font-size: 20px;
-    transition: all 0.3s ease;
+    transition: var(--transition-normal);
 }
 
 .navbar-brand:hover{
-    color: royalblue !important;
+    color: var(--medium-gray) !important;
     text-decoration: none;
     transform: scale(1.02);
 }
@@ -45,32 +45,42 @@
 
 
 .btn-session{
-    background-color: royalblue;
+    background: var(--white);
+    color: var(--dark-color);
     position: absolute;
     right: 50px;
-    
+    border-radius: var(--radius-md);
+    transition: var(--transition-normal);
 }
 .btn-session:hover{
-    background-color: rgb(48, 48, 48) !important;
+    background: rgba(74, 74, 74, 0.8) !important;
+}
+
+.btn-session .nav-link {
+    color: var(--dark-color) !important;
+}
+
+.btn-session:hover .nav-link {
+    color: var(--white) !important;
 }
 
 .nav-link {
-    color: rgb(190, 190, 190) !important;
+    color: var(--light-gray) !important;
 }
 
 .nav-link:hover {
-    color: royalblue !important;
+    color: var(--white) !important;
 }
 
 .user-avatar {
     width: 35px;
     height: 35px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: var(--radius-full);
+    background: var(--primary-gradient);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--white);
     font-size: 16px;
     flex-shrink: 0;
 }
@@ -85,12 +95,12 @@
 .user-name {
     font-weight: 600;
     font-size: 14px;
-    color: rgb(190, 190, 190) !important;
+    color: var(--light-gray) !important;
 }
 
 .user-role {
     font-size: 11px !important;
-    color: rgb(140, 140, 140) !important;
+    color: var(--medium-gray) !important;
     margin-top: -2px;
 }
 
@@ -102,24 +112,24 @@
 }
 
 .nav-item.dropdown .dropdown-toggle:hover {
-    background-color: rgb(61, 61, 61) !important;
+    background-color: var(--primary-light) !important;
 }
 
 /* Personalizar el menú dropdown */
 .dropdown-menu {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     margin-top: 8px;
 }
 
 .dropdown-item {
     padding: 10px 16px;
-    transition: all 0.2s ease;
+    transition: var(--transition-fast);
 }
 
 .dropdown-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--lighter-gray);
 }
 
 .dropdown-item.text-danger:hover {

@@ -11,7 +11,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             height: 100vh;
             display: flex;
             align-items: center;
@@ -23,8 +23,8 @@
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
             padding: 20px;
             width: 100%;
             max-width: 450px;
@@ -41,7 +41,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: var(--primary-gradient);
         }
 
         .login-header {
