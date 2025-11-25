@@ -25,6 +25,7 @@
 * {
     font-family: 'Poppins', sans-serif;
     box-sizing: border-box;
+    max-width: 100%;
 }
 
 body {
@@ -86,7 +87,7 @@ body {
 .promo-carousel, .news-section {
     padding: 2rem 0;
     margin: 25px auto;
-    max-width: 1500px;
+    max-width: 100%;
 }
 
 .section-title {
@@ -143,7 +144,7 @@ body {
 
 /* --- CARRUSEL (ÁREA DE PROMOCIONES DESTACADAS) --- */
 .carousel-wrapper {
-  max-width: 1500px;
+  max-width: 100%;
   margin: 0 auto;
   overflow-x: scroll;
   padding: 0 20px 20px 20px;
