@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="2;url=public/Pages/Client Portal/clientPortal.php">
     <title>Shopping Rosario - Sistema de Promociones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -14,7 +17,7 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -55,12 +58,13 @@
 
         .loading-text {
             font-size: 1.2rem;
-            font-weight: 500;
+            font-weight: 700;
         }
 
         .subtitle {
             margin-top: 10px;
             font-size: 0.9rem;
+            font-weight: 500;
             opacity: 0.8;
         }
     </style>

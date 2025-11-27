@@ -1,0 +1,466 @@
+/* ============================================
+   PROMOTIONS PAGE - PROMOCIONES
+   ============================================ */
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2.5rem 0;
+}
+
+.container-custom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* ============================================
+   HEADER Y FILTROS
+   ============================================ */
+
+.promotions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.promotions-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.promotions-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.promotions-badge {
+    background: #fee2e2;
+    color: var(--danger-color);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.promotions-filters {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 700;
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .filter-label {
+        display: block;
+    }
+}
+
+/* Dropdown personalizado con checkbox */
+.dropdown-custom {
+    position: relative;
+}
+
+.dropdown-checkbox {
+    display: none;
+}
+
+.dropdown-toggle-custom {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: var(--transition-fast);
+    user-select: none;
+}
+
+.dropdown-toggle-custom:hover {
+    color: var(--text-primary);
+}
+
+.dropdown-toggle-custom i {
+    font-size: 0.75rem;
+    transition: var(--transition-normal);
+}
+
+.dropdown-checkbox:checked + .dropdown-toggle-custom i {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu-custom {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: auto;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.dropdown-checkbox:checked ~ .dropdown-menu-custom {
+    display: block;
+}
+
+/* Alinear dropdown de local y categoría a la derecha para evitar scroll horizontal */
+.dropdown-custom:nth-last-child(-n+2) .dropdown-menu-custom {
+    left: auto;
+    right: 0;
+}
+
+.dropdown-item-custom {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+    border-bottom: 1px solid var(--lighter-gray);
+    font-size: 0.875rem;
+}
+
+.dropdown-item-custom:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item-custom:hover {
+    background: var(--lighter-gray);
+}
+
+/* ============================================
+   GRID DE PROMOCIONES
+   ============================================ */
+
+.promotions-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .promotions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .promotions-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .promotions-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ============================================
+   TARJETA DE PROMOCIÓN
+   ============================================ */
+
+.promo-card {
+    background: var(--white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition-normal);
+}
+
+.promo-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+/* Imagen + Badge + Chip */
+.promo-image-container {
+    position: relative;
+    height: 12rem;
+    overflow: hidden;
+}
+
+.promo-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+}
+
+/* Chip de Categoría de Cliente */
+.promo-client-category {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    color: var(--white);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    z-index: 10;
+    text-transform: capitalize;
+    box-shadow: var(--shadow-sm);
+}
+
+.promo-client-category.inicial {
+    background: var(--info-color);
+}
+
+.promo-client-category.medium {
+    background: var(--warning-color);
+    color: var(--text-primary);
+}
+
+.promo-client-category.premium {
+    background: var(--primary-gradient);
+}
+
+.promo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.promo-card:hover .promo-image {
+    transform: scale(1.05);
+}
+
+/* Contenido */
+.promo-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.promo-validity {
+    font-size: 0.75rem;
+    color: var(--medium-gray);
+    margin-bottom: 0.75rem;
+}
+
+/* Precios */
+.promo-price-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.promo-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.promo-price-original {
+    font-size: 0.875rem;
+    color: var(--medium-gray);
+    text-decoration: line-through;
+    margin-bottom: 0.25rem;
+}
+
+/* Sección del Local */
+.promo-store-section {
+    border-top: 1px solid var(--light-gray);
+    margin-top: auto;
+    padding-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.promo-store-logo {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--white);
+    font-size: 0.75rem;
+}
+
+.promo-store-logo-text {
+    font-family: serif;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
+.promo-store-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-store-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.promo-store-local {
+    font-size: 0.625rem;
+    color: var(--text-secondary);
+}
+
+/* Botón Solicitar Promoción */
+.promo-request-btn {
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+.promo-request-btn:hover {
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.1);
+}
+
+.promo-request-btn:active {
+    filter: brightness(0.95);
+    transform: translateY(1px);
+}
+
+.promo-request-btn i {
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   MENSAJE SIN RESULTADOS
+   ============================================ */
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.no-results i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.no-results p {
+    font-size: 1.2rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .container-custom {
+        padding: 0 1rem;
+    }
+
+    .promotions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .promotions-title {
+        font-size: 1.75rem;
+    }
+
+    .promotions-filters {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .promotions-title {
+        font-size: 1.5rem;
+    }
+
+    .promotions-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .promo-image-container {
+        height: 10rem;
+    }
+
+    .promo-title {
+        font-size: 1rem;
+    }
+
+    .promo-price {
+        font-size: 1.25rem;
+    }
+    
+    .promo-request-btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+}

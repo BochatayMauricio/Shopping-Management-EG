@@ -1,6 +1,12 @@
-/* General Styles */
+/* ============================================
+   STORES PAGE - DISEÑO HORIZONTAL PROFESIONAL
+   ============================================ */
+
 * {
     font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -15,297 +21,430 @@ body {
     padding: 2rem 0;
 }
 
-/* Page Header */
-.page-header {
-    text-align: center;
-    margin-bottom: 3rem;
+.container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
 }
 
-.page-title {
-    font-size: 2.5rem;
+/* ============================================
+   HEADER CON FILTROS
+   ============================================ */
+
+.stores-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.stores-title {
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin: 0;
 }
 
-.page-subtitle {
-    font-size: 1.1rem;
+.filter-dropdown-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 1rem;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
-/* Filters Section */
-.filters-section {
-    background: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    margin-bottom: 2rem;
-}
-
-/* Search Form */
-.search-form {
-    margin-bottom: 1.5rem;
-}
-
-.search-box {
-    position: relative;
+/* Input directo de búsqueda */
+.filter-input-form {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    max-width: 500px;
-    margin: 0 auto;
+    position: relative;
 }
 
-.search-box i.fa-search {
-    position: absolute;
-    left: 1rem;
-    color: var(--medium-gray);
-    z-index: 1;
-}
-
-.search-input {
-    flex: 1;
-    padding: 0.6rem 7rem 0.6rem 2.75rem;
+.filter-input-direct {
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
     border: 2px solid var(--light-gray);
     border-radius: var(--radius-md);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    min-width: 200px;
+    outline: none;
     transition: var(--transition-normal);
+}
+
+.filter-input-direct:focus {
+    border-color: var(--primary-color);
+}
+
+.filter-input-btn {
+    position: absolute;
+    right: 0.25rem;
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.filter-input-btn:hover {
+    opacity: 0.9;
+}
+
+/* Dropdown personalizado con checkbox */
+.dropdown-custom {
+    position: relative;
+}
+
+/* Ocultar el checkbox */
+.dropdown-checkbox {
+    display: none;
+}
+
+.dropdown-toggle-custom {
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-normal);
+    user-select: none;
+}
+
+.dropdown-toggle-custom:hover {
+    border-color: var(--medium-gray);
     background: var(--lighter-gray);
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: var(--white);
+.dropdown-toggle-custom i {
+    font-size: 0.75rem;
+    transition: var(--transition-normal);
 }
 
+/* Rotar el ícono cuando el checkbox está marcado */
+.dropdown-checkbox:checked + .dropdown-toggle-custom i {
+    transform: rotate(180deg);
+}
 
-.clear-search {
+.dropdown-menu-custom {
     position: absolute;
-    right: 0.5rem;
-    background: var(--danger-color);
-    color: var(--white);
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    text-decoration: none;
-    transition: var(--transition-normal);
-}
-
-.clear-search:hover {
-    background: #c82333;
-    transform: scale(1.1);
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.filter-btn {
-    padding: 0.5rem 1.5rem;
-    border: 2px solid var(--light-gray);
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: auto;
     background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Si el dropdown está cerca del borde derecho, alinearlo a la derecha */
+.dropdown-custom:last-child .dropdown-menu-custom {
+    left: auto;
+    right: 0;
+}
+
+/* Mostrar el menú cuando el checkbox está marcado */
+.dropdown-checkbox:checked ~ .dropdown-menu-custom {
+    display: block;
+}
+
+.dropdown-item-custom {
+    display: block;
+    padding: 0.75rem 1rem;
     color: var(--text-primary);
-    border-radius: 25px;
-    font-size: 0.9rem;
-    font-weight: 500;
     text-decoration: none;
-    display: inline-block;
+    transition: var(--transition-fast);
+    border-bottom: 1px solid var(--lighter-gray);
+}
+
+.dropdown-item-custom:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item-custom:hover {
+    background: var(--lighter-gray);
+}
+
+.dropdown-item-custom.active {
+    background: var(--primary-gradient);
+    color: var(--white);
+}
+
+/* Dropdown de búsqueda */
+.search-dropdown {
+    min-width: 300px;
+}
+
+.search-dropdown-form {
+    display: flex;
+    padding: 0.75rem;
+    gap: 0.5rem;
+}
+
+.search-dropdown-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    outline: none;
     transition: var(--transition-normal);
 }
 
-.filter-btn:hover {
-    border-color: var(--medium-gray);
-    color: var(--dark-gray);
-    transform: translateY(-2px);
+.search-dropdown-input:focus {
+    border-color: var(--primary-color);
 }
 
-.filter-btn.active {
+.search-dropdown-btn {
     background: var(--primary-gradient);
-    border-color: var(--primary-dark);
-    color: var(--text-light);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-normal);
 }
 
-/* Stores Grid */
-.stores-grid {
+.search-dropdown-btn:hover {
+    opacity: 0.9;
+}
+
+/* ============================================
+   GRID DE LOCALES - DISEÑO HORIZONTAL
+   ============================================ */
+
+.stores-grid-horizontal {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
 }
 
-/* Store Card */
-.store-card {
-    background: var(--bg-secondary);
+/* Tarjeta Horizontal */
+.store-card-horizontal {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-md);
     transition: var(--transition-normal);
-    display: flex;
-    flex-direction: column;
+    min-height: 120px;
 }
 
-.store-card:hover {
-    transform: translateY(-8px);
+.store-card-horizontal:hover {
+    transform: translateY(-4px);
     box-shadow: var(--shadow-xl);
 }
 
-/* Store Card Header */
-.store-card-header {
-    padding: 1.5rem;
-    background: var(--primary-gradient);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.store-card-horizontal:hover .store-promotions-btn {
+    opacity: 1;
+    max-height: 50px;
+    padding: 0.6rem 1.25rem;
+    margin: 0.75rem 1rem;
 }
 
-.store-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+/* Contenedor superior para logo e info */
+.store-card-horizontal > div:first-child {
+    display: flex;
+    flex: 1;
+}
+
+/* Sección del Logo (Izquierda - 30%) */
+.store-logo-section {
+    width: 30%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    padding: 0.5rem;
 }
 
-.store-icon i {
-    font-size: 1.5rem;
-    color: var(--text-light);
+.store-logo-icon {
+    font-size: 3rem;
+    color: var(--white);
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
-.store-category {
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--primary-dark);
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    backdrop-filter: blur(10px);
-}
-
-/* Store Card Body */
-.store-card-body {
-    padding: 1.5rem;
-    flex-grow: 1;
-}
-
-.store-name {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.store-info {
+/* Sección de Información (Derecha - 70%) */
+.store-info-section {
+    width: 70%;
+    padding: 1.25rem 1.5rem;
+    background: var(--white);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    justify-content: center;
 }
 
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.store-brand-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+}
+
+.store-location {
+    font-size: 0.875rem;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
 }
 
-.info-item i {
-    width: 20px;
-    color: var(--medium-gray);
-}
-
-/* Store Card Footer */
-.store-card-footer {
-    padding: 1.5rem;
-    border-top: 1px solid var(--light-gray);
-}
-
-.btn-promotions {
-    width: 100%;
-    padding: 0.75rem 1.5rem;
+/* Botón de Promociones */
+.store-promotions-btn {
     background: var(--primary-gradient);
-    color: var(--text-light);
+    color: var(--white);
     border: none;
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    max-height: 0;
+    padding: 0 1.25rem;
+    margin: 0 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    align-self: center;
+    width: calc(100% - 2rem);
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    transition: var(--transition-normal);
 }
 
-.btn-promotions:hover {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-lg);
-    color: var(--text-light);
+.store-promotions-btn:hover {
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.1);
 }
 
-.btn-promotions i {
-    font-size: 1.1rem;
+.store-promotions-btn:active {
+    filter: brightness(0.95);
 }
 
-/* No Stores Message */
-.no-stores {
+/* ============================================
+   MENSAJE SIN RESULTADOS
+   ============================================ */
+
+.no-results {
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
     color: var(--text-secondary);
 }
 
-.no-stores i {
+.no-results i {
     font-size: 4rem;
     margin-bottom: 1rem;
     opacity: 0.3;
 }
 
-.no-stores p {
+.no-results p {
     font-size: 1.2rem;
 }
 
-/* Responsive Design */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
 @media (max-width: 768px) {
-    .page-title {
+    .stores-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stores-title {
         font-size: 2rem;
     }
-    
-    .page-subtitle {
-        font-size: 1rem;
+
+    .filter-dropdown-group {
+        width: 100%;
+        justify-content: flex-start;
     }
-    
-    .stores-grid {
+
+    .stores-grid-horizontal {
         grid-template-columns: 1fr;
     }
-    
-    .filter-buttons {
-        justify-content: flex-start;
+
+    .store-card-horizontal {
+        height: 100px;
+    }
+
+    .store-brand-name {
+        font-size: 1.25rem;
+    }
+
+    .store-logo-icon {
+        font-size: 2.5rem;
+    }
+
+    .container-custom {
+        padding: 0 1rem;
     }
 }
 
 @media (max-width: 576px) {
-    .main-content {
-        padding: 1rem 0;
-    }
-    
-    .page-title {
+    .stores-title {
         font-size: 1.75rem;
     }
-    
-    .filters-section {
+
+    .filter-dropdown-group {
+        gap: 0.5rem;
+    }
+
+    .dropdown-toggle-custom {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .filter-label {
+        font-size: 0.9rem;
+    }
+
+    .store-card-horizontal {
+        height: 90px;
+    }
+
+    .store-logo-section {
+        width: 35%;
+    }
+
+    .store-info-section {
+        width: 65%;
         padding: 1rem;
     }
-    
-    .filter-btn {
-        padding: 0.4rem 1rem;
+
+    .store-brand-name {
+        font-size: 1.1rem;
+    }
+
+    .store-location {
         font-size: 0.85rem;
+    }
+
+    .store-logo-icon {
+        font-size: 2rem;
     }
 }

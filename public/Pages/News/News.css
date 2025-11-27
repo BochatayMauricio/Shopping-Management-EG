@@ -1,0 +1,323 @@
+/* ============================================
+   NEWS PAGE - NOVEDADES
+   ============================================ */
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.container-custom {
+    max-width: 900px;
+    width: 100%;
+    padding: 0 2rem;
+}
+
+/* ============================================
+   TÍTULO DE LA SECCIÓN
+   ============================================ */
+
+.news-section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   TARJETA DE NOVEDAD
+   ============================================ */
+
+.news-card {
+    background: var(--white);
+    border-radius: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Ocultar los radio inputs */
+.news-radio {
+    display: none;
+}
+
+/* Contenedor de slides */
+.news-slider-container {
+    position: relative;
+    width: 100%;
+}
+
+/* Cada slide */
+.news-slide {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Mostrar el slide cuando su radio está checked */
+#news-0:checked ~ .news-slider-container .news-slide[data-slide="0"],
+#news-1:checked ~ .news-slider-container .news-slide[data-slide="1"],
+#news-2:checked ~ .news-slider-container .news-slide[data-slide="2"],
+#news-3:checked ~ .news-slider-container .news-slide[data-slide="3"],
+#news-4:checked ~ .news-slider-container .news-slide[data-slide="4"] {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Imagen de Portada */
+.news-image-container {
+    height: 320px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.news-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.news-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+}
+
+/* Contenido de la Noticia */
+.news-content {
+    padding: 2rem;
+    padding-bottom: 1rem;
+}
+
+/* Título */
+.news-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+/* Meta Data (Autor) */
+.news-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.news-author-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--dark-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 0.75rem;
+}
+
+.news-author-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Descripción */
+.news-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+}
+
+.news-read-more {
+    color: var(--text-primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+    margin-left: 0.25rem;
+    transition: var(--transition-fast);
+}
+
+.news-read-more:hover {
+    color: var(--dark-color);
+    text-decoration-color: var(--dark-color);
+}
+
+/* ============================================
+   NAVEGACIÓN DEL SLIDER
+   ============================================ */
+
+.news-navigation {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+}
+
+.news-nav-arrows-container {
+    position: relative;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Ocultar todas las flechas por defecto */
+.news-nav-arrow {
+    display: none;
+    color: var(--medium-gray);
+    transition: var(--transition-fast);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Mostrar flecha anterior solo cuando el slide correspondiente está activo */
+#news-1:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="1"],
+#news-2:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="2"],
+#news-3:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="3"],
+#news-4:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="4"] {
+    display: block;
+}
+
+/* Mostrar flecha siguiente solo cuando el slide correspondiente está activo */
+#news-0:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="0"],
+#news-1:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="1"],
+#news-2:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="2"],
+#news-3:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="3"] {
+    display: block;
+}
+
+.news-nav-arrow:hover {
+    color: var(--dark-color);
+}
+
+.news-nav-next:hover {
+    transform: translateX(4px);
+}
+
+.news-nav-prev:hover {
+    transform: translateX(-4px);
+}
+
+/* Indicadores (Dots) */
+.news-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.news-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--light-gray);
+    transition: var(--transition-fast);
+    cursor: pointer;
+    display: block;
+}
+
+.news-dot:hover {
+    background: var(--medium-gray);
+}
+
+/* Activar el dot correspondiente según el radio checked */
+#news-0:checked ~ .news-navigation .news-dot[data-index="0"],
+#news-1:checked ~ .news-navigation .news-dot[data-index="1"],
+#news-2:checked ~ .news-navigation .news-dot[data-index="2"],
+#news-3:checked ~ .news-navigation .news-dot[data-index="3"],
+#news-4:checked ~ .news-navigation .news-dot[data-index="4"] {
+    background: var(--dark-color);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .container-custom {
+        padding: 0 1rem;
+    }
+
+    .news-section-title {
+        font-size: 1.75rem;
+    }
+
+    .news-image-container {
+        height: 250px;
+    }
+
+    .news-content {
+        padding: 1.5rem;
+    }
+
+    .news-title {
+        font-size: 1.5rem;
+    }
+
+    .news-description {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .news-section-title {
+        font-size: 1.5rem;
+    }
+
+    .news-card {
+        border-radius: 1.5rem;
+    }
+
+    .news-image-container {
+        height: 200px;
+    }
+
+    .news-content {
+        padding: 1.25rem;
+    }
+
+    .news-title {
+        font-size: 1.25rem;
+    }
+
+    .news-author-text {
+        font-size: 0.7rem;
+    }
+
+    .news-description {
+        font-size: 0.75rem;
+    }
+}

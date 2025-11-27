@@ -29,16 +29,13 @@ if(isset($_GET) && isset($_GET['action'])) {
                         <a class="nav-link" href="../../Pages/Stores/Stores.php">Locales</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/Promotions/Promotions.php">Promociones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/News/News.php">Novedades</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
-                    </li>
-                <?php endif; ?>
-                <?php if ($user && $user['userType'] === 'client'): ?>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../Pages/Stores/Stores.php">Tiendas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Promociones</a>
                     </li>
                 <?php endif; ?>
                 <?php if ($user && $user['userType'] === 'admin'): ?>
@@ -50,9 +47,6 @@ if(isset($_GET) && isset($_GET['action'])) {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Solicitudes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Novedades</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Reportes</a>
