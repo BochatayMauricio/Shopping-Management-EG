@@ -1,5 +1,6 @@
 <?php  
 require_once __DIR__. '/../config/config.php';
+include_once __DIR__ . '/alert.service.php';
 /**
  * Función para validar email
  * @param string $email
@@ -25,7 +26,7 @@ function authenticateUser($userName, $password) {
     }
     
     $userName = strtolower($userName);
-    $query = "SELECT * FROM users WHERE userName = '$userName'";
+    $query = "SELECT * FROM users WHERE name = '$userName'";
 
     $result = mysqli_query($CONNECTION, $query);
     
@@ -36,18 +37,20 @@ function authenticateUser($userName, $password) {
     }
 
     if($result->num_rows == 0){
+        AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
         return false;
     } 
 
     // Verificar la contraseña
     $user = $result->fetch_assoc();
-    if (!password_verify($password, $user['userPassword'])) {
+    if (!password_verify($password, $user['password'])) {
         return false; // Contraseña incorrecta
     }
 
     session_start();
     $_SESSION['user'] = $user;
     mysqli_close($CONNECTION);
+    AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
     return $user;
 }
 
@@ -62,6 +65,7 @@ function getUserRole() {
 function logout(){
     session_unset();
     session_destroy();
+    AlertService::success("Sesión cerrada correctamente.");
     header("Location: ./../../../public/Pages/Client Portal/clientPortal.php");
     exit();
 }

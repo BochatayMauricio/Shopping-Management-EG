@@ -15,7 +15,7 @@ if(isset($_GET) && isset($_GET['action'])) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
         <div class="container-fluid">
-            <a class="navbar-brand" href="">Shopping Rosario</a>
+            <a class="navbar-brand" href="../../Pages/Client Portal/clientPortal.php">Shopping Rosario</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -24,21 +24,22 @@ if(isset($_GET) && isset($_GET['action'])) {
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="../../Pages/Client Portal/clientPortal.php">Inicio</a>
                 </li>
-                <?php if(!$user): ?>
+                <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/News/News.php">Novedades</a>
+                </li>
+                <?php if(!$user || $user['type'] === 'client'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Stores/Stores.php">Locales</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Promotions/Promotions.php">Promociones</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../Pages/News/News.php">Novedades</a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
                     </li>
                 <?php endif; ?>
-                <?php if ($user && $user['userType'] === 'admin'): ?>
+                <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Gestion Locales</a>
                     </li>
@@ -61,8 +62,8 @@ if(isset($_GET) && isset($_GET['action'])) {
                             </div>
                             
                             <div class="user-info">
-                                <span class="user-name"><?php echo htmlspecialchars($user['userName']); ?></span>
-                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['userType']).'-'.htmlspecialchars($user['userCategory']); ?></small>
+                                <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
+                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['type']).'-'.htmlspecialchars($user['category']); ?></small>
                             </div>
                         </a>
                         <ul class="dropdown-menu">

@@ -57,6 +57,7 @@
                     </span>
                 </div>
                 <div id="password-error" class="sr-only" role="alert"></div>
+                <div id="userName-error" class="sr-only" role="alert"></div>
             </div>
 
             <button type="submit" class="login-button" id="loginBtn" name="loginBtn">

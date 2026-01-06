@@ -260,3 +260,32 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.news-section .section-title {
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.news-section .section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #0d6efd; /* Color principal */
+}
+
+.news-author-text {
+    font-size: 0.85rem;
+    font-style: italic;
+    display: block;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}

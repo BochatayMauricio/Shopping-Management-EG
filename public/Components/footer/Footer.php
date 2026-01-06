@@ -24,6 +24,9 @@
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#">Inicio</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="../../Pages/News/News.php">Novedades</a>
+                    </li>
                     <?php if(!$user): ?>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
@@ -32,7 +35,7 @@
                             <a class="nav-link text-white" href="#">Contacto</a>
                         </li>
                     <?php endif; ?>
-                    <?php if ($user && $user['userType'] === 'client'): ?>
+                    <?php if ($user && $user['type'] === 'client'): ?>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="#">Tiendas</a>
                         </li>
@@ -40,7 +43,7 @@
                             <a class="nav-link text-white" href="#">Ofertas</a>
                         </li>
                     <?php endif; ?>
-                    <?php if ($user && $user['userType'] === 'admin'): ?>
+                    <?php if ($user && $user['type'] === 'admin'): ?>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="#">Gestión Locales</a>
                         </li>

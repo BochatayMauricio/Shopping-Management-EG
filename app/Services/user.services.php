@@ -11,7 +11,7 @@ function registerUser($userName, $password) {
     }
     $userName = strtolower($userName);
 
-    $checkQuery = "SELECT codUser FROM users WHERE userName = '$userName'";
+    $checkQuery = "SELECT cod FROM users WHERE name = '$userName'";
     $checkResult = mysqli_query($CONNECTION, $checkQuery);
     if ($checkResult->num_rows > 0) {
         AlertService::warning('El nombre de usuario ya existe.');
@@ -20,7 +20,7 @@ function registerUser($userName, $password) {
     // Hashear la contraseña antes de guardarla
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
 
-    $query="INSERT INTO users (userName, userPassword, userType, userCategory) VALUES ('$userName', '$passwordHashed', 'client', 'inicial')";
+    $query="INSERT INTO users (name, password, type, category) VALUES ('$userName', '$passwordHashed', 'client', 'inicial')";
     $result = mysqli_query($CONNECTION, $query);
     if (!$result) {
         AlertService::error("Error: " . mysqli_error($CONNECTION));
@@ -29,7 +29,7 @@ function registerUser($userName, $password) {
 
     $codUser = mysqli_insert_id($CONNECTION);
    
-    $query = "SELECT * FROM users WHERE codUser = $codUser";
+    $query = "SELECT * FROM users WHERE cod = $codUser";
     $result = mysqli_query($CONNECTION, $query);
     if (!$result) {
         AlertService::error("Error: " . mysqli_error($CONNECTION));

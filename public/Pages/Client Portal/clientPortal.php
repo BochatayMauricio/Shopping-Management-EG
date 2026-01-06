@@ -1,6 +1,7 @@
 <?php
 // Incluir servicios y iniciar sesión
 include_once '../../../app/Services/login.services.php';
+include_once '../../../app/Services/news.services.php';
 session_start();
 $user = getCurrentUser();
 
@@ -17,6 +18,8 @@ $allPromotions = [
     ['local' => 'Tienda E', 'discount' => 45, 'description' => '2x1 en toda la sección infantil', 'image' => '../../../assets/local2.jpg', 'rubro' => 'servicios'],
     ['local' => 'Tienda F', 'discount' => 10, 'description' => 'Regalo exclusivo con tu compra', 'image' => '../../../assets/local3.jpg', 'rubro' => 'hogar'],
 ];
+
+$news = getNews();
 
 // No hay lógica de filtrado ya que se eliminó la búsqueda.
 ?>
@@ -42,23 +45,34 @@ $allPromotions = [
         <p>Tu guía diaria de ofertas y novedades exclusivas.</p>
     </div>
 </header>
-<section class="news-section">
-    <h2 class="section-title">Últimas Novedades y Eventos</h2>
-    <div class="news-container">
-        <div class="news-card">
-            <h3>Noche de Compras Extrema</h3>
-            <p>¡Horario extendido hasta las 23:00hs con descuentos adicionales en tiendas seleccionadas!</p>
-            <span class="news-date">20 de Noviembre</span>
-        </div>
-        <div class="news-card">
-            <h3>Apertura: Local de Cafetería Premium</h3>
-            <p>Descubre el nuevo espacio de relax en el segundo piso. ¡Café gratis la primera hora!</p>
-            <span class="news-date">15 de Noviembre</span>
-        </div>
-        <div class="news-card">
-            <h3>Sorteo Semanal</h3>
-            <p>Participa en el sorteo de un voucher de $10.000 llenando nuestro formulario.</p>
-            <span class="news-date">10 de Noviembre</span>
+<section class="news-section my-5">
+    <div class="container">
+        <h2 class="section-title mb-4 fw-bold">Últimas Novedades y Eventos</h2>
+        
+        <div class="row g-4"> 
+            <?php foreach ($news as $novedad): ?>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark">
+                                <?php echo htmlspecialchars($novedad['title']); ?>
+                            </h5>
+                            
+                            <span class="news-author-text text-muted mb-2 italic">
+                                Por: <?php echo htmlspecialchars($novedad['author']); ?>
+                            </span>
+                            
+                            <p class="card-text text-secondary">
+                                <?php echo htmlspecialchars($novedad['description']); ?>
+                            </p>
+                            
+                            <div class="mt-auto">
+                                <a href="../../Pages/News/News.php" class="btn btn-link p-0 text-decoration-none fw-bold">Leer más →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

@@ -12,7 +12,7 @@ date_default_timezone_set(TIMEZONE);
  */
 $hostname = "localhost";
 $username = "root";
-$password = "root";
+$password = "vicen";
 $dbname = "shopping_management";
 $dbport = 3306;
 
