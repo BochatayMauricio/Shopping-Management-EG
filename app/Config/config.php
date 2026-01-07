@@ -34,7 +34,7 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS users (
         cod INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        password VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(100) NOT NULL,
         type VARCHAR(15) NOT NULL,
         category VARCHAR(10) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -42,7 +42,10 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS stores (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
+        logo VARCHAR(50) DEFAULT 'default_logo.png',
+        color VARCHAR(7) DEFAULT '#0d6efd',
         ubication VARCHAR(50) NOT NULL,
+        local_number VARCHAR(10) NOT NULL,
         category VARCHAR(30) NOT NULL,
         id_owner INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,13 +53,17 @@ $tables = [
     )",
     "CREATE TABLE IF NOT EXISTS promotions (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(100) NOT NULL AFTER id,
         description VARCHAR(200) NOT NULL,
+        image VARCHAR(255) DEFAULT NULL AFTER description,
         date_from DATE NOT NULL,
         date_until DATE NOT NULL,
         client_category VARCHAR(15) NOT NULL,
         week_days VARCHAR(255) NOT NULL,
         status VARCHAR(15) NOT NULL,
         discount DECIMAL(5,2) NOT NULL,
+        price DECIMAL(10,2) DEFAULT NULL AFTER discount,
+        original_price DECIMAL(10,2) DEFAULT NULL AFTER price,
         id_store INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (id_store) REFERENCES stores(id) ON DELETE CASCADE ON UPDATE CASCADE
