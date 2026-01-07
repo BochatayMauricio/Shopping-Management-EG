@@ -62,7 +62,7 @@ $news = getNews();
                                 Por: <?php echo htmlspecialchars($novedad['author']); ?>
                             </span>
                             
-                            <p class="card-text text-secondary">
+                            <p class="card-text text-secondary text-truncate-custom">
                                 <?php echo htmlspecialchars($novedad['description']); ?>
                             </p>
                             

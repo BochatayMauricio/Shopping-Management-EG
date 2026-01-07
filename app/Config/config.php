@@ -70,6 +70,15 @@ $tables = [
         PRIMARY KEY (id_client, id_promotion),
         FOREIGN KEY (id_client) REFERENCES users(cod) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_promotion) REFERENCES promotions(id) ON DELETE CASCADE ON UPDATE CASCADE
+    )",
+    "CREATE TABLE IF NOT EXISTS `news` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `title` VARCHAR(255) NOT NULL,
+        `description` TEXT NOT NULL,
+        `image` VARCHAR(255) DEFAULT NULL,
+        `author` VARCHAR(100) NOT NULL,
+        `date` DATE NOT NULL,
+        PRIMARY KEY (`id`)
     )"
 ];
 

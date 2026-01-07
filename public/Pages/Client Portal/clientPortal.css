@@ -289,3 +289,12 @@ body {
 .card:hover {
     transform: translateY(-5px);
 }
+
+.text-truncate-custom {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Número de líneas que quieres mostrar */
+    -webkit-box-orient: vertical;  
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

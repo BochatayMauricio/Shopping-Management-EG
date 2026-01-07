@@ -27,7 +27,7 @@ if(isset($_GET) && isset($_GET['action'])) {
                 <li class="nav-item">
                         <a class="nav-link" href="../../Pages/News/News.php">Novedades</a>
                 </li>
-                <?php if(!$user || $user['type'] === 'client'): ?>
+                <?php if(!$user || $user['type'] === 'client' || $user['type'] === 'owner'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Stores/Stores.php">Locales</a>
                     </li>
@@ -41,7 +41,7 @@ if(isset($_GET) && isset($_GET['action'])) {
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Gestion Locales</a>
+                        <a class="nav-link" href="../../Pages/Stores/Stores.php">Gestion Locales</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Validar Cuentas</a>
