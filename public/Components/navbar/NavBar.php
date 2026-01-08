@@ -36,7 +36,7 @@ if(isset($_GET) && isset($_GET['action'])) {
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
+                        <a class="nav-link" href="../../Pages/Contact/contact.php">Contacto</a>
                     </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>

@@ -47,78 +47,40 @@ $news = getNews();
 
     <main class="main-content">
         <div class="container-custom">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="news-section-title mb-0">Novedades</h2>
-                
-                <?php if($user && $user['type'] === 'admin'): ?>
-                    <button type="button" class="btn btn-primary admin-fab" data-bs-toggle="modal" data-bs-target="#createNewsModal">
-                        <i class="fa-solid fa-plus me-2"></i> Crear Novedad
-                    </button>
-                <?php endif; ?>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="news-section-title mb-4 pt-4">Novedades</h2>
+        
+        <?php if($user && $user['type'] === 'admin'): ?>
+            <button type="button" class="btn btn-primary admin-fab" data-bs-toggle="modal" data-bs-target="#createNewsModal">
+                <i class="fa-solid fa-plus me-2"></i> Crear Novedad
+            </button>
+        <?php endif; ?>
+    </div>
 
-            <div class="news-card">
-                <?php foreach ($news as $index => $item): ?>
-                    <input type="radio" name="news-slider" id="news-<?php echo $index; ?>" class="news-radio" <?php echo $index === 0 ? 'checked' : ''; ?>>
-                <?php endforeach; ?>
-
-                <div class="news-slider-container">
-                    <?php foreach ($news as $index => $item): ?>
-                        <div class="news-slide" data-slide="<?php echo $index; ?>">
-                            <div class="news-image-container">
-                                <img src="<?php echo htmlspecialchars($item['image']); ?>" class="news-image">
-                                <div class="news-image-overlay"></div>
-                            </div>
-                            <div class="news-content">
-                                <h3 class="news-title"><?php echo htmlspecialchars($item['title']); ?></h3>
-                                <div class="news-meta">
-                                    <i class="fa-regular fa-user"></i>
-                                    <span class="news-author-text">Por: <?php echo htmlspecialchars($item['author']); ?></span>
-                                </div>
-                                <p class="news-description text-truncate-custom">
-                                    <?php echo htmlspecialchars($item['description']); ?>
-                                </p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+    <div class="news-grid">
+        <?php foreach ($news as $item): ?>
+            <div class="news-item-card">
+                <div class="news-image-container">
+                    <img src="<?php echo htmlspecialchars($item['image']); ?>" class="news-image" alt="Novedad">
+                    <div class="news-image-overlay"></div>
                 </div>
-
-                <div class="news-navigation">
-                    <div class="news-nav-arrows-container">
-                        <?php for ($i = 0; $i < count($news); $i++): ?>
-                            <?php if ($i > 0): ?>
-                                <label for="news-<?php echo $i - 1; ?>" 
-                                    class="news-nav-arrow news-nav-prev"
-                                    data-for-slide="<?php echo $i; ?>">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </label>
-                            <?php endif; ?>
-                        <?php endfor; ?>
+                <div class="news-content">
+                    <h3 class="news-title"><?php echo htmlspecialchars($item['title']); ?></h3>
+                    <div class="news-meta">
+                        <i class="fa-regular fa-user"></i>
+                        <span class="news-author-text">Por: <?php echo htmlspecialchars($item['author']); ?></span>
+                        <span class="news-date-text ms-3">
+                            <i class="fa-regular fa-calendar"></i> <?php echo date("d/m/Y", strtotime($item['date'])); ?>
+                        </span>
                     </div>
-
-                    <div class="news-dots">
-                        <?php for ($i = 0; $i < count($news); $i++): ?>
-                            <label for="news-<?php echo $i; ?>" 
-                                class="news-dot"
-                                data-index="<?php echo $i; ?>"></label>
-                        <?php endfor; ?>
-                    </div>
-
-                    <div class="news-nav-arrows-container">
-                        <?php for ($i = 0; $i < count($news); $i++): ?>
-                            <?php if ($i < count($news) - 1): ?>
-                                <label for="news-<?php echo $i + 1; ?>" 
-                                    class="news-nav-arrow news-nav-next"
-                                    data-for-slide="<?php echo $i; ?>">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </label>
-                            <?php endif; ?>
-                        <?php endfor; ?>
-                    </div>
+                    <p class="news-description">
+                        <?php echo htmlspecialchars($item['description']); ?>
+                    </p>
                 </div>
             </div>
-        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
 
         <?php if($user && $user['type'] === 'admin'): ?>
         <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">

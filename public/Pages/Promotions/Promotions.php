@@ -3,12 +3,14 @@ include_once __DIR__ . '/../../../app/Services/login.services.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
+include_once __DIR__ . '/../../../app/Services/stores.services.php';
 
 session_start();
 $user = getCurrentUser();
 
 // Datos reales de la base de datos
 $promotions = getPromotionsWithStoreData();
+$allStores = getAllStores();
 
 // Parámetros de filtros de la URL
 $filterCategory = isset($_GET['category']) ? trim($_GET['category']) : 'all';
@@ -54,6 +56,25 @@ $filteredPromotions = array_filter($promotions, function($promo) use ($filterCat
 });
 
 $activeCount = count($filteredPromotions);
+
+$activeFilters = [];
+if ($filterCategory !== 'all') $activeFilters['category'] = "Rubro: " . ucfirst($filterCategory);
+if ($filterDiscount !== 'all') {
+    $discountTexts = ['high' => '30% o más', 'medium' => '15% - 29%', 'special' => '2x1 / Especiales'];
+    $activeFilters['discount'] = "Descuento: " . ($discountTexts[$filterDiscount] ?? $filterDiscount);
+}
+if ($filterStore !== 'all') $activeFilters['store'] = "Local: " . $filterStore;
+if ($filterClientCategory !== 'all') $activeFilters['client_category'] = "Categoría: " . ucfirst($filterClientCategory);
+
+function buildFilterUrl($paramName, $paramValue) {
+    $params = $_GET; // Obtenemos todos los parámetros actuales
+    if ($paramValue === 'all') {
+        unset($params[$paramName]); // Si es 'all', quitamos el filtro de la URL
+    } else {
+        $params[$paramName] = $paramValue; // Si no, agregamos o actualizamos el valor
+    }
+    return '?' . http_build_query($params); // Retornamos la nueva cadena de consulta
+}
 ?>
 
 <!DOCTYPE html>
@@ -76,72 +97,90 @@ $activeCount = count($filteredPromotions);
     <main class="main-content">
         <div class="container-custom">
             
-            <div class="promotions-header">
+<div class="promotions-header">
                 <div class="promotions-title-section">
-                    <h1 class="promotions-title">Promociones</h1>
+                    <h1 class="promotions-title mb-4 pt-4">Promociones</h1>
                     <span class="promotions-badge"><?php echo $activeCount; ?> Ofertas activas</span>
                 </div>
                 
-                <div class="promotions-filters">
-                    <span class="filter-label">Filtrar por:</span>
-                    
-                    <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-rubro-promo" class="dropdown-checkbox">
-                        <label for="dropdown-rubro-promo" class="dropdown-toggle-custom">
-                            Rubro <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?category=all" class="dropdown-item-custom">Todos</a>
-                            <a href="?category=gastronomia" class="dropdown-item-custom">Gastronomía</a>
-                            <a href="?category=ropa" class="dropdown-item-custom">Ropa</a>
-                            <a href="?category=tecnologia" class="dropdown-item-custom">Tecnología</a>
-                            <a href="?category=deportes" class="dropdown-item-custom">Deportes</a>
-                        </div>
-                    </div>
+<div class="promotions-filters">
+    <span class="filter-label">Filtrar por:</span>
+    
+    <div class="dropdown-custom">
+        <input type="checkbox" id="dropdown-rubro-promo" class="dropdown-checkbox">
+        <label for="dropdown-rubro-promo" class="dropdown-toggle-custom">
+            Rubro <i class="fas fa-chevron-down"></i>
+        </label>
+        <div class="dropdown-menu-custom">
+            <a href="<?php echo buildFilterUrl('category', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+            <a href="<?php echo buildFilterUrl('category', 'gastronomia'); ?>" class="dropdown-item-custom">Gastronomía</a>
+            <a href="<?php echo buildFilterUrl('category', 'ropa'); ?>" class="dropdown-item-custom">Ropa</a>
+            <a href="<?php echo buildFilterUrl('category', 'tecnologia'); ?>" class="dropdown-item-custom">Tecnología</a>
+            <a href="<?php echo buildFilterUrl('category', 'deportes'); ?>" class="dropdown-item-custom">Deportes</a>
+        </div>
+    </div>
 
-                    <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-descuento" class="dropdown-checkbox">
-                        <label for="dropdown-descuento" class="dropdown-toggle-custom">
-                            Descuentos <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?discount=all" class="dropdown-item-custom">Todos</a>
-                            <a href="?discount=high" class="dropdown-item-custom">30% o más</a>
-                            <a href="?discount=medium" class="dropdown-item-custom">15% - 29%</a>
-                            <a href="?discount=special" class="dropdown-item-custom">2x1 / Especiales</a>
-                        </div>
-                    </div>
+    <div class="dropdown-custom">
+        <input type="checkbox" id="dropdown-descuento" class="dropdown-checkbox">
+        <label for="dropdown-descuento" class="dropdown-toggle-custom">
+            Descuentos <i class="fas fa-chevron-down"></i>
+        </label>
+        <div class="dropdown-menu-custom">
+            <a href="<?php echo buildFilterUrl('discount', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+            <a href="<?php echo buildFilterUrl('discount', 'high'); ?>" class="dropdown-item-custom">30% o más</a>
+            <a href="<?php echo buildFilterUrl('discount', 'medium'); ?>" class="dropdown-item-custom">15% - 29%</a>
+            <a href="<?php echo buildFilterUrl('discount', 'special'); ?>" class="dropdown-item-custom">2x1 / Especiales</a>
+        </div>
+    </div>
 
-                    <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-local" class="dropdown-checkbox">
-                        <label for="dropdown-local" class="dropdown-toggle-custom">
-                            Local <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?store=all" class="dropdown-item-custom">Todos</a>
-                            <?php
-                            $uniqueStores = array_unique(array_column($promotions, 'store_name'));
-                            foreach ($uniqueStores as $storeName): ?>
-                                <a href="?store=<?php echo urlencode($storeName); ?>" class="dropdown-item-custom">
-                                    <?php echo htmlspecialchars($storeName); ?>
+    <div class="dropdown-custom">
+        <input type="checkbox" id="dropdown-local" class="dropdown-checkbox">
+        <label for="dropdown-local" class="dropdown-toggle-custom">
+            Local <i class="fas fa-chevron-down"></i>
+        </label>
+<div class="dropdown-menu-custom">
+    <a href="<?php echo buildFilterUrl('store', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+    <?php foreach ($allStores as $store): ?>
+        <a href="<?php echo buildFilterUrl('store', $store['name']); ?>" class="dropdown-item-custom">
+            <?php echo htmlspecialchars($store['name']); ?>
+        </a>
+    <?php endforeach; ?>
+</div>
+    </div>
+
+    <div class="dropdown-custom">
+        <input type="checkbox" id="dropdown-client-category" class="dropdown-checkbox">
+        <label for="dropdown-client-category" class="dropdown-toggle-custom">
+            Categoría <i class="fas fa-chevron-down"></i>
+        </label>
+        <div class="dropdown-menu-custom">
+            <a href="<?php echo buildFilterUrl('client_category', 'all'); ?>" class="dropdown-item-custom">Todas</a>
+            <a href="<?php echo buildFilterUrl('client_category', 'inicial'); ?>" class="dropdown-item-custom">Inicial</a>
+            <a href="<?php echo buildFilterUrl('client_category', 'medium'); ?>" class="dropdown-item-custom">Medium</a>
+            <a href="<?php echo buildFilterUrl('client_category', 'premium'); ?>" class="dropdown-item-custom">Premium</a>
+        </div>
+    </div>
+</div>
+
+                <?php if (!empty($activeFilters)): ?>
+                    <div class="active-filters-container mt-3 d-flex flex-wrap gap-2 align-items-center">
+                        <span class="small text-muted fw-medium me-2">Filtros aplicados:</span>
+                        <?php foreach ($activeFilters as $key => $label): ?>
+                            <div class="filter-chip">
+                                <?php echo htmlspecialchars($label); ?>
+                                <a href="?<?php 
+                                    $params = $_GET; 
+                                    unset($params[$key]); 
+                                    echo http_build_query($params); 
+                                ?>" class="ms-2 text-decoration-none">
+                                    <i class="fas fa-times-circle"></i>
                                 </a>
-                            <?php endforeach; ?>
-                        </div>
+                            </div>
+                        <?php endforeach; ?>
+                        
+                        <a href="Promotions.php" class="btn-clear-all ms-2">Limpiar todos</a>
                     </div>
-
-                    <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-client-category" class="dropdown-checkbox">
-                        <label for="dropdown-client-category" class="dropdown-toggle-custom">
-                            Categoría <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?client_category=all" class="dropdown-item-custom">Todas</a>
-                            <a href="?client_category=inicial" class="dropdown-item-custom">Inicial</a>
-                            <a href="?client_category=medium" class="dropdown-item-custom">Medium</a>
-                            <a href="?client_category=premium" class="dropdown-item-custom">Premium</a>
-                        </div>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
 
             <div class="promotions-grid">
@@ -202,7 +241,6 @@ $activeCount = count($filteredPromotions);
                     <div class="no-results">
                         <i class="fas fa-search"></i>
                         <p>No se encontraron promociones con los filtros seleccionados</p>
-                        <a href="Promotions.php" class="btn btn-link">Limpiar filtros</a>
                     </div>
                 <?php endif; ?>
             </div>
