@@ -3,6 +3,7 @@
 define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
+define('BASE_URL', 'http://localhost/Shopping-Management-EG/');
 
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);

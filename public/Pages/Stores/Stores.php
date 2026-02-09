@@ -245,7 +245,6 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     </div>
 
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Lógica de Vista Previa Dinámica
@@ -305,7 +304,7 @@ function renderStoreCard($store, $isMine) {
             </div>
         </div>
         <div class="store-card-footer d-flex gap-2">
-            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promos</a>
+            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>
             <?php if($isMine): ?>
                 <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= $store['ubication'] ?>', '<?= $store['local_number'] ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
             <?php endif; ?>

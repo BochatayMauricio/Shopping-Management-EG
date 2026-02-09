@@ -15,11 +15,12 @@ $user = getCurrentUser();
     <title>Contacto - Shopping Rosario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="contact.css">
 </head>
 <body>
-    <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
+    <?php include_once '../../Components/navbar/NavBar.php'; ?>
 
     <main class="main-content container py-5">
         <div class="mx-auto" style="max-width: 850px;">
@@ -84,7 +85,7 @@ $user = getCurrentUser();
                         <div class="col-md-4">
                             <i class="fas fa-envelope text-primary mb-2"></i>
                             <p class="mb-0 small fw-bold">Email</p>
-                            <span class="text-secondary">info@rosario.com</span>
+                            <span class="text-secondary">info@shoppingrosario.com</span>
                         </div>
                         <div class="col-md-4">
                             <i class="fas fa-clock text-primary mb-2"></i>
@@ -101,7 +102,7 @@ $user = getCurrentUser();
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
 
     <?php if(isset($_GET['success'])): ?>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <script>
             Swal.fire({
                 title: '¡Mensaje Enviado!',

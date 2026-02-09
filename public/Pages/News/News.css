@@ -1,6 +1,3 @@
-/* ============================================
-   NEWS GRID - NOVEDADES APILADAS
-   ============================================ */
 
 /* Contenedor principal de la sección */
 .container-custom {
@@ -139,4 +136,29 @@
     .news-grid {
         grid-template-columns: 1fr; /* Una sola columna en móviles pequeños */
     }
+}
+
+/* Asegura que el contenedor de la cabecera ocupe todo el ancho disponible */
+.d-flex.justify-content-between {
+    width: 100%;
+    border-bottom: 2px solid #f8f9fa; /* Opcional: una línea sutil divisoria */
+    padding-bottom: 1rem;
+}
+
+.news-section-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    /* Quitamos el margin por defecto para que el flex lo centre bien verticalmente */
+    margin: 0; 
+}
+
+/* Estilo para el botón de registro de novedades */
+.btn-primary {
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }
