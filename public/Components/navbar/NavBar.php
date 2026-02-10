@@ -69,7 +69,7 @@ if(isset($_GET['action']) && $_GET['action'] === 'logout') {
                             </div>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
+                            <li><a class="dropdown-item" href="../../Pages/Customer Portal/customerPortal.php"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt me-2"></i>Solicitudes</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>

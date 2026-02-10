@@ -534,3 +534,104 @@ body {
 .clear-all-link:hover {
     text-decoration: underline;
 }
+
+/* Filtro de escala de grises para la tarjeta bloqueada */
+.promo-locked {
+    filter: grayscale(0.6);
+    cursor: not-allowed;
+    position: relative;
+}
+
+/* Capa oscura sobre la imagen */
+.promo-lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 5;
+    transition: opacity 0.3s ease;
+}
+
+/* Botón deshabilitado */
+.btn-locked {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.promo-card:hover .promo-lock-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Botón cuando ya se obtuvo */
+.btn-obtained {
+    background-color: #10b981 !important; /* Verde esmeralda */
+    border-color: #10b981 !important;
+    color: white !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+/* Botón cuando ya se usó */
+.btn-used {
+    background-color: #94a3b8 !important; /* Gris azulado */
+    border-color: #94a3b8 !important;
+    color: white !important;
+    cursor: not-allowed;
+}
+
+/* Animación sutil para el check */
+.btn-obtained i {
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}
+
+.promo-expired-gray {
+    filter: grayscale(1);
+    opacity: 0.6;
+    pointer-events: none; /* Evita cualquier interacción */
+}
+
+.promo-expired-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    z-index: 10;
+}
+/* Tarjeta grisácea */
+.promo-expired {
+    filter: grayscale(0.8) opacity(0.7);
+}
+
+/* Cartel de finalizada sobre la imagen */
+.promo-expired-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Botón de vencida */
+.btn-expired {
+    background-color: #343a40 !important;
+    border-color: #343a40 !important;
+    cursor: not-allowed;
+}

@@ -9,8 +9,11 @@ function getPromotionsWithStoreData() {
                 p.title, 
                 p.image, 
                 p.description,
-                CONCAT('-', CAST(p.discount AS UNSIGNED), '% OFF') as discount_label,
+                -- Traemos la fecha real para las comparaciones de PHP (Línea clave)
+                p.date_until, 
+                -- Traemos la fecha formateada para la vista
                 DATE_FORMAT(p.date_until, '%d/%m') as valid_until,
+                CONCAT('-', CAST(p.discount AS UNSIGNED), '% OFF') as discount_label,
                 p.price, 
                 p.original_price, 
                 s.name as store_name, 
@@ -32,7 +35,7 @@ function getPromotionsWithStoreData() {
     }
 
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
-};
+}
 
 function createPromotion($data) {
     global $CONNECTION;
@@ -64,4 +67,76 @@ function createPromotion($data) {
     );
     
     return mysqli_stmt_execute($stmt);
+}
+
+function hasClientRequestedPromo($clientId, $promoId) {
+    global $CONNECTION;
+    $query = "SELECT COUNT(*) as total FROM user_promotions WHERE id_client = ? AND id_promotion = ? AND status != 'canceled'";
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "ii", $clientId, $promoId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'] > 0;
+}
+
+/**
+ * Registra la solicitud de la promoción en la tabla relacional
+ */
+function requestPromotion($clientId, $promoId) {
+    global $CONNECTION;
+    
+    // 1. Evitar solicitudes duplicadas
+    if (hasClientRequestedPromo($clientId, $promoId)) {
+        return "already_requested";
+    }
+
+    // 2. Insertar la nueva relación
+    $query = "INSERT INTO user_promotions (id_client, id_promotion, date_from, status) VALUES (?, ?, NOW(), 'active')";
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "ii", $clientId, $promoId);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        return true;
+    }
+    return false;
+}
+
+function getPromotionRequestStatus($clientId, $promoId) {
+    global $CONNECTION;
+    $query = "SELECT status FROM user_promotions WHERE id_client = ? AND id_promotion = ?";
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "ii", $clientId, $promoId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row['status']; // Retornará 'active' (obtenida) o 'used' (usada)
+    }
+    return false; // No solicitada aún
+}
+
+function getClientPromotions($clientId) {
+    global $CONNECTION;
+    
+    $query = "SELECT p.*, 
+                     CONCAT('-', CAST(p.discount AS UNSIGNED), '% OFF') as discount_label,
+                     DATE_FORMAT(p.date_until, '%d/%m/%Y') as valid_until,
+                     -- Comparamos la fecha actual con la de vencimiento
+                     IF(p.date_until < CURDATE(), 1, 0) as is_expired,
+                     cp.status as request_status, 
+                     cp.date_from as obtained_at, 
+                     s.name as store_name, 
+                     s.logo as store_logo, 
+                     s.color as store_color
+              FROM user_promotions cp
+              JOIN promotions p ON cp.id_promotion = p.id
+              JOIN stores s ON p.id_store = s.id
+              WHERE cp.id_client = ? AND cp.status = 'active'
+              ORDER BY is_expired ASC, p.date_until ASC"; // Primero las vigentes, luego las vencidas
+    
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $clientId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }

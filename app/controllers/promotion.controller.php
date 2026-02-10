@@ -34,3 +34,53 @@ if (isset($_POST['btnCreatePromo'])) {
     }
     exit();
 }
+
+if (isset($_POST['btnRequestPromo'])) {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    
+    $clientId = $_SESSION['user']['cod'] ?? $_SESSION['user']['id'];
+    $promoId = $_POST['id_promotion'];
+    $userCategory = $_SESSION['user']['category'] ?? 'inicial';
+
+    // 1. Validación de seguridad básica: solo clientes
+    if ($_SESSION['user']['type'] !== 'client') {
+        header("Location: " . $_SERVER['PHP_SELF'] . "?request=denied");
+        exit();
+    }
+
+    // 2. Validación de Seguridad por Niveles (Protección contra bypass de HTML)
+    $levelWeights = ['inicial' => 1, 'medium' => 2, 'premium' => 3];
+    
+    // Necesitamos traer la info de la promo para saber qué nivel requiere
+    // Asumimos que tienes una función getPromotionById en tus servicios
+    $allPromos = getPromotionsWithStoreData();
+    $currentPromo = null;
+    foreach($allPromos as $p) {
+        if($p['id'] == $promoId) {
+            $currentPromo = $p;
+            break;
+        }
+    }
+
+    if ($currentPromo) {
+        $userWeight = $levelWeights[strtolower($userCategory)] ?? 1;
+        $promoWeight = $levelWeights[strtolower($currentPromo['client_category'])] ?? 1;
+
+        if ($userWeight < $promoWeight) {
+            header("Location: " . $_SERVER['PHP_SELF'] . "?request=level_low");
+            exit();
+        }
+    }
+
+    // 3. Procesar la solicitud
+    $result = requestPromotion($clientId, $promoId);
+
+    if ($result === true) {
+        header("Location: " . $_SERVER['PHP_SELF'] . "?request=success");
+    } elseif ($result === "already_requested") {
+        header("Location: " . $_SERVER['PHP_SELF'] . "?request=duplicate");
+    } else {
+        header("Location: " . $_SERVER['PHP_SELF'] . "?request=error");
+    }
+    exit();
+}
