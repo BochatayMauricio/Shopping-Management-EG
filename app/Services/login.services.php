@@ -66,7 +66,7 @@ function logout(){
     session_unset();
     session_destroy();
     AlertService::success("Sesión cerrada correctamente.");
-    header("Location: ./../../../public/Pages/Client Portal/clientPortal.php");
+    header("Location: ./../../../public/Pages/Home/home.php");
     exit();
 }
 

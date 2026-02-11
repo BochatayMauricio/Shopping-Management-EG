@@ -21,16 +21,17 @@ $news = getNews();
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="News.css">
     <style>
-        /* Mejoras estéticas adicionales */
+        /* Botón integrado al flujo del documento */
         .admin-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
             border-radius: 50px;
-            padding: 15px 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 12px 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-family: 'Poppins', sans-serif;
+            transition: transform 0.2s;
+        }
+        .admin-fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
         .modal-content { border-radius: 15px; border: none; font-family: 'Poppins', sans-serif; }
         .modal-header { background: #007bff; color: white; border-radius: 15px 15px 0 0; }
@@ -47,40 +48,42 @@ $news = getNews();
 
     <main class="main-content">
         <div class="container-custom">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="news-section-title mb-4 pt-4">Novedades</h2>
-        
-        <?php if($user && $user['type'] === 'admin'): ?>
-            <button type="button" class="btn btn-primary admin-fab" data-bs-toggle="modal" data-bs-target="#createNewsModal">
-                <i class="fa-solid fa-plus me-2"></i> Crear Novedad
-            </button>
-        <?php endif; ?>
-    </div>
-
-    <div class="news-grid">
-        <?php foreach ($news as $item): ?>
-            <div class="news-item-card">
-                <div class="news-image-container">
-                    <img src="<?php echo htmlspecialchars($item['image']); ?>" class="news-image" alt="Novedad">
-                    <div class="news-image-overlay"></div>
-                </div>
-                <div class="news-content">
-                    <h3 class="news-title"><?php echo htmlspecialchars($item['title']); ?></h3>
-                    <div class="news-meta">
-                        <i class="fa-regular fa-user"></i>
-                        <span class="news-author-text">Por: <?php echo htmlspecialchars($item['author']); ?></span>
-                        <span class="news-date-text ms-3">
-                            <i class="fa-regular fa-calendar"></i> <?php echo date("d/m/Y", strtotime($item['date'])); ?>
-                        </span>
-                    </div>
-                    <p class="news-description">
-                        <?php echo htmlspecialchars($item['description']); ?>
-                    </p>
-                </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="news-section-title mb-4 pt-4">Novedades</h2>
             </div>
-        <?php endforeach; ?>
-    </div>
-</div>
+
+            <div class="news-grid">
+                <?php foreach ($news as $item): ?>
+                    <div class="news-item-card">
+                        <div class="news-image-container">
+                            <img src="<?php echo htmlspecialchars($item['image']); ?>" class="news-image" alt="Novedad">
+                            <div class="news-image-overlay"></div>
+                        </div>
+                        <div class="news-content">
+                            <h3 class="news-title"><?php echo htmlspecialchars($item['title']); ?></h3>
+                            <div class="news-meta">
+                                <i class="fa-regular fa-user"></i>
+                                <span class="news-author-text">Por: <?php echo htmlspecialchars($item['author']); ?></span>
+                                <span class="news-date-text ms-3">
+                                    <i class="fa-regular fa-calendar"></i> <?php echo date("d/m/Y", strtotime($item['date'])); ?>
+                                </span>
+                            </div>
+                            <p class="news-description">
+                                <?php echo htmlspecialchars($item['description']); ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if($user && $user['type'] === 'admin'): ?>
+                <div class="text-center mt-5 mb-5">
+                    <button type="button" class="btn btn-primary admin-fab" data-bs-toggle="modal" data-bs-target="#createNewsModal">
+                        <i class="fa-solid fa-plus me-2"></i> Crear Nueva Novedad
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <?php if($user && $user['type'] === 'admin'): ?>
         <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
@@ -124,5 +127,6 @@ $news = getNews();
     </main>
 
     <?php include_once '../../Components/footer/Footer.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

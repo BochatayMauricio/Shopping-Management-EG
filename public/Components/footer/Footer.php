@@ -22,7 +22,7 @@
             <div class="col-md-3">
                 <ul class="navbar-nav footer-nav">
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="#">Inicio</a>
+                        <a class="nav-link text-white" href="../../Pages/Home/home.php">Inicio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="../../Pages/News/News.php">Novedades</a>
@@ -32,32 +32,29 @@
                             <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Contacto</a>
+                            <a class="nav-link text-white" href="../../Pages/Contact/Contact.php">Contacto</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($user && $user['type'] === 'client'): ?>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Tiendas</a>
+                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Tiendas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Ofertas</a>
+                            <a class="nav-link text-white" href="../../Pages/Promotions/Promotions.php">Ofertas</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($user && $user['type'] === 'admin'): ?>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Gestión Locales</a>
+                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Gestión Locales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Validar Cuentas</a>
+                            <a class="nav-link text-white" href="../../Pages/Requests/Requests.php">Solicitudes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Solicitudes</a>
+                            <a class="nav-link text-white" href="../../Pages/News/News.php">Novedades</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Novedades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Reportes</a>
+                            <a class="nav-link text-white" href="../../Pages/Reports/Reports.php">Reportes</a>
                         </li>
                     <?php endif; ?>
                 </ul>
