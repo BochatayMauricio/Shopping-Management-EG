@@ -1,0 +1,180 @@
+
+.main-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Tarjeta de Perfil */
+.profile-card {
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.user-avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #0d6efd, #0043a8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2rem;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+}
+
+/* Estilo tipo Cupón/Ticket */
+.coupon-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.coupon-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.coupon-code-box {
+    background-color: #f1f5f9;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 2px;
+    color: #334155;
+}
+
+.coupon-expired {
+    filter: grayscale(0.8);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.coupon-expired .coupon-code-box {
+    text-decoration: line-through;
+    border-style: solid; /* Cambiamos dashed por solid para que parezca anulado */
+}
+
+/* --- Estilos Generales para el Portal --- */
+.main-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* --- Perfil del Administrador (userPortal.php) --- */
+.profile-card {
+    background: #ffffff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.user-avatar-circle {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #1e293b, #334155); /* Azul noche para admin */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    box-shadow: 0 5px 15px rgba(30, 41, 59, 0.2);
+}
+
+/* Botones de Navegación del Portal */
+.btn-primary.rounded-pill {
+    background-color: #0d6efd;
+    border: none;
+    padding: 10px 25px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-primary.rounded-pill:hover {
+    transform: translateY(-2px);
+    background-color: #0b5ed7;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+/* --- Módulo de Solicitudes (requests.php) --- */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.table thead th {
+    border: none;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.table tbody tr:hover {
+    transform: scale(1.01);
+    background-color: #fefefe;
+}
+
+.table td {
+    padding: 1.25rem 1rem;
+    border: none;
+}
+
+.table td:first-child { border-radius: 10px 0 0 10px; }
+.table td:last-child { border-radius: 0 10px 10px 0; }
+
+/* Botones de acción circular */
+.btn-success.rounded-pill, .btn-danger.rounded-pill {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* --- Módulo de Reportes (reports.php) --- */
+.card.rounded-4 {
+    border: none;
+    background: #ffffff;
+}
+
+.section-title {
+    font-weight: 800;
+    color: #1e293b;
+    border-left: 5px solid #0d6efd;
+    padding-left: 15px;
+}
+
+/* Efecto de borde dashed para estados vacíos */
+.border-dashed {
+    border: 2px dashed #cbd5e1 !important;
+    background-color: #f1f5f9;
+}
+
+/* Badge de Descuento en Tablas */
+.discount-tag {
+    background-color: #fee2e2;
+    color: #ef4444;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+
+/* Estilos de Gráficas */
+canvas {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Badges de Categoría en el Portal */
+.badge-premium { background-color: #f59e0b; color: #fff; }
+.badge-medium { background-color: #6366f1; color: #fff; }
+.badge-inicial { background-color: #94a3b8; color: #fff; }

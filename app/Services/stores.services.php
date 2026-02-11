@@ -106,3 +106,13 @@ function updateStore($id, $name, $ubication, $local_number) {
     
     return false;
 }
+
+/**
+ * Cuenta locales agrupados por su categoría (Gastronomía, Ropa, etc.)
+ */
+function getStoresStatsByCategory() {
+    global $CONNECTION;
+    $query = "SELECT category, COUNT(*) as total FROM stores GROUP BY category";
+    $result = mysqli_query($CONNECTION, $query);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}

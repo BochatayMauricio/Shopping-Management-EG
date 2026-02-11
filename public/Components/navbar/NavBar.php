@@ -41,18 +41,20 @@ if(isset($_GET['action']) && $_GET['action'] === 'logout') {
                         <a class="nav-link" href="../../Pages/Contact/contact.php">Contacto</a>
                     </li>
                 <?php endif; ?>
+                <?php if($user && $user['type'] === 'owner'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promoción</a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Stores/Stores.php">Gestion Locales</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Validar Cuentas</a>
+                        <a class="nav-link" href="../../Pages/Requests/requests.php">Solicitudes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Solicitudes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Reportes</a>
+                        <a class="nav-link" href="../../Pages/Reports/reports.php">Reportes</a>
                     </li>
                 <?php endif; ?>
                 <?php if ($user): ?>
@@ -69,7 +71,7 @@ if(isset($_GET['action']) && $_GET['action'] === 'logout') {
                             </div>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../../Pages/Customer Portal/customerPortal.php"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
+                            <li><a class="dropdown-item" href="../../Pages/User Portal/userPortal.php"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt me-2"></i>Solicitudes</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
