@@ -1,6 +1,11 @@
 /* ============================================
-   STORES PAGE - DISEÑO HORIZONTAL PROFESIONAL
+   CONFIGURACIÓN GLOBAL Y VARIABLES
    ============================================ */
+:root {
+    --transition-modern: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --card-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    --card-shadow-hover: 0 12px 24px rgba(0,0,0,0.1);
+}
 
 * {
     font-family: 'Poppins', sans-serif;
@@ -10,441 +15,250 @@
 }
 
 body {
-    background-color: var(--bg-primary);
+    background-color: #f8f9fa;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 .main-content {
-    flex: 1;
     padding: 2rem 0;
 }
 
 .container-custom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+    margin: 0 15px;
+    padding: 0 1.5rem;
 }
 
 /* ============================================
-   HEADER CON FILTROS
+   HEADER Y FILTROS
    ============================================ */
-
 .stores-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
 }
 
 .stores-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #212529;
+    letter-spacing: -0.5px;
 }
 
 .filter-dropdown-group {
+    background: white;
+    padding: 1rem;
+    border-radius: 15px;
+    border: 1px solid rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.filter-label {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-/* Input directo de búsqueda */
-.filter-input-form {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    position: relative;
-}
-
-.filter-input-direct {
-    padding: 0.5rem 2.5rem 0.5rem 1rem;
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    min-width: 200px;
-    outline: none;
-    transition: var(--transition-normal);
-}
-
-.filter-input-direct:focus {
-    border-color: var(--primary-color);
-}
-
-.filter-input-btn {
-    position: absolute;
-    right: 0.25rem;
-    background: var(--primary-gradient);
-    color: var(--white);
-    border: none;
-    padding: 0.4rem 0.75rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: var(--transition-normal);
-}
-
-.filter-input-btn:hover {
-    opacity: 0.9;
-}
-
-/* Dropdown personalizado con checkbox */
+/* Dropdown personalizado */
 .dropdown-custom {
     position: relative;
 }
 
-/* Ocultar el checkbox */
-.dropdown-checkbox {
-    display: none;
-}
+.dropdown-checkbox { display: none; }
 
 .dropdown-toggle-custom {
-    background: var(--white);
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-md);
-    padding: 0.5rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
-    color: var(--text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: var(--transition-normal);
-    user-select: none;
+    transition: var(--transition-modern);
 }
 
-.dropdown-toggle-custom:hover {
-    border-color: var(--medium-gray);
-    background: var(--lighter-gray);
-}
-
-.dropdown-toggle-custom i {
-    font-size: 0.75rem;
-    transition: var(--transition-normal);
-}
-
-/* Rotar el ícono cuando el checkbox está marcado */
-.dropdown-checkbox:checked + .dropdown-toggle-custom i {
-    transform: rotate(180deg);
+.dropdown-checkbox:checked ~ .dropdown-menu-custom {
+    display: block;
+    animation: fadeIn 0.2s ease;
 }
 
 .dropdown-menu-custom {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    top: 110%;
     left: 0;
-    right: auto;
-    background: var(--white);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    min-width: 200px;
-    max-width: 250px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    min-width: 180px;
     z-index: 1000;
     display: none;
     overflow: hidden;
-    white-space: nowrap;
-}
-
-/* Si el dropdown está cerca del borde derecho, alinearlo a la derecha */
-.dropdown-custom:last-child .dropdown-menu-custom {
-    left: auto;
-    right: 0;
-}
-
-/* Mostrar el menú cuando el checkbox está marcado */
-.dropdown-checkbox:checked ~ .dropdown-menu-custom {
-    display: block;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 .dropdown-item-custom {
     display: block;
-    padding: 0.75rem 1rem;
-    color: var(--text-primary);
+    padding: 0.8rem 1.2rem;
+    color: #495057;
     text-decoration: none;
-    transition: var(--transition-fast);
-    border-bottom: 1px solid var(--lighter-gray);
-}
-
-.dropdown-item-custom:last-child {
-    border-bottom: none;
-}
-
-.dropdown-item-custom:hover {
-    background: var(--lighter-gray);
-}
-
-.dropdown-item-custom.active {
-    background: var(--primary-gradient);
-    color: var(--white);
-}
-
-/* Dropdown de búsqueda */
-.search-dropdown {
-    min-width: 300px;
-}
-
-.search-dropdown-form {
-    display: flex;
-    padding: 0.75rem;
-    gap: 0.5rem;
-}
-
-.search-dropdown-input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-sm);
     font-size: 0.9rem;
-    outline: none;
-    transition: var(--transition-normal);
 }
 
-.search-dropdown-input:focus {
-    border-color: var(--primary-color);
-}
+.dropdown-item-custom:hover { background: #f0f7ff; color: #0d6efd; }
 
-.search-dropdown-btn {
-    background: var(--primary-gradient);
-    color: var(--white);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: var(--transition-normal);
-}
-
-.search-dropdown-btn:hover {
-    opacity: 0.9;
+/* ============================================
+   SISTEMA DE GRID (HORIZONTAL)
+   ============================================ */
+.stores-grid-container, 
+.stores-grid-horizontal {
+    display: grid;
+    /* Crea columnas de mínimo 320px que se expanden */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin-bottom: 3rem;
 }
 
 /* ============================================
-   GRID DE LOCALES - DISEÑO HORIZONTAL
+   TARJETA MODERNA (ESTILO CARD)
    ============================================ */
-
-.stores-grid-horizontal {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
-}
-
-/* Tarjeta Horizontal */
-.store-card-horizontal {
+.store-card-modern {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.06);
     display: flex;
     flex-direction: column;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition-normal);
-    min-height: 120px;
+    height: 100%;
+    transition: var(--transition-modern);
+    box-shadow: var(--card-shadow);
 }
 
-.store-card-horizontal:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+.store-card-modern:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--card-shadow-hover) !important;
 }
 
-.store-card-horizontal:hover .store-promotions-btn {
-    opacity: 1;
-    max-height: 50px;
-    padding: 0.6rem 1.25rem;
-    margin: 0.75rem 1rem;
-}
-
-/* Contenedor superior para logo e info */
-.store-card-horizontal > div:first-child {
+.store-card-body {
+    padding: 1.5rem;
     display: flex;
-    flex: 1;
+    align-items: center;
+    gap: 1.2rem;
+    flex-grow: 1;
 }
 
-/* Sección del Logo (Izquierda - 30%) */
-.store-logo-section {
-    width: 30%;
+.store-logo-wrapper {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    padding: 0.5rem;
+    padding: 10px;
 }
 
-.store-logo-icon {
-    font-size: 3rem;
-    color: var(--white);
+.store-img {
     max-width: 100%;
     max-height: 100%;
-    width: auto;
-    height: auto;
     object-fit: contain;
 }
 
-/* Sección de Información (Derecha - 70%) */
-.store-info-section {
-    width: 70%;
-    padding: 1.25rem 1.5rem;
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.store-info-meta {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 2px;
 }
 
-.store-brand-name {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin: 0 0 0.25rem 0;
-    line-height: 1.3;
+.badge-management {
+    background: #fff3cd;
+    color: #856404;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
 }
 
-.store-location {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin: 0;
+/* Footer de la tarjeta */
+.store-card-footer {
+    padding: 1.2rem 1.5rem;
+    background: #fcfcfc;
+    border-top: 1px solid #f1f1f1;
+    border-radius: 0 0 20px 20px;
 }
 
-/* Botón de Promociones */
-.store-promotions-btn {
-    background: var(--primary-gradient);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0;
-    max-height: 0;
-    padding: 0 1.25rem;
-    margin: 0 1rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    align-self: center;
-    width: calc(100% - 2rem);
-    text-decoration: none;
+/* Botones */
+.btn-modern {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0.7rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: var(--transition-modern);
 }
 
-.store-promotions-btn:hover {
-    box-shadow: var(--shadow-md);
-    filter: brightness(1.1);
+.btn-modern-primary {
+    background-color: #f0f7ff;
+    color: #0d6efd;
 }
 
-.store-promotions-btn:active {
-    filter: brightness(0.95);
+.btn-modern-primary:hover {
+    background-color: #0d6efd;
+    color: white;
 }
+
+.btn-modern-dark {
+    background-color: #212529;
+    color: white;
+}
+
+.btn-modern-dark:hover { background-color: #000; }
 
 /* ============================================
-   MENSAJE SIN RESULTADOS
+   RESPONSIVE
    ============================================ */
-
-.no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-secondary);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-.no-results i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.3;
-}
-
-.no-results p {
-    font-size: 1.2rem;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
 
 @media (max-width: 768px) {
-    .stores-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .stores-title {
-        font-size: 2rem;
-    }
-
-    .filter-dropdown-group {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    .stores-grid-horizontal {
-        grid-template-columns: 1fr;
-    }
-
-    .store-card-horizontal {
-        height: 100px;
-    }
-
-    .store-brand-name {
-        font-size: 1.25rem;
-    }
-
-    .store-logo-icon {
-        font-size: 2.5rem;
-    }
-
-    .container-custom {
-        padding: 0 1rem;
+    .stores-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 }
 
-@media (max-width: 576px) {
-    .stores-title {
-        font-size: 1.75rem;
+@media (max-width: 480px) {
+    .stores-grid-container {
+        grid-template-columns: 1fr;
     }
+    .container-custom { padding: 0 1rem; }
+}
 
-    .filter-dropdown-group {
-        gap: 0.5rem;
-    }
+/* Resaltado para locales del usuario */
+.is-mine-card {
+    background: linear-gradient(to right, #ffffff, #fffdf5) !important;
+    border: 2px solid #ffc107 !important; /* Borde ámbar/amarillo */
+    transform: scale(1.02);
+    z-index: 1;
+}
 
-    .dropdown-toggle-custom {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.85rem;
-    }
+/* Ajuste del botón en el footer para que entren dos */
+.store-card-footer {
+    display: flex;
+    gap: 8px;
+    padding: 10px 15px;
+}
 
-    .filter-label {
-        font-size: 0.9rem;
-    }
+.btn-modern {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
 
-    .store-card-horizontal {
-        height: 90px;
-    }
-
-    .store-logo-section {
-        width: 35%;
-    }
-
-    .store-info-section {
-        width: 65%;
-        padding: 1rem;
-    }
-
-    .store-brand-name {
-        font-size: 1.1rem;
-    }
-
-    .store-location {
-        font-size: 0.85rem;
-    }
-
-    .store-logo-icon {
-        font-size: 2rem;
-    }
+.btn-modern-dark {
+    background-color: #212529;
+    color: white;
+    border: none;
 }

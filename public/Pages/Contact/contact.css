@@ -1,0 +1,65 @@
+.contact-header h1 {
+    font-size: 2.5rem;
+    color: #212529;
+}
+
+/* Inputs con estilo moderno */
+.form-control, .form-select {
+    border: 1px solid #e9ecef;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+}
+
+/* Estilo de la tarjeta de info negra */
+.bg-dark {
+    background-color: #1a1d20 !important;
+}
+
+.social-links a {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #0d6efd !important;
+    transform: translateY(-3px);
+}
+
+/* Adaptación del mapa */
+iframe {
+    filter: grayscale(0.5) contrast(1.1);
+}
+
+.max-width-contact {
+    max-width: 900px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.icon-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
+
+textarea {
+    resize: none;
+}

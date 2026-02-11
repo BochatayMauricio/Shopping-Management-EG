@@ -1,184 +1,123 @@
 <?php
-include_once '../../../app/Services/login.services.php';
-session_start();
+include_once __DIR__ . '/../../../app/Services/login.services.php';
+include_once __DIR__ . '/../../../app/Services/promotions.services.php';
+include_once __DIR__ . '/../../../app/controllers/news.controller.php';
+include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
+include_once __DIR__ . '/../../../app/Services/stores.services.php';
+include_once __DIR__ . '/../../../app/Services/user.services.php'; 
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $user = getCurrentUser();
 
-// Datos estáticos de promociones
-$promotions = [
-    [
-        'id' => 1,
-        'title' => 'Combo Doble Cuarto',
-        'image' => 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&q=80&w=500',
-        'discount' => '-30% OFF',
-        'badge_color' => '#dc2626',
-        'valid_until' => '30/11',
-        'price' => 8500,
-        'original_price' => 12150,
-        'store_name' => "McDonald's",
-        'store_logo' => 'fa-brands fa-mcdonalds',
-        'store_color' => '#DB0007',
-        'local_number' => '1',
-        'store_category' => 'Gastronomia',
-        'client_category' => 'Inicial',
-        'status' => 'active'
-    ],
-    [
-        'id' => 2,
-        'title' => 'Remeras Selección',
-        'image' => 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&q=80&w=500',
-        'discount' => '2x1',
-        'badge_color' => '#000000',
-        'valid_until' => 'Solo efectivo',
-        'price' => 15000,
-        'original_price' => null,
-        'store_name' => 'H&M',
-        'store_logo' => 'fa-solid fa-shirt',
-        'store_color' => '#E50010',
-        'local_number' => '18',
-        'store_category' => 'Ropa',
-        'client_category' => 'Medium',
-        'status' => 'active'
-    ],
-    [
-        'id' => 3,
-        'title' => 'Latte Grande',
-        'image' => 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80&w=500',
-        'discount' => '-15% OFF',
-        'badge_color' => '#15803d',
-        'valid_until' => 'Llevando 2 medialunas',
-        'price' => 4200,
-        'original_price' => null,
-        'store_name' => 'Starbucks',
-        'store_logo' => 'fa-solid fa-mug-hot',
-        'store_color' => '#00704A',
-        'local_number' => '2',
-        'store_category' => 'Gastronomia',
-        'client_category' => 'Premium',
-        'status' => 'active'
-    ],
-    [
-        'id' => 4,
-        'title' => 'Airpods Pro',
-        'image' => 'https://images.unsplash.com/photo-1595935736128-db1f0a261263?auto=format&fit=crop&q=80&w=500',
-        'discount' => 'Finde',
-        'badge_color' => '#2563eb',
-        'valid_until' => '12 Cuotas s/interés',
-        'price' => 199999,
-        'original_price' => null,
-        'store_name' => 'Apple Store',
-        'store_logo' => 'fa-brands fa-apple',
-        'store_color' => '#555555',
-        'local_number' => '5',
-        'store_category' => 'Tecnologia',
-        'client_category' => 'Premium',
-        'status' => 'active'
-    ],
-    [
-        'id' => 5,
-        'title' => 'Zapatillas Running',
-        'image' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=500',
-        'discount' => '-40% OFF',
-        'badge_color' => '#dc2626',
-        'valid_until' => 'Hasta agotar stock',
-        'price' => 45000,
-        'original_price' => 75000,
-        'store_name' => 'Nike',
-        'store_logo' => 'fa-solid fa-shoe-prints',
-        'store_color' => '#FF6600',
-        'local_number' => '8',
-        'store_category' => 'Deportes',
-        'client_category' => 'Medium',
-        'status' => 'active'
-    ],
-    [
-        'id' => 6,
-        'title' => 'Whopper Doble',
-        'image' => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=500',
-        'discount' => '-25% OFF',
-        'badge_color' => '#dc2626',
-        'valid_until' => 'Martes y Miércoles',
-        'price' => 6800,
-        'original_price' => 9066,
-        'store_name' => 'Burger King',
-        'store_logo' => 'fa-solid fa-burger',
-        'store_color' => '#D62300',
-        'local_number' => '10',
-        'store_category' => 'Gastronomia',
-        'client_category' => 'Inicial',
-        'status' => 'active'
-    ],
-    [
-        'id' => 7,
-        'title' => 'Jeans Premium',
-        'image' => 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=500',
-        'discount' => '3x2',
-        'badge_color' => '#000000',
-        'valid_until' => 'Válido hasta fin de mes',
-        'price' => 28000,
-        'original_price' => null,
-        'store_name' => 'Zara',
-        'store_logo' => 'fa-solid fa-shirt',
-        'store_color' => '#000000',
-        'local_number' => '12',
-        'store_category' => 'Ropa',
-        'client_category' => 'Premium',
-        'status' => 'inactive'
-    ],
-    [
-        'id' => 8,
-        'title' => 'Notebook Gamer',
-        'image' => 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=500',
-        'discount' => '-20% OFF',
-        'badge_color' => '#2563eb',
-        'valid_until' => '18 cuotas sin interés',
-        'price' => 850000,
-        'original_price' => 1062500,
-        'store_name' => 'Samsung',
-        'store_logo' => 'fa-solid fa-laptop',
-        'store_color' => '#1428A0',
-        'local_number' => '15',
-        'store_category' => 'Tecnologia',
-        'client_category' => 'Medium',
-        'status' => 'active'
-    ]
-];
+// --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    // SI ES OWNER CREANDO PROMO:
+    if (isset($_POST['btnCreatePromo'])) {
+        $_POST['id'] = $_POST['id_store']; // Adaptamos para el controlador
+        if(isset($_POST['discount'])) {
+            $_POST['discount'] = intval(preg_replace('/[^0-9]/', '', $_POST['discount']));
+        }
 
-// Filtrar solo promociones activas
-$activePromotions = array_filter($promotions, function($promo) {
-    return $promo['status'] === 'active';
-});
+        $storeId = isset($_POST['id_store']) ? intval($_POST['id_store']) : 0;
+        if ($storeId > 0) {
+            $promoData = [
+                'title'           => $_POST['title'],
+                'image'           => $_POST['image'],
+                'date_from'       => $_POST['date_from'],
+                'date_until'      => $_POST['date_until'],
+                'client_category' => $_POST['client_category'],
+                'week_days'       => $_POST['week_days'],
+                'discount'        => $_POST['discount'],
+                'price'           => $_POST['price'],
+                'original_price'  => !empty($_POST['original_price']) ? $_POST['original_price'] : 0,
+                'id_store'        => $storeId
+            ];
+            if (createPromotion($promoData)) {
+                header("Location: Promotions.php?status=submitted");
+                exit(); 
+            }
+        }
+    }
+    
+    // SI ES CLIENTE SOLICITANDO PROMO:
+    // Aseguramos que el controlador reciba 'id' que es lo que suele buscar
+    if (isset($_POST['btnRequestPromo'])) {
+        $_POST['id'] = $_POST['id_promotion'];
+    }
+}
 
-// Obtener filtros
+// Datos de BD
+$promotions = getPromotionsWithStoreData();
+$allStores = getAllStores();
+$myStores = ($user && $user['type'] === 'owner') ? getStoresByOwner($user['cod'] ?? $user['id']) : [];
+$today = date('Y-m-d');
+
+// --- LÓGICA DE NIVEL DINÁMICO ---
+$userWeight = 1;
+$myUsedPromoIds = []; 
+
+if ($user && $user['type'] === 'client') {
+    $userId = $user['cod'] ?? $user['id'];
+    $progress = getClientLevelProgress($userId);
+    
+    // Peso dinámico para bloquear/desbloquear cards
+    if ($progress['used'] >= 5) $userWeight = 3;
+    elseif ($progress['used'] >= 3) $userWeight = 2;
+    else $userWeight = 1;
+
+    // Obtener las que ya usó para el check visual "YA UTILIZADA"
+    $myPromos = getClientPromotions($userId);
+    foreach ($myPromos as $mp) {
+        // Usamos request_status que es el alias de tu SQL
+        if (($mp['request_status'] ?? $mp['status']) === 'used') {
+            $myUsedPromoIds[] = $mp['id'];
+        }
+    }
+}
+
+$levelWeights = ['inicial' => 1, 'medium' => 2, 'premium' => 3];
+
+// Filtros URL
 $filterCategory = isset($_GET['category']) ? trim($_GET['category']) : 'all';
 $filterDiscount = isset($_GET['discount']) ? trim($_GET['discount']) : 'all';
 $filterStore = isset($_GET['store']) ? trim(urldecode($_GET['store'])) : 'all';
 $filterClientCategory = isset($_GET['client_category']) ? trim($_GET['client_category']) : 'all';
 
-// Filtrar promociones activas
-$filteredPromotions = array_filter($activePromotions, function($promo) use ($filterCategory, $filterDiscount, $filterStore, $filterClientCategory) {
+$filteredPromotions = array_filter($promotions, function($promo) use ($filterCategory, $filterDiscount, $filterStore, $filterClientCategory, $today) {    
+    if (strtolower($promo['status']) !== 'active') return false;
+    if ($promo['date_until'] < $today) return false;
     $categoryMatch = ($filterCategory === 'all') || (strtolower(trim($promo['store_category'])) === strtolower($filterCategory));
     $storeMatch = ($filterStore === 'all') || (strtolower(trim($promo['store_name'])) === strtolower($filterStore));
     $clientCategoryMatch = ($filterClientCategory === 'all') || (strtolower(trim($promo['client_category'])) === strtolower($filterClientCategory));
-    
-    // Filtro de descuento
     $discountMatch = true;
     if ($filterDiscount !== 'all') {
-        if (strpos($promo['discount'], '%') !== false) {
-            $percentage = intval(preg_replace('/[^0-9]/', '', $promo['discount']));
-            if ($filterDiscount === 'high') {
-                $discountMatch = $percentage >= 30;
-            } elseif ($filterDiscount === 'medium') {
-                $discountMatch = $percentage >= 15 && $percentage < 30;
-            }
-        } elseif ($filterDiscount === 'special') {
-            $discountMatch = strpos($promo['discount'], 'x') !== false || strpos($promo['discount'], 'Finde') !== false;
-        }
+        $percentage = intval(preg_replace('/[^0-9]/', '', $promo['discount_label']));
+        if ($filterDiscount === 'high') $discountMatch = $percentage >= 30;
+        elseif ($filterDiscount === 'medium') $discountMatch = $percentage >= 15 && $percentage < 30;
+        elseif ($filterDiscount === 'special') $discountMatch = (strpos(strtolower($promo['discount_label']), 'x') !== false);
     }
-    
-    return $categoryMatch && $storeMatch && $discountMatch && $clientCategoryMatch;
+    return $categoryMatch && $storeMatch && $clientCategoryMatch && $discountMatch;
 });
-
 $activeCount = count($filteredPromotions);
+
+$activeFilters = [];
+if ($filterCategory !== 'all') $activeFilters['category'] = "Rubro: " . ucfirst($filterCategory);
+if ($filterDiscount !== 'all') {
+    $discountTexts = ['high' => '30% o más', 'medium' => '15% - 29%', 'special' => '2x1 / Especiales'];
+    $activeFilters['discount'] = "Descuento: " . ($discountTexts[$filterDiscount] ?? $filterDiscount);
+}
+if ($filterStore !== 'all') $activeFilters['store'] = "Local: " . $filterStore;
+if ($filterClientCategory !== 'all') $activeFilters['client_category'] = "Categoría: " . ucfirst($filterClientCategory);
+
+function buildFilterUrl($paramName, $paramValue) {
+    $params = $_GET; 
+    if ($paramValue === 'all') unset($params[$paramName]); 
+    else $params[$paramName] = $paramValue; 
+    return '?' . http_build_query($params); 
+}
 ?>
 
 <!DOCTYPE html>
@@ -187,10 +126,8 @@ $activeCount = count($filteredPromotions);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promociones - Shopping Rosario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="Promotions.css">
@@ -201,118 +138,127 @@ $activeCount = count($filteredPromotions);
     <main class="main-content">
         <div class="container-custom">
             
-            <!-- HEADER Y FILTROS -->
             <div class="promotions-header">
                 <div class="promotions-title-section">
-                    <h1 class="promotions-title">Promociones</h1>
+                    <h1 class="promotions-title mb-4 pt-4">Promociones</h1>
                     <span class="promotions-badge"><?php echo $activeCount; ?> Ofertas activas</span>
                 </div>
                 
                 <div class="promotions-filters">
                     <span class="filter-label">Filtrar por:</span>
-                    
-                    <!-- Dropdown Rubro -->
                     <div class="dropdown-custom">
                         <input type="checkbox" id="dropdown-rubro-promo" class="dropdown-checkbox">
-                        <label for="dropdown-rubro-promo" class="dropdown-toggle-custom">
-                            Rubro <i class="fas fa-chevron-down"></i>
-                        </label>
+                        <label for="dropdown-rubro-promo" class="dropdown-toggle-custom">Rubro <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
-                            <a href="?category=all<?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Todos</a>
-                            <a href="?category=gastronomia<?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Gastronomía</a>
-                            <a href="?category=ropa<?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Ropa</a>
-                            <a href="?category=tecnologia<?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Tecnología</a>
-                            <a href="?category=deportes<?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Deportes</a>
+                            <a href="<?php echo buildFilterUrl('category', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+                            <a href="<?php echo buildFilterUrl('category', 'gastronomia'); ?>" class="dropdown-item-custom">Gastronomía</a>
+                            <a href="<?php echo buildFilterUrl('category', 'ropa'); ?>" class="dropdown-item-custom">Ropa</a>
+                            <a href="<?php echo buildFilterUrl('category', 'tecnologia'); ?>" class="dropdown-item-custom">Tecnología</a>
+                            <a href="<?php echo buildFilterUrl('category', 'deportes'); ?>" class="dropdown-item-custom">Deportes</a>
                         </div>
                     </div>
-
-                    <!-- Dropdown Descuentos -->
                     <div class="dropdown-custom">
                         <input type="checkbox" id="dropdown-descuento" class="dropdown-checkbox">
-                        <label for="dropdown-descuento" class="dropdown-toggle-custom">
-                            Descuentos <i class="fas fa-chevron-down"></i>
-                        </label>
+                        <label for="dropdown-descuento" class="dropdown-toggle-custom">Descuentos <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
-                            <a href="?discount=all<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Todos</a>
-                            <a href="?discount=high<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">30% o más</a>
-                            <a href="?discount=medium<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">15% - 29%</a>
-                            <a href="?discount=special<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">2x1 / 3x2</a>
+                            <a href="<?php echo buildFilterUrl('discount', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+                            <a href="<?php echo buildFilterUrl('discount', 'high'); ?>" class="dropdown-item-custom">30% o más</a>
+                            <a href="<?php echo buildFilterUrl('discount', 'medium'); ?>" class="dropdown-item-custom">15% - 29%</a>
+                            <a href="<?php echo buildFilterUrl('discount', 'special'); ?>" class="dropdown-item-custom">2x1 / Especiales</a>
                         </div>
                     </div>
-
-                    <!-- Dropdown Local -->
                     <div class="dropdown-custom">
                         <input type="checkbox" id="dropdown-local" class="dropdown-checkbox">
-                        <label for="dropdown-local" class="dropdown-toggle-custom">
-                            Local <i class="fas fa-chevron-down"></i>
-                        </label>
+                        <label for="dropdown-local" class="dropdown-toggle-custom">Local <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
-                            <a href="?store=all<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom">Todos</a>
-                            <?php
-                            $uniqueStores = array_unique(array_column($activePromotions, 'store_name'));
-                            foreach ($uniqueStores as $storeName): ?>
-                                <a href="?store=<?php echo urlencode($storeName); ?><?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterClientCategory !== 'all' ? '&client_category=' . $filterClientCategory : ''; ?>" class="dropdown-item-custom"><?php echo htmlspecialchars($storeName); ?></a>
+                            <a href="<?php echo buildFilterUrl('store', 'all'); ?>" class="dropdown-item-custom">Todos</a>
+                            <?php foreach ($allStores as $store): ?>
+                                <a href="<?php echo buildFilterUrl('store', $store['name']); ?>" class="dropdown-item-custom"><?php echo htmlspecialchars($store['name']); ?></a>
                             <?php endforeach; ?>
                         </div>
                     </div>
-
-                    <!-- Dropdown Categoría de Cliente -->
                     <div class="dropdown-custom">
                         <input type="checkbox" id="dropdown-client-category" class="dropdown-checkbox">
-                        <label for="dropdown-client-category" class="dropdown-toggle-custom">
-                            Categoría <i class="fas fa-chevron-down"></i>
-                        </label>
+                        <label for="dropdown-client-category" class="dropdown-toggle-custom">Categoría <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
-                            <a href="?client_category=all<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?>" class="dropdown-item-custom">Todas</a>
-                            <a href="?client_category=inicial<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?>" class="dropdown-item-custom">Inicial</a>
-                            <a href="?client_category=medium<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?>" class="dropdown-item-custom">Medium</a>
-                            <a href="?client_category=premium<?php echo $filterCategory !== 'all' ? '&category=' . $filterCategory : ''; ?><?php echo $filterDiscount !== 'all' ? '&discount=' . $filterDiscount : ''; ?><?php echo $filterStore !== 'all' ? '&store=' . urlencode($filterStore) : ''; ?>" class="dropdown-item-custom">Premium</a>
+                            <a href="<?php echo buildFilterUrl('client_category', 'all'); ?>" class="dropdown-item-custom">Todas</a>
+                            <a href="<?php echo buildFilterUrl('client_category', 'inicial'); ?>" class="dropdown-item-custom">Inicial</a>
+                            <a href="<?php echo buildFilterUrl('client_category', 'medium'); ?>" class="dropdown-item-custom">Medium</a>
+                            <a href="<?php echo buildFilterUrl('client_category', 'premium'); ?>" class="dropdown-item-custom">Premium</a>
                         </div>
                     </div>
                 </div>
+                <?php if (!empty($activeFilters)): ?>
+                    <div class="active-filters-container mt-3 d-flex flex-wrap gap-2 align-items-center">
+                        <?php foreach ($activeFilters as $key => $label): ?>
+                            <div class="filter-chip">
+                                <?php echo htmlspecialchars($label); ?>
+                                <a href="?<?php $params = $_GET; unset($params[$key]); echo http_build_query($params); ?>" class="ms-2 text-decoration-none"><i class="fas fa-times-circle"></i></a>
+                            </div>
+                        <?php endforeach; ?>
+                        <a href="Promotions.php" class="btn-clear-all ms-2">Limpiar todos</a>
+                    </div>
+                <?php endif; ?>
             </div>
 
-            <!-- GRID DE PROMOCIONES -->
             <div class="promotions-grid">
-                <?php
-                if (count($filteredPromotions) > 0) {
-                    foreach ($filteredPromotions as $promo) {
-                ?>
-                        <div class="promo-card">
-                            <!-- Imagen + Badge -->
+                <?php if (count($filteredPromotions) > 0): ?>
+                    <?php foreach ($filteredPromotions as $promo): ?>
+                        <?php 
+                            $promoCategory = strtolower($promo['client_category']);
+                            $promoWeight = $levelWeights[$promoCategory] ?? 1;
+                            
+                            // LOGICA DINÁMICA
+                            $isLocked = ($userWeight < $promoWeight);
+                            $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
+                            $isExpired = ($promo['date_until'] < $today);
+                        ?>
+                        <div class="promo-card <?php echo ($isLocked || $isAlreadyUsed) ? 'promo-locked' : ''; ?>">
                             <div class="promo-image-container">
-                                <span class="promo-badge" style="background-color: <?php echo $promo['badge_color']; ?>;">
-                                    <?php echo htmlspecialchars($promo['discount']); ?>
+                                <?php 
+                                    $badge_color = '#000000';
+                                    $discount_val = intval(preg_replace('/[^0-9]/', '', $promo['discount_label']));
+                                    if($discount_val >= 30) $badge_color = '#dc2626';
+                                    elseif($discount_val > 0) $badge_color = '#2563eb';
+                                ?>
+
+                                <?php if ($isAlreadyUsed): ?>
+                                    <div class="promo-lock-overlay" style="background: rgba(25, 135, 84, 0.75);">
+                                        <i class="fas fa-check-circle mb-2"></i>
+                                        <span class="small fw-bold">YA UTILIZADA</span>
+                                    </div>
+                                <?php elseif ($isLocked): ?>
+                                    <div class="promo-lock-overlay">
+                                        <i class="fas fa-lock mb-2"></i>
+                                        <span class="small fw-bold">Nivel <?php echo htmlspecialchars($promo['client_category']); ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <span class="promo-badge" style="background-color: <?php echo $badge_color; ?>;">
+                                    <?php echo htmlspecialchars($promo['discount_label']); ?>
                                 </span>
-                                <!-- Chip de Categoría de Cliente -->
+
                                 <span class="promo-client-category <?php echo strtolower($promo['client_category']); ?>">
                                     <?php echo htmlspecialchars($promo['client_category']); ?>
                                 </span>
-                                <img src="<?php echo htmlspecialchars($promo['image']); ?>" 
-                                     alt="<?php echo htmlspecialchars($promo['title']); ?>" 
-                                     class="promo-image">
+                                
+                                <img src="<?php echo htmlspecialchars($promo['image']); ?>" class="promo-image">
                             </div>
                             
-                            <!-- Contenido -->
                             <div class="promo-content">
                                 <h3 class="promo-title"><?php echo htmlspecialchars($promo['title']); ?></h3>
-                                <p class="promo-validity"><?php echo htmlspecialchars($promo['valid_until']); ?></p>
+                                <p class="promo-validity">Válido hasta: <?php echo htmlspecialchars($promo['valid_until']); ?></p>
                                 
                                 <div class="promo-price-section">
                                     <span class="promo-price">$<?php echo number_format($promo['price'], 0, ',', '.'); ?></span>
-                                    <?php if ($promo['original_price']): ?>
+                                    <?php if ($promo['original_price'] > 0): ?>
                                         <span class="promo-price-original">$<?php echo number_format($promo['original_price'], 0, ',', '.'); ?></span>
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Separador y Local -->
                                 <div class="promo-store-section">
                                     <div class="promo-store-logo" style="background-color: <?php echo $promo['store_color']; ?>;">
-                                        <?php if (isset($promo['store_logo'])): ?>
-                                            <i class="<?php echo $promo['store_logo']; ?>"></i>
-                                        <?php elseif (isset($promo['store_logo_text'])): ?>
-                                            <span class="promo-store-logo-text"><?php echo $promo['store_logo_text']; ?></span>
-                                        <?php endif; ?>
+                                        <i class="<?php echo $promo['store_logo']; ?>"></i>
                                     </div>
                                     <div class="promo-store-info">
                                         <span class="promo-store-name"><?php echo htmlspecialchars($promo['store_name']); ?></span>
@@ -320,30 +266,108 @@ $activeCount = count($filteredPromotions);
                                     </div>
                                 </div>
 
-                                <!-- Botón Solicitar (solo si es cliente logueado) -->
-                                <?php if ($user && $user['rol'] === 'client'): ?>
-                                    <button class="promo-request-btn">
-                                        <i class="fas fa-ticket-alt"></i> Solicitar Promoción
-                                    </button>
+                                <?php if ($user && $user['type'] === 'client'): ?>
+                                    <?php $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']); ?>
+                                    <form action="" method="POST">
+                                        <input type="hidden" name="id_promotion" value="<?php echo $promo['id']; ?>">
+                                        
+                                        <?php if ($isAlreadyUsed): ?>
+                                            <button type="button" class="promo-request-btn" style="background-color: #198754; border-color: #198754; color: white;" disabled>
+                                                Utilizada con éxito
+                                            </button>
+                                        <?php elseif ($requestStatus === 'active'): ?>
+                                            <button type="button" class="promo-request-btn btn-obtained" disabled>Promoción Obtenida</button>
+                                        <?php elseif ($isLocked): ?>
+                                            <button type="button" class="promo-request-btn btn-locked" disabled>Bloqueado (Nivel <?= ucfirst($promo['client_category']) ?>)</button>
+                                        <?php else: ?>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn">Solicitar Promoción</button>
+                                        <?php endif; ?>
+                                    </form>
                                 <?php endif; ?>
                             </div>
                         </div>
-                <?php
-                    }
-                } else {
-                    echo '<div class="no-results">
-                            <i class="fas fa-search"></i>
-                            <p>No se encontraron promociones con los filtros seleccionados</p>
-                          </div>';
-                }
-                ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
-
         </div>
+
+        <?php if($user && $user['type'] === 'owner'): ?>
+            <div class="container-custom d-flex justify-content-center my-5">
+                <button type="button" class="btn btn-warning admin-fab" data-bs-toggle="modal" data-bs-target="#createPromoModal">
+                    <i class="fa-solid fa-plus me-2"></i> Nueva Promo
+                </button>
+            </div>
+            <div class="modal fade" id="createPromoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0 rounded-4">
+                        <div class="modal-header bg-warning text-dark">
+                            <h5 class="modal-title fw-bold">Sugerir Nueva Promoción</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <form action="" method="POST">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">¿Para qué local es la promo?</label>
+                                        <select name="id_store" class="form-select border-primary" required>
+                                            <option value="" disabled selected>Selecciona un local...</option>
+                                            <?php foreach ($myStores as $s): ?>
+                                                <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?> (Local <?= $s['local_number'] ?>)</option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">Título de la Promo</label>
+                                        <input type="text" name="title" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Fecha Inicio</label>
+                                        <input type="date" name="date_from" class="form-control" value="<?= $today ?>" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Fecha Fin</label>
+                                        <input type="date" name="date_until" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">% Descuento</label>
+                                        <input type="number" name="discount" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">Precio Promo</label>
+                                        <input type="number" name="price" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">Precio Original</label>
+                                        <input type="number" name="original_price" class="form-control">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">URL Imagen</label>
+                                        <input type="url" name="image" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Categoría Cliente</label>
+                                        <select name="client_category" class="form-select">
+                                            <option value="Inicial">Inicial</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Premium">Premium</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Días de validez</label>
+                                        <input type="text" name="week_days" class="form-control" placeholder="Lunes a Jueves">
+                                    </div>
+                                </div>
+                                <div class="text-end mt-3">
+                                    <button type="submit" name="btnCreatePromo" class="btn btn-dark px-4 rounded-pill">Enviar para Revisión</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </main>
 
     <?php include_once '../../Components/footer/Footer.php'; ?>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

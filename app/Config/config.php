@@ -3,6 +3,7 @@
 define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
+define('BASE_URL', 'http://localhost/Shopping-Management-EG/');
 
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
@@ -12,7 +13,7 @@ date_default_timezone_set(TIMEZONE);
  */
 $hostname = "localhost";
 $username = "root";
-$password = "root";
+$password = "vicen";
 $dbname = "shopping_management";
 $dbport = 3306;
 
@@ -34,7 +35,8 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS users (
         cod INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        password VARCHAR(100) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(100) NOT NULL,
         type VARCHAR(15) NOT NULL,
         category VARCHAR(10) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -42,7 +44,10 @@ $tables = [
     "CREATE TABLE IF NOT EXISTS stores (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
+        logo VARCHAR(255) DEFAULT 'default_logo.png',
+        color VARCHAR(7) DEFAULT '#0d6efd',
         ubication VARCHAR(50) NOT NULL,
+        local_number VARCHAR(10) NOT NULL,
         category VARCHAR(30) NOT NULL,
         id_owner INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,13 +55,17 @@ $tables = [
     )",
     "CREATE TABLE IF NOT EXISTS promotions (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(100) NOT NULL,
         description VARCHAR(200) NOT NULL,
+        image VARCHAR(255) DEFAULT 'default_logo.png',
         date_from DATE NOT NULL,
         date_until DATE NOT NULL,
         client_category VARCHAR(15) NOT NULL,
         week_days VARCHAR(255) NOT NULL,
         status VARCHAR(15) NOT NULL,
         discount DECIMAL(5,2) NOT NULL,
+        price DECIMAL(10,2) DEFAULT NULL,
+        original_price DECIMAL(10,2) DEFAULT NULL,
         id_store INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (id_store) REFERENCES stores(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -70,6 +79,23 @@ $tables = [
         PRIMARY KEY (id_client, id_promotion),
         FOREIGN KEY (id_client) REFERENCES users(cod) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_promotion) REFERENCES promotions(id) ON DELETE CASCADE ON UPDATE CASCADE
+    )",
+    "CREATE TABLE IF NOT EXISTS news (
+        id INT NOT NULL AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        image VARCHAR(255) DEFAULT NULL,
+        author VARCHAR(100) NOT NULL,
+        date DATE NOT NULL,
+        PRIMARY KEY (id)
+    )",
+    "CREATE TABLE IF NOT EXISTS contact_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )"
 ];
 

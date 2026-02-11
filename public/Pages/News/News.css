@@ -1,96 +1,46 @@
-/* ============================================
-   NEWS PAGE - NOVEDADES
-   ============================================ */
 
-* {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background-color: var(--bg-primary);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.main-content {
-    flex: 1;
-    padding: 2rem 0;
-    display: flex;
-    justify-content: center;
-}
-
+/* Contenedor principal de la sección */
 .container-custom {
-    max-width: 900px;
-    width: 100%;
-    padding: 0 2rem;
+    margin: 0 15px;
+    padding: 0 1.5rem;
 }
-
-/* ============================================
-   TÍTULO DE LA SECCIÓN
-   ============================================ */
 
 .news-section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #212529;
+    letter-spacing: -0.5px;
 }
 
-/* ============================================
-   TARJETA DE NOVEDAD
-   ============================================ */
+/* Grilla Adaptativa */
+.news-grid {
+    display: grid;
+    /* Esto crea columnas automáticas de mínimo 300px */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
 
-.news-card {
-    background: var(--white);
-    border-radius: 2rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--light-gray);
+/* Tarjeta de Novedad Individual */
+.news-item-card {
+    background: var(--white, #fff);
+    border-radius: 1.5rem;
+    border: 1px solid var(--light-gray, #eee);
+    box-shadow: var(--shadow-sm, 0 4px 6px rgba(0,0,0,0.05));
     overflow: hidden;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Ocultar los radio inputs */
-.news-radio {
-    display: none;
+.news-item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-/* Contenedor de slides */
-.news-slider-container {
-    position: relative;
-    width: 100%;
-}
-
-/* Cada slide */
-.news-slide {
-    display: none;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Mostrar el slide cuando su radio está checked */
-#news-0:checked ~ .news-slider-container .news-slide[data-slide="0"],
-#news-1:checked ~ .news-slider-container .news-slide[data-slide="1"],
-#news-2:checked ~ .news-slider-container .news-slide[data-slide="2"],
-#news-3:checked ~ .news-slider-container .news-slide[data-slide="3"],
-#news-4:checked ~ .news-slider-container .news-slide[data-slide="4"] {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Imagen de Portada */
+/* Imagen de la noticia */
 .news-image-container {
-    height: 320px;
+    height: 220px;
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -100,166 +50,71 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
+    transition: transform 0.5s ease;
+}
+
+.news-item-card:hover .news-image {
+    transform: scale(1.05);
 }
 
 .news-image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
 }
 
-/* Contenido de la Noticia */
+/* Cuerpo de la noticia */
 .news-content {
-    padding: 2rem;
-    padding-bottom: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-/* Título */
 .news-title {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    line-height: 1.3;
+    color: var(--text-primary, #333);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
 }
 
-/* Meta Data (Autor) */
+/* Meta datos (Autor y Fecha) */
 .news-meta {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-}
-
-.news-author-icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: var(--dark-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--white);
-    font-size: 0.75rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
 }
 
 .news-author-text {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
     font-weight: 500;
 }
 
-/* Descripción */
+/* Descripción con límite de líneas */
 .news-description {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    color: var(--text-secondary, #555);
+    font-size: 0.9rem;
     line-height: 1.6;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1.5rem;
+    
+    /* Truncado de texto a 3 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.news-read-more {
-    color: var(--text-primary);
-    font-weight: 700;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 2px;
-    margin-left: 0.25rem;
-    transition: var(--transition-fast);
-}
-
-.news-read-more:hover {
-    color: var(--dark-color);
-    text-decoration-color: var(--dark-color);
-}
-
-/* ============================================
-   NAVEGACIÓN DEL SLIDER
-   ============================================ */
-
-.news-navigation {
-    margin-top: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-}
-
-.news-nav-arrows-container {
-    position: relative;
-    width: 1.5rem;
-    height: 1.5rem;
-}
-
-/* Ocultar todas las flechas por defecto */
-.news-nav-arrow {
-    display: none;
-    color: var(--medium-gray);
-    transition: var(--transition-fast);
-    text-decoration: none;
-    font-size: 0.875rem;
-    padding: 0.25rem;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-/* Mostrar flecha anterior solo cuando el slide correspondiente está activo */
-#news-1:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="1"],
-#news-2:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="2"],
-#news-3:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="3"],
-#news-4:checked ~ .news-navigation .news-nav-arrow.news-nav-prev[data-for-slide="4"] {
-    display: block;
-}
-
-/* Mostrar flecha siguiente solo cuando el slide correspondiente está activo */
-#news-0:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="0"],
-#news-1:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="1"],
-#news-2:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="2"],
-#news-3:checked ~ .news-navigation .news-nav-arrow.news-nav-next[data-for-slide="3"] {
-    display: block;
-}
-
-.news-nav-arrow:hover {
-    color: var(--dark-color);
-}
-
-.news-nav-next:hover {
-    transform: translateX(4px);
-}
-
-.news-nav-prev:hover {
-    transform: translateX(-4px);
-}
-
-/* Indicadores (Dots) */
-.news-dots {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.news-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--light-gray);
-    transition: var(--transition-fast);
-    cursor: pointer;
-    display: block;
-}
-
-.news-dot:hover {
-    background: var(--medium-gray);
-}
-
-/* Activar el dot correspondiente según el radio checked */
-#news-0:checked ~ .news-navigation .news-dot[data-index="0"],
-#news-1:checked ~ .news-navigation .news-dot[data-index="1"],
-#news-2:checked ~ .news-navigation .news-dot[data-index="2"],
-#news-3:checked ~ .news-navigation .news-dot[data-index="3"],
-#news-4:checked ~ .news-navigation .news-dot[data-index="4"] {
-    background: var(--dark-color);
+/* Estilo para botón de administración (FAB) */
+.admin-fab {
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
 }
 
 /* ============================================
@@ -267,57 +122,43 @@ body {
    ============================================ */
 
 @media (max-width: 768px) {
-    .container-custom {
-        padding: 0 1rem;
+    .news-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
     }
-
+    
     .news-section-title {
         font-size: 1.75rem;
     }
+}
 
-    .news-image-container {
-        height: 250px;
-    }
-
-    .news-content {
-        padding: 1.5rem;
-    }
-
-    .news-title {
-        font-size: 1.5rem;
-    }
-
-    .news-description {
-        font-size: 0.8rem;
+@media (max-width: 480px) {
+    .news-grid {
+        grid-template-columns: 1fr; /* Una sola columna en móviles pequeños */
     }
 }
 
-@media (max-width: 576px) {
-    .news-section-title {
-        font-size: 1.5rem;
-    }
+/* Asegura que el contenedor de la cabecera ocupe todo el ancho disponible */
+.d-flex.justify-content-between {
+    width: 100%;
+    border-bottom: 2px solid #f8f9fa; /* Opcional: una línea sutil divisoria */
+    padding-bottom: 1rem;
+}
 
-    .news-card {
-        border-radius: 1.5rem;
-    }
+.news-section-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    /* Quitamos el margin por defecto para que el flex lo centre bien verticalmente */
+    margin: 0; 
+}
 
-    .news-image-container {
-        height: 200px;
-    }
+/* Estilo para el botón de registro de novedades */
+.btn-primary {
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
 
-    .news-content {
-        padding: 1.25rem;
-    }
-
-    .news-title {
-        font-size: 1.25rem;
-    }
-
-    .news-author-text {
-        font-size: 0.7rem;
-    }
-
-    .news-description {
-        font-size: 0.75rem;
-    }
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
 }

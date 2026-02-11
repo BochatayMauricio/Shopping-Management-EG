@@ -1,115 +1,37 @@
 <?php
-// Datos estáticos de las tiendas con colores de marca
-include_once '../../../app/Services/login.services.php';
+// public/Pages/Stores/Stores.php
+include_once __DIR__ . '/../../../app/Services/login.services.php';
+include_once __DIR__ . '/../../../app/Services/promotions.services.php';
+include_once __DIR__ . '/../../../app/Services/stores.services.php';
+include_once __DIR__ . '/../../../app/controllers/store.controller.php';
+
 session_start();
 $user = getCurrentUser();
+$stores = getAllStores();
 
-$stores = [
-    [
-        'id' => 1,
-        'name' => "McDonald's",
-        'floor' => 'Planta Baja',
-        'local_number' => '12',
-        'category' => 'Gastronomia',
-        'logo_icon' => 'https://imgs.search.brave.com/sgIqmpaUkd9ap3Yjb8rqXxdeqKc_0m4j2iZD_nwCALo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/Zm90b3MtcHJlbWl1/bS9tLWFtYXJpbGxh/LWVzdGEtZGlidWph/ZGEtcm9qby1uYXJh/bmphXzEwNTgzMzgt/Mjc1MDAuanBnP3Nl/bXQ9YWlzX2h5YnJp/ZCZ3PTc0MCZxPTgw',
-        'brand_color' => '#DA291C',
-        'owner' => 'Juan Pérez'
-    ],
-    [
-        'id' => 2,
-        'name' => 'Starbucks',
-        'floor' => 'Planta Baja',
-        'local_number' => '8',
-        'category' => 'Gastronomia',
-        'logo_icon' => 'https://imgs.search.brave.com/ywfHpQA0rfOt7M8eSY-gsGpv_Sn3Z2Lg_2dvo0W4UwQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmxvZ29tYXN0ZXIu/YWkvaHMtZnMvaHVi/ZnMvc3RhcmJ1Y2tz/JTIwbG9nbyUyMGN1/cnJlbnQuanBnP3dp/ZHRoPTE3MDAmaGVp/Z2h0PTExNDgmbmFt/ZT1zdGFyYnVja3Ml/MjBsb2dvJTIwY3Vy/cmVudC5qcGc',
-        'brand_color' => '#00704A',
-        'owner' => 'María García'
-    ],
-    [
-        'id' => 3,
-        'name' => 'Zara',
-        'floor' => 'Primer Piso',
-        'local_number' => '25',
-        'category' => 'Ropa',
-        'logo_icon' => 'https://imgs.search.brave.com/wtFEY8UZs9olLaBb-CCmf-1OOrATNoBvPp7kvmL72ss/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zLndp/ZGdldC1jbHViLmNv/bS9zYW1wbGVzL3o1/Z0RrNE02ZmtOVVEx/SFBXWmpVS1ZwbUp5/UDIvanJkMW1hVHZN/MVo3WUdhRkhPUHIv/QTBCNTlBRTYtM0Qz/Qy00Mzg1LUFCM0Yt/QjYyNTRFQThDNTZG/LmpwZz9xPTcw',
-        'brand_color' => '#000000',
-        'owner' => 'Carlos López'
-    ],
-    [
-        'id' => 4,
-        'name' => 'Nike',
-        'floor' => 'Primer Piso',
-        'local_number' => '15',
-        'category' => 'Deportes',
-        'logo_icon' => 'https://imgs.search.brave.com/4WnQhBRTGk8JLUqNETVFbzWVqGII_Yh0OQdFY1p0ihs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMTAv/OTk0LzQxMS9zbWFs/bC9uaWtlLWxvZ28t/d2hpdGUtY2xvdGhl/cy1kZXNpZ24taWNv/bi1hYnN0cmFjdC1m/b290YmFsbC1pbGx1/c3RyYXRpb24td2l0/aC1ibGFjay1iYWNr/Z3JvdW5kLWZyZWUt/dmVjdG9yLmpwZw',
-        'brand_color' => '#FF6600',
-        'owner' => 'Ana Martínez'
-    ],
-    [
-        'id' => 5,
-        'name' => 'Apple Store',
-        'floor' => 'Planta Baja',
-        'local_number' => '5',
-        'category' => 'Tecnologia',
-        'logo_icon' => 'https://imgs.search.brave.com/UvL_BzNlgjjyoyf6_ctU7dySQx77eC3_Pv_6EaGP_lY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZy/ZWVwaWsuY29tLzI1/Ni8xNDA3Ny8xNDA3/NzA3MS5wbmc_c2Vt/dD1haXNfd2hpdGVf/bGFiZWw',
-        'brand_color' => '#555555',
-        'owner' => 'Pedro Sánchez'
-    ],
-    [
-        'id' => 6,
-        'name' => 'H&M',
-        'floor' => 'Primer Piso',
-        'local_number' => '18',
-        'category' => 'Ropa',
-        'logo_icon' => 'https://imgs.search.brave.com/wkxnVPP8Radkgp8_cDvO6QnFKaCr_VIokkNttOjeWwo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90aHVt/YnMuZHJlYW1zdGlt/ZS5jb20vYi9oLW0t/bG9nby04MDc4NjE2/MC5qcGc',
-        'brand_color' => '#E50010',
-        'owner' => 'Laura Fernández'
-    ],
-    [
-        'id' => 7,
-        'name' => 'Samsung',
-        'floor' => 'Segundo Piso',
-        'local_number' => '30',
-        'category' => 'Tecnologia',
-        'logo_icon' => 'https://imgs.search.brave.com/TN9BEKQfVPOl3i8djLiYwZzbMnkda5OsJ01r7P6YR1o/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZy/ZWVwaWsuY29tLzI1/Ni84ODIvODgyNzQ3/LnBuZz9zZW10PWFp/c19oeWJyaWQ',
-        'brand_color' => '#1428A0',
-        'owner' => 'Roberto Díaz'
-    ],
-    [
-        'id' => 8,
-        'name' => 'Adidas',
-        'floor' => 'Segundo Piso',
-        'local_number' => '22',
-        'category' => 'Deportes',
-        'logo_icon' => 'https://imgs.search.brave.com/blm76o3mvLsvWFzG7cg6HMN9IgZ0kFA-Ahs7MfNxZ2k/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMTAv/OTk0LzI5MS9zbWFs/bC9hZGlkYXMtc3lt/Ym9sLWxvZ28td2hp/dGUtY2xvdGhlcy1k/ZXNpZ24taWNvbi1h/YnN0cmFjdC1mb290/YmFsbC1pbGx1c3Ry/YXRpb24td2l0aC1i/bGFjay1iYWNrZ3Jv/dW5kLWZyZWUtdmVj/dG9yLmpwZw',
-        'brand_color' => '#000000',
-        'owner' => 'Sofía Ruiz'
-    ],
-    [
-        'id' => 9,
-        'name' => 'Burger King',
-        'floor' => 'Planta Baja',
-        'local_number' => '10',
-        'category' => 'Gastronomia',
-        'logo_icon' => 'https://imgs.search.brave.com/OXl9xD16suJzYXninm99ZvPKR8Lq5PM9Z7ovneUc1Vw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/aWNvbnM4LmNvbS9j/b29sLzEyMDAvYnVy/Z2VyLWtpbmctbmV3/LWxvZ28uanBn',
-        'brand_color' => '#D62300',
-        'owner' => 'Miguel Torres'
-    ]
-];
+// Identificar locales del dueño
+$myStoreIds = [];
+if ($user && $user['type'] === 'owner') {
+    $userId = $user['cod'] ?? $user['id'] ?? 0;
+    $myStoresData = getStoresByOwner($userId);
+    foreach ($myStoresData as $ms) {
+        $myStoreIds[] = $ms['id']; 
+    }
+}
 
-// Obtener los filtros
-$filterCategory = isset($_GET['category']) ? $_GET['category'] : 'all';
-$filterFloor = isset($_GET['floor']) ? $_GET['floor'] : 'all';
-$searchName = isset($_GET['search']) ? trim($_GET['search']) : '';
+// Lógica de Filtros
+$filterCategory = $_GET['category'] ?? 'all';
+$filterFloor = $_GET['ubication'] ?? 'all';
+$searchName = trim($_GET['search'] ?? '');
 
-// Filtrar tiendas
 $filteredStores = array_filter($stores, function($store) use ($filterCategory, $filterFloor, $searchName) {
-    $categoryMatch = ($filterCategory === 'all') || (strtolower($store['category']) === strtolower($filterCategory));
-    $floorMatch = ($filterFloor === 'all') || ($store['floor'] === $filterFloor);
-    $nameMatch = empty($searchName) || (stripos($store['name'], $searchName) !== false);
-    
+    $categoryMatch = ($filterCategory === 'all') || (strtolower($store['category'] ?? '') === strtolower($filterCategory));
+    $floorMatch = ($filterFloor === 'all') || (($store['ubication'] ?? '') === $filterFloor);
+    $nameMatch = empty($searchName) || (stripos($store['name'] ?? '', $searchName) !== false);
     return $categoryMatch && $floorMatch && $nameMatch;
 });
+
+$hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($searchName));
 ?>
 
 <!DOCTYPE html>
@@ -118,109 +40,274 @@ $filteredStores = array_filter($stores, function($store) use ($filterCategory, $
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Locales - Shopping Rosario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="stores.css">
 </head>
 <body>
-    <?php include_once '../../Components/navbar/NavBar.php'; ?>
+    <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
 
-    <main class="main-content">
-        <div class="container-custom">
-            <!-- Header con filtros -->
-            <div class="stores-header">
-                <h1 class="stores-title">Locales</h1>
-                <div class="filter-dropdown-group">
-                    <span class="filter-label">Filtrar por:</span>
-                    
-                    <!-- Dropdown Rubro -->
+    <main class="main-content container-custom">
+        <header class="stores-header d-flex justify-content-between align-items-end mb-4 pt-4">
+            <div>
+                <h1 class="stores-title mb-0">Locales</h1>
+                <p class="text-muted mb-0">Explora las mejores tiendas del Shopping Rosario</p>
+            </div>
+            <?php if ($user && $user['type'] === 'admin'): ?>
+                <button type="button" class="btn btn-primary rounded-pill px-4 shadow" data-bs-toggle="modal" data-bs-target="#addStoreModal">
+                    <i class="fas fa-plus-circle me-2"></i> Nuevo Local
+                </button>
+            <?php endif; ?>
+        </header>
+
+        <section class="filter-dropdown-group p-3 mb-4 bg-white rounded-4 shadow-sm border">
+            <div class="row align-items-center g-3 w-100">
+                <div class="col-auto">
+                    <span class="filter-label fw-bold"><i class="fas fa-filter text-primary me-1"></i> Filtrar:</span>
+                </div>
+                <div class="col-auto">
                     <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-rubro" class="dropdown-checkbox">
-                        <label for="dropdown-rubro" class="dropdown-toggle-custom">
-                            Rubro <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?category=all<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'all' ? 'active' : ''; ?>">Todos</a>
-                            <a href="?category=gastronomia<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'gastronomia' ? 'active' : ''; ?>">Gastronomía</a>
-                            <a href="?category=ropa<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'ropa' ? 'active' : ''; ?>">Ropa</a>
-                            <a href="?category=tecnologia<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'tecnologia' ? 'active' : ''; ?>">Tecnología</a>
-                            <a href="?category=deportes<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'deportes' ? 'active' : ''; ?>">Deportes</a>
-                            <a href="?category=retail<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterFloor !== 'all' ? '&floor=' . urlencode($filterFloor) : ''; ?>" class="dropdown-item-custom <?php echo $filterCategory === 'retail' ? 'active' : ''; ?>">Retail</a>
-                        </div>
-                    </div>
-
-                    <!-- Input directo de Nombre -->
-                    <form method="GET" class="filter-input-form">
-                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($filterCategory); ?>">
-                        <input type="hidden" name="floor" value="<?php echo htmlspecialchars($filterFloor); ?>">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            class="filter-input-direct" 
-                            placeholder="Buscar por nombre..." 
-                            value="<?php echo htmlspecialchars($searchName); ?>"
-                        >
-                        <button type="submit" class="filter-input-btn"><i class="fas fa-search"></i></button>
-                    </form>
-
-                    <!-- Dropdown Piso -->
-                    <div class="dropdown-custom">
-                        <input type="checkbox" id="dropdown-piso" class="dropdown-checkbox">
-                        <label for="dropdown-piso" class="dropdown-toggle-custom">
-                            Piso <i class="fas fa-chevron-down"></i>
-                        </label>
-                        <div class="dropdown-menu-custom">
-                            <a href="?floor=all<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterCategory !== 'all' ? '&category=' . urlencode($filterCategory) : ''; ?>" class="dropdown-item-custom <?php echo $filterFloor === 'all' ? 'active' : ''; ?>">Todos</a>
-                            <a href="?floor=Planta+Baja<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterCategory !== 'all' ? '&category=' . urlencode($filterCategory) : ''; ?>" class="dropdown-item-custom <?php echo $filterFloor === 'Planta Baja' ? 'active' : ''; ?>">Planta Baja</a>
-                            <a href="?floor=Primer+Piso<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterCategory !== 'all' ? '&category=' . urlencode($filterCategory) : ''; ?>" class="dropdown-item-custom <?php echo $filterFloor === 'Primer Piso' ? 'active' : ''; ?>">Primer Piso</a>
-                            <a href="?floor=Segundo+Piso<?php echo !empty($searchName) ? '&search=' . urlencode($searchName) : ''; ?><?php echo $filterCategory !== 'all' ? '&category=' . urlencode($filterCategory) : ''; ?>" class="dropdown-item-custom <?php echo $filterFloor === 'Segundo Piso' ? 'active' : ''; ?>">Segundo Piso</a>
+                        <input type="checkbox" id="drop-cat" class="dropdown-checkbox">
+                        <label for="drop-cat" class="dropdown-toggle-custom">Rubro <i class="fas fa-chevron-down ms-2"></i></label>
+                        <div class="dropdown-menu-custom shadow border-0">
+                            <a href="?category=all&ubication=<?= $filterFloor ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Todos</a>
+                            <a href="?category=gastronomia&ubication=<?= $filterFloor ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Gastronomía</a>
+                            <a href="?category=ropa&ubication=<?= $filterFloor ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Ropa</a>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Grid de locales -->
-            <div class="stores-grid-horizontal">
-                <?php
-                if (count($filteredStores) > 0) {
-                    foreach ($filteredStores as $store) {
-                ?>
-                        <div class="store-card-horizontal">
-                            <div>
-                                <!-- Lado izquierdo: Logo con color de marca -->
-                                <div class="store-logo-section" style="background-color: <?php echo $store['brand_color']; ?>;">
-                                    <!-- <i class="fas store-logo-icon"></i> -->
-                                    <img class="store-logo-icon" src="<?php echo htmlspecialchars($store['logo_icon']); ?>" alt="<?php echo htmlspecialchars($store['name']); ?> Logo" >
-                                </div>
-                                
-                                <!-- Lado derecho: Información -->
-                                <div class="store-info-section">
-                                    <h3 class="store-brand-name"><?php echo htmlspecialchars($store['name']); ?></h3>
-                                    <p class="store-location"><?php echo htmlspecialchars($store['floor']); ?> - Local <?php echo htmlspecialchars($store['local_number']); ?></p>
-                                </div>
-                            </div>
-
-                            <a href="../Promotions/Promotions.php?store=<?php echo urlencode($store['name']); ?>" class="store-promotions-btn">Ver Promociones</a>
+                <div class="col-auto">
+                    <div class="dropdown-custom">
+                        <input type="checkbox" id="drop-floor" class="dropdown-checkbox">
+                        <label for="drop-floor" class="dropdown-toggle-custom">Piso <i class="fas fa-chevron-down ms-2"></i></label>
+                        <div class="dropdown-menu-custom shadow border-0">
+                            <a href="?ubication=all&category=<?= $filterCategory ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Todos</a>
+                            <a href="?ubication=Planta Baja&category=<?= $filterCategory ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Planta Baja</a>
+                            <a href="?ubication=Primer Piso&category=<?= $filterCategory ?>&search=<?= $searchName ?>" class="dropdown-item-custom">Primer Piso</a>
                         </div>
-                <?php
-                    }
-                } else {
-                    echo '<div class="no-results">
-                            <i class="fas fa-search"></i>
-                            <p>No se encontraron locales con los filtros seleccionados</p>
-                          </div>';
-                }
-                ?>
+                    </div>
+                </div>
+                <div class="col">
+                    <form method="GET" class="d-flex border rounded-pill px-3 py-1 bg-light">
+                        <input type="hidden" name="category" value="<?= $filterCategory ?>">
+                        <input type="hidden" name="ubication" value="<?= $filterFloor ?>">
+                        <input type="text" name="search" class="form-control border-0 bg-transparent" placeholder="Buscar local..." value="<?= htmlspecialchars($searchName) ?>">
+                        <button type="submit" class="btn btn-link text-primary p-0"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <?php if ($hay_filtros): ?>
+            <div class="active-filters-container mb-4 d-flex align-items-center gap-2 flex-wrap">
+                <span class="small text-muted">Filtros activos:</span>
+                <?php if ($filterCategory !== 'all'): ?>
+                    <div class="filter-badge">Rubro: <?= ucfirst($filterCategory) ?> <a href="?category=all&ubication=<?= $filterFloor ?>&search=<?= $searchName ?>">×</a></div>
+                <?php endif; ?>
+                <?php if ($filterFloor !== 'all'): ?>
+                    <div class="filter-badge">Piso: <?= $filterFloor ?> <a href="?ubication=all&category=<?= $filterCategory ?>&search=<?= $searchName ?>">×</a></div>
+                <?php endif; ?>
+                <?php if ($searchName): ?>
+                    <div class="filter-badge">"<?= htmlspecialchars($searchName) ?>" <a href="?search=&category=<?= $filterCategory ?>&ubication=<?= $filterFloor ?>">×</a></div>
+                <?php endif; ?>
+                <a href="Stores.php" class="clear-all-filters small ms-2">Limpiar todo</a>
+            </div>
+        <?php endif; ?>
+
+        <section class="stores-grid-container">
+            <?php foreach ($filteredStores as $store): 
+                $isMine = in_array($store['id'], $myStoreIds);
+                renderStoreCard($store, $isMine); 
+            endforeach; ?>
+        </section>
     </main>
 
-    <?php include_once '../../Components/footer/Footer.php'; ?>
+    <?php if ($user && $user['type'] === 'admin'): ?>
+    <div class="modal fade" id="addStoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    <div class="modal-header bg-primary text-white p-4">
+                        <h5 class="modal-title fw-bold">Registrar Nuevo Local</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-4 text-center border-end d-flex flex-column align-items-center">
+                                <div id="createLogoPreview" class="rounded-4 border bg-light mb-2 d-flex align-items-center justify-content-center" style="width:150px; height:150px; overflow:hidden;">
+                                    <i class="fas fa-image text-muted fa-3x"></i>
+                                </div>
+                                <small class="text-muted">Vista previa del logo</small>
+                            </div>
+<div class="col-md-8">
+    <div class="row g-3">
+        <div class="col-12">
+            <label class="form-label small fw-bold">URL del Logo</label>
+            <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://...">
+        </div>
+        <div class="col-12">
+            <label class="form-label small fw-bold">O subir archivo</label>
+            <input type="file" id="input_file" name="logo_file" class="form-control" accept="image/*">
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="col-md-7">
+            <label class="form-label small fw-bold">Nombre del Local</label>
+            <input type="text" name="name" class="form-control rounded-pill px-3" required placeholder="Ej: Samsung Store">
+        </div>
+        <div class="col-md-5">
+            <label class="form-label small fw-bold">Rubro / Categoría</label>
+            <select name="category" class="form-select rounded-pill px-3" required>
+                <option value="" selected disabled>Seleccionar...</option>
+                <option value="tecnologia">Tecnología</option>
+                <option value="gastronomia">Gastronomía</option>
+                <option value="ropa">Ropa</option>
+                <option value="hogar">Hogar</option>
+                <option value="otros">Otros</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label small fw-bold">Ubicación</label>
+            <select name="ubication" class="form-select rounded-pill px-3">
+                <option value="Planta Baja">Planta Baja</option>
+                <option value="Primer Piso">Primer Piso</option>
+                <option value="Segundo Piso">Segundo Piso</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label small fw-bold">N° Local</label>
+            <input type="text" name="local_number" class="form-control rounded-pill px-3" required placeholder="Ej: L-45">
+        </div>
+<div class="col-md-12">
+    <label class="form-label small fw-bold">Color de Marca</label>
+    <div class="d-flex align-items-center gap-2">
+        <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
+        <small class="text-muted">Se usará en el borde de la tarjeta.</small>
+    </div>
+</div>
+
+        <div class="col-12">
+            <label class="form-label small fw-bold">Dueño Responsable</label>
+            <select name="id_owner" class="form-select rounded-pill px-3" required>
+                <option value="" selected disabled>Asignar un dueño...</option>
+                <?php $owners = getAllOwners(); foreach($owners as $owner): ?>
+                    <option value="<?= $owner['cod'] ?>"><?= $owner['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4">
+                        <button type="submit" name="btnCreateStore" class="btn btn-primary rounded-pill px-4">Crear Local</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="modal fade" id="manageStoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <form action="" method="POST">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title fw-bold">Gestionar Local</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="store_id" id="edit_store_id">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Nombre del Local</label>
+                            <input type="text" name="name" id="edit_name" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Ubicación</label>
+                            <select name="floor" id="edit_floor" class="form-select rounded-pill">
+                                <option value="Planta Baja">Planta Baja</option>
+                                <option value="Primer Piso">Primer Piso</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Número de Local</label>
+                            <input type="text" name="local_number" id="edit_local_number" class="form-control rounded-pill">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" name="btnUpdateStore" class="btn btn-dark rounded-pill px-4">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
+
+    <script>
+        // Lógica de Vista Previa Dinámica
+        const inputUrl = document.getElementById('input_url');
+        const inputFile = document.getElementById('input_file');
+        const preview = document.getElementById('createLogoPreview');
+
+        if(inputUrl) {
+            inputUrl.addEventListener('input', () => {
+                if(inputUrl.value) preview.innerHTML = `<img src="${inputUrl.value}" style="width:100%; height:100%; object-fit:contain;">`;
+                else preview.innerHTML = '<i class="fas fa-image text-muted fa-3x"></i>';
+            });
+        }
+
+        if(inputFile) {
+            inputFile.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:contain;">`;
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Abrir modal de gestión
+        function openManageModal(id, name, ubication, number) {
+            document.getElementById('edit_store_id').value = id;
+            document.getElementById('edit_name').value = name;
+            document.getElementById('edit_floor').value = ubication;
+            document.getElementById('edit_local_number').value = number;
+            new bootstrap.Modal(document.getElementById('manageStoreModal')).show();
+        }
+    </script>
 </body>
 </html>
+
+<?php
+function renderStoreCard($store, $isMine) {
+    $logo_db = $store['logo_icon'] ?? $store['logo'] ?? '';
+    $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
+    $brand_color = $store['color'] ?? '#0d6efd';
+    $mineClass = $isMine ? 'is-mine-card' : '';
+    ?>
+    <article class="store-card-modern shadow-sm <?= $mineClass ?>" style="border-left: 5px solid <?= $brand_color ?>;">
+        <div class="store-card-body">
+            <div class="store-logo-wrapper" style="background-color: <?= $brand_color ?>10;">
+                <img src="<?= $final_url ?>" class="store-img" onerror="this.src='https://via.placeholder.com/150';">
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h3 class="h6 fw-bold mb-0"><?= htmlspecialchars($store['name']) ?></h3>
+                    <?php if($isMine): ?> <span class="badge rounded-pill bg-warning text-dark" style="font-size: 0.6rem;">MÍO</span> <?php endif; ?>
+                </div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= $store['ubication'] ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= $store['local_number'] ?></div>
+            </div>
+        </div>
+        <div class="store-card-footer d-flex gap-2">
+            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>
+            <?php if($isMine): ?>
+                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= $store['ubication'] ?>', '<?= $store['local_number'] ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
+            <?php endif; ?>
+        </div>
+    </article>
+<?php } ?>

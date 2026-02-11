@@ -24,7 +24,7 @@
                 AlertService::success($loginSuccess);
                 $_SESSION['user'] = $user;
                 
-                header("Location: ./../../../public/Pages/Client Portal/clientPortal.php");
+                header("Location: ./../../../public/Pages/Home/home.php");
                 exit();
             } else {
                 $loginError = 'Credenciales incorrectas. Verifica tu email y contraseña.';
