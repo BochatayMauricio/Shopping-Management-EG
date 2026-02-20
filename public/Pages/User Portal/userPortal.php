@@ -194,27 +194,62 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                 $currentStatus = isset($promo['status']) ? trim(strtolower($promo['status'])) : 'active';
                 
                 $isUsed = ($currentStatus === 'used');
+                $isPending = ($currentStatus === 'pending');
+                $isRejected = ($currentStatus === 'rejected');
                 $isExpired = (isset($promo['is_expired']) && $promo['is_expired'] == 1 && !$isUsed);
             ?>
                 <div class="col-md-6">
-                    <div class="card coupon-card h-100 shadow-sm <?php echo ($isExpired || $isUsed) ? 'coupon-expired' : ''; ?>" 
-                         style="border-top: 5px solid <?php echo $isUsed ? '#198754' : ($isExpired ? '#adb5bd' : ($promo['store_color'] ?? '#0d6efd')); ?>;">
+                    <div class="card coupon-card h-100 shadow-sm <?php echo ($isExpired || $isUsed || $isPending || $isRejected) ? 'coupon-expired' : ''; ?>" 
+                         style="border-top: 5px solid <?php 
+                            if ($isUsed) echo '#198754';
+                            elseif ($isPending) echo '#ffc107';
+                            elseif ($isRejected) echo '#dc3545';
+                            elseif ($isExpired) echo '#adb5bd';
+                            else echo ($promo['store_color'] ?? '#0d6efd'); 
+                         ?>;">
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-2">
-                                <h5 class="fw-bold mb-0 <?php echo ($isExpired || $isUsed) ? 'text-muted' : ''; ?>"><?= htmlspecialchars($promo['title']) ?></h5>
-                                <span class="badge <?php echo $isUsed ? 'bg-success' : ($isExpired ? 'bg-secondary' : 'bg-danger'); ?>">
-                                    <?= $isUsed ? 'USADA' : $promo['discount_label'] ?>
+                                <h5 class="fw-bold mb-0 <?php echo ($isExpired || $isUsed || $isPending || $isRejected) ? 'text-muted' : ''; ?>"><?= htmlspecialchars($promo['title']) ?></h5>
+                                <span class="badge <?php 
+                                    if ($isUsed) echo 'bg-success';
+                                    elseif ($isPending) echo 'bg-warning text-dark';
+                                    elseif ($isRejected) echo 'bg-danger';
+                                    elseif ($isExpired) echo 'bg-secondary';
+                                    else echo 'bg-danger';
+                                ?>">
+                                    <?php 
+                                        if ($isUsed) echo 'USADA';
+                                        elseif ($isPending) echo 'PENDIENTE';
+                                        elseif ($isRejected) echo 'RECHAZADA';
+                                        else echo $promo['discount_label'];
+                                    ?>
                                 </span>
                             </div>
                             <p class="text-muted small mb-3"><i class="fas fa-store me-1"></i> <?= htmlspecialchars($promo['store_name']) ?></p>
-                            <div class="coupon-code-box text-center mb-3 <?php echo ($isExpired || $isUsed) ? 'bg-light opacity-50' : ''; ?>">
-                                <span class="small d-block text-muted mb-1">CÓDIGO DE CANJE</span>
-                                <strong class="<?php echo ($isExpired || $isUsed) ? 'text-muted' : 'text-dark'; ?>">SR-<?= $promo['id'] . ($user['cod'] ?? $user['id']) ?></strong>
-                            </div>
+                            
+                            <?php if ($isPending): ?>
+                                <div class="alert alert-warning py-2 px-3 mb-3">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <small>Esperando aprobación del local</small>
+                                </div>
+                            <?php elseif ($isRejected): ?>
+                                <div class="alert alert-danger py-2 px-3 mb-3">
+                                    <i class="fas fa-times-circle me-1"></i>
+                                    <small>Solicitud rechazada por el local</small>
+                                </div>
+                            <?php else: ?>
+                                <div class="coupon-code-box text-center mb-3 <?php echo ($isExpired || $isUsed) ? 'bg-light opacity-50' : ''; ?>">
+                                    <span class="small d-block text-muted mb-1">CÓDIGO DE CANJE</span>
+                                    <strong class="<?php echo ($isExpired || $isUsed) ? 'text-muted' : 'text-dark'; ?>">SR-<?= $promo['id'] . ($user['cod'] ?? $user['id']) ?></strong>
+                                </div>
+                            <?php endif; ?>
+                            
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <small class="<?php echo $isExpired ? 'text-danger fw-bold' : 'text-muted'; ?>">
                                     <?php 
                                         if($isUsed) echo "Canjeado con éxito";
+                                        elseif($isPending) echo "Solicitado: " . date('d/m/Y', strtotime($promo['obtained_at']));
+                                        elseif($isRejected) echo "";
                                         else echo $isExpired ? 'VENCIDA' : 'Vence: ' . $promo['valid_until']; 
                                     ?>
                                 </small>
@@ -222,6 +257,14 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                                 <?php if ($isUsed): ?>
                                     <button class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-none" disabled>
                                         <i class="fas fa-check-circle me-1"></i> Usada
+                                    </button>
+                                <?php elseif ($isPending): ?>
+                                    <button class="btn btn-sm btn-warning rounded-pill px-3" disabled>
+                                        <i class="fas fa-hourglass-half me-1"></i> Pendiente
+                                    </button>
+                                <?php elseif ($isRejected): ?>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3" disabled>
+                                        <i class="fas fa-times me-1"></i> Rechazada
                                     </button>
                                 <?php elseif ($isExpired): ?>
                                     <button class="btn btn-sm btn-secondary rounded-pill px-3 disabled" disabled>Expiró</button>

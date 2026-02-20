@@ -92,6 +92,7 @@ function hasClientRequestedPromo($clientId, $promoId) {
 
 /**
  * Registra la solicitud de la promoción en la tabla relacional
+ * Estado inicial: 'pending' - El dueño del local debe aprobarla
  */
 function requestPromotion($clientId, $promoId) {
     global $CONNECTION;
@@ -101,8 +102,8 @@ function requestPromotion($clientId, $promoId) {
         return "already_requested";
     }
 
-    // 2. Insertar la nueva relación
-    $query = "INSERT INTO user_promotions (id_client, id_promotion, date_from, status) VALUES (?, ?, NOW(), 'active')";
+    // 2. Insertar la nueva relación con estado pendiente
+    $query = "INSERT INTO user_promotions (id_client, id_promotion, date_from, status) VALUES (?, ?, NOW(), 'pending')";
     $stmt = mysqli_prepare($CONNECTION, $query);
     mysqli_stmt_bind_param($stmt, "ii", $clientId, $promoId);
     
@@ -268,4 +269,80 @@ function redeemPromotionCode($fullCode) {
         "success" => true, 
         "message" => "¡Canje exitoso! El cliente (ID: $clientId) ahora tiene $totalUsed promociones usadas y es nivel $newCategory."
     ];
+}
+
+/**
+ * Obtiene las solicitudes de clientes pendientes para las tiendas de un owner
+ */
+function getPendingClientRequests($ownerId) {
+    global $CONNECTION;
+    
+    $query = "SELECT 
+                up.id_client,
+                up.id_promotion,
+                up.date_from as request_date,
+                up.status,
+                u.name as client_name,
+                u.email as client_email,
+                u.category as client_category,
+                p.title as promo_title,
+                p.discount,
+                p.price,
+                p.original_price,
+                p.image as promo_image,
+                s.name as store_name,
+                s.color as store_color,
+                s.id as store_id
+              FROM user_promotions up
+              JOIN users u ON up.id_client = u.cod
+              JOIN promotions p ON up.id_promotion = p.id
+              JOIN stores s ON p.id_store = s.id
+              WHERE up.status = 'pending' AND s.id_owner = ?
+              ORDER BY up.date_from DESC";
+    
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $ownerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (!$result) {
+        error_log("Error en getPendingClientRequests: " . mysqli_error($CONNECTION));
+        return [];
+    }
+    
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Aprueba o rechaza la solicitud de un cliente para una promoción
+ */
+function updateClientRequestStatus($clientId, $promoId, $newStatus) {
+    global $CONNECTION;
+    
+    $query = "UPDATE user_promotions SET status = ? WHERE id_client = ? AND id_promotion = ?";
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "sii", $newStatus, $clientId, $promoId);
+    
+    return mysqli_stmt_execute($stmt);
+}
+
+/**
+ * Cuenta las solicitudes pendientes para las tiendas de un owner
+ */
+function countPendingClientRequests($ownerId) {
+    global $CONNECTION;
+    
+    $query = "SELECT COUNT(*) as total
+              FROM user_promotions up
+              JOIN promotions p ON up.id_promotion = p.id
+              JOIN stores s ON p.id_store = s.id
+              WHERE up.status = 'pending' AND s.id_owner = ?";
+    
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $ownerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    
+    return $row['total'] ?? 0;
 }

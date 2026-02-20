@@ -43,7 +43,12 @@ if(isset($_GET['action']) && $_GET['action'] === 'logout') {
                 <?php endif; ?>
                 <?php if($user && $user['type'] === 'owner'): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promoción</a>
+                        <a class="nav-link" href="../../Pages/Client%20Requests/clientRequests.php">
+                            <i class="fas fa-user-clock me-1"></i>Solicitudes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promo</a>
                     </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>

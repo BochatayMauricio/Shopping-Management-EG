@@ -1,0 +1,76 @@
+/* clientRequests.css */
+
+/* Card de solicitud */
+.request-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Info del cliente */
+.client-info {
+  background-color: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.client-info i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Botones de acción */
+.request-card .btn {
+  font-weight: 600;
+  padding: 10px 20px;
+}
+
+.request-card .btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+}
+
+.request-card .btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.request-card .btn-outline-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+/* Badge pendiente animado */
+.badge.bg-warning {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Empty state */
+.fa-inbox {
+  color: #cbd5e1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .request-card .card-footer form {
+    flex-direction: column;
+  }
+
+  .request-card .btn {
+    width: 100%;
+  }
+}
