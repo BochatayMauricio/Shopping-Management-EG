@@ -148,7 +148,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                             <?php if (!empty($myStores)): ?>
                                 <div class="d-flex flex-column gap-3">
                                     <?php foreach ($myStores as $store): 
-                                        $logo_db = $store['logo'] ?? $store['logo_icon'] ?? '';
+                                        $logo_db = $store['logo'] ?? '';
                                         $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
                                         $brand_color = $store['color'] ?? '#0d6efd';
                                     ?>

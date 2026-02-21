@@ -1,42 +1,42 @@
 <?php
 // app/Services/news.services.php
 
-// Supongamos que tienes un archivo de conexión global
 require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../models/News.php';
 
+/**
+ * Obtiene todas las noticias
+ * @return News[]
+ */
 function getNews() {
     global $CONNECTION;
 
-    $news = []; // Array donde guardaremos los resultados
-
-    // 1. Verificamos la conexión
     if (!$CONNECTION) {
         error_log("Error: No hay conexión a la base de datos en getNews");
         return [];
     }
 
-    // 2. Definimos la consulta (ajusta los nombres de las columnas según tu DB)
-    // Es recomendable ordenar por fecha para que las últimas noticias salgan primero
     $query = "SELECT id, title, description, image, author, date FROM news ORDER BY date DESC";
-
-    // 3. Ejecutamos la consulta
     $result = mysqli_query($CONNECTION, $query);
 
-    // 4. Verificamos si hubo errores en la consulta
     if (!$result) {
         error_log("Error en la consulta de noticias: " . mysqli_error($CONNECTION));
         return [];
     }
 
-    // 5. Recorremos los resultados y los guardamos en el array
+    $news = [];
     while ($row = mysqli_fetch_assoc($result)) {
-        $news[] = $row;
+        $news[] = News::fromArray($row);
     }
 
-    // 6. Retornamos el array con los datos reales
     return $news;
 }
 
+/**
+ * Crea una nueva noticia
+ * @param News|array $newsData Objeto News o array con datos
+ * @return bool
+ */
 function createNews($title, $description, $image, $author, $date) {
     global $CONNECTION;
 
@@ -44,13 +44,27 @@ function createNews($title, $description, $image, $author, $date) {
     
     $stmt = mysqli_prepare($CONNECTION, $query);
     
-    // "sssss" indica que los 5 parámetros son strings
     mysqli_stmt_bind_param($stmt, "sssss", $title, $description, $image, $author, $date);
     
     $result = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
 
     return $result;
+}
+
+/**
+ * Crea una noticia desde un objeto News
+ * @param News $news
+ * @return bool
+ */
+function createNewsFromModel(News $news) {
+    return createNews(
+        $news->getTitle(),
+        $news->getDescription(),
+        $news->getImage(),
+        $news->getAuthor(),
+        $news->getDate()
+    );
 }
 // function getNews() {
 //     // Simulamos la conexión y consulta a la base de datos

@@ -71,8 +71,8 @@ if ($user && $user['type'] === 'client') {
     // Obtener las que ya usó para el check visual "YA UTILIZADA"
     $myPromos = getClientPromotions($userId);
     foreach ($myPromos as $mp) {
-        // Usamos request_status que es el alias de tu SQL
-        if (($mp['request_status'] ?? $mp['status']) === 'used') {
+        // El modelo Promotion usa 'status' para el estado de la solicitud
+        if ($mp['status'] === 'used') {
             $myUsedPromoIds[] = $mp['id'];
         }
     }

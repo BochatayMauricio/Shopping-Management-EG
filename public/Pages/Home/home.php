@@ -5,23 +5,7 @@ include_once '../../../app/Services/news.services.php';
 session_start();
 $user = getCurrentUser();
 
-// =========================================================================
-// LÓGICA DE DATOS (SIMULACIÓN DE BASE DE DATOS)
-// =========================================================================
-
-// Simulación de la base de datos de Promociones con el campo 'rubro'
-$allPromotions = [
-    ['local' => 'Tienda A', 'discount' => 30, 'description' => 'Descuento especial en productos de verano', 'image' => '../../../assets/local1.jpg', 'rubro' => 'ropa'],
-    ['local' => 'Tienda B', 'discount' => 20, 'description' => 'Ofertas flash solo por hoy', 'image' => '../../../assets/local2.jpg', 'rubro' => 'tecnologia'],
-    ['local' => 'Tienda C', 'discount' => 50, 'description' => 'Hasta 50% off en marcas seleccionadas', 'image' => '../../../assets/local3.jpg', 'rubro' => 'gastronomia'],
-    ['local' => 'Tienda D', 'discount' => 15, 'description' => 'Promoción limitada de temporada', 'image' => '../../../assets/local1.jpg', 'rubro' => 'ropa'],
-    ['local' => 'Tienda E', 'discount' => 45, 'description' => '2x1 en toda la sección infantil', 'image' => '../../../assets/local2.jpg', 'rubro' => 'servicios'],
-    ['local' => 'Tienda F', 'discount' => 10, 'description' => 'Regalo exclusivo con tu compra', 'image' => '../../../assets/local3.jpg', 'rubro' => 'hogar'],
-];
-
 $news = getNews();
-
-// No hay lógica de filtrado ya que se eliminó la búsqueda.
 ?>
 
 <!DOCTYPE html>
@@ -76,24 +60,12 @@ $news = getNews();
         </div>
     </div>
 </section>
-<section class="promo-carousel">
-    <h2 class="section-title">Promociones Destacadas</h2>
-    
-    <div class="carousel-wrapper" id="carousel">
-        <div class="carousel-container">
-        
-        <?php foreach ($allPromotions as $promo): 
-             // Generar clase de rubro para el color dinámico
-            $rubroClass = 'card-rubro-' . strtolower($promo['rubro']); 
-        ?>
-            <div class="carousel-card <?= htmlspecialchars($rubroClass) ?>">
-              <img src="<?= htmlspecialchars($promo['image']) ?>" alt="<?= htmlspecialchars($promo['local']) ?>">
-              <h3><?= htmlspecialchars($promo['local']) ?></h3>
-              <p><?= htmlspecialchars($promo['description']) ?></p>
-              <p><strong><?= htmlspecialchars($promo['discount']) ?>% OFF</strong></p>
-            </div>
-        <?php endforeach; ?>
 
+<section class="ubicaciones-section my-5">
+    <div class="container">
+        <h2 class="section-title mb-4 fw-bold">Ubicaciones</h2>
+        <div class="ubicaciones-image-container text-center">
+            <img src="../../../assets/ubicaciones.jpg" alt="Mapa de ubicaciones del Shopping" class="img-fluid rounded shadow">
         </div>
     </div>
 </section>

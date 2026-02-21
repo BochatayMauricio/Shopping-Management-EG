@@ -1,15 +1,19 @@
 <?php
 require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../models/Promotion.php';
 
 function getAllPromotions() {
     global $CONNECTION;
-    // Quitamos el filtro de status para traer el histórico completo
     $query = "SELECT status, (SELECT COUNT(*) FROM user_promotions up WHERE up.id_promotion = p.id) as use_count 
               FROM promotions p";
     $result = mysqli_query($CONNECTION, $query);
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
+/**
+ * Obtiene promociones con datos de tienda
+ * @return Promotion[]
+ */
 function getPromotionsWithStoreData() {
     global $CONNECTION;
     
@@ -18,20 +22,22 @@ function getPromotionsWithStoreData() {
                 p.title, 
                 p.image, 
                 p.description,
-                -- Traemos la fecha real para las comparaciones de PHP (Línea clave)
                 p.date_until, 
-                -- Traemos la fecha formateada para la vista
                 DATE_FORMAT(p.date_until, '%d/%m') as valid_until,
                 CONCAT('-', CAST(p.discount AS UNSIGNED), '% OFF') as discount_label,
                 p.price, 
                 p.original_price, 
+                p.date_from,
+                p.client_category,
+                p.week_days,
+                p.status,
+                p.discount,
+                p.id_store,
                 s.name as store_name, 
                 s.logo as store_logo, 
                 s.color as store_color,
                 s.local_number,
-                s.category as store_category,
-                p.client_category,
-                p.status
+                s.category as store_category
               FROM promotions p
               JOIN stores s ON p.id_store = s.id
               WHERE p.status = 'active'
@@ -43,7 +49,11 @@ function getPromotionsWithStoreData() {
         return [];
     }
 
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $promotions = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $promotions[] = Promotion::fromArray($row);
+    }
+    return $promotions;
 }
 
 // En app/Services/promotions.services.php
@@ -126,13 +136,16 @@ function getPromotionRequestStatus($clientId, $promoId) {
     return false; // No solicitada aún
 }
 
+/**
+ * Obtiene las promociones de un cliente
+ * @return Promotion[]
+ */
 function getClientPromotions($clientId) {
     global $CONNECTION;
     
     $query = "SELECT p.*, 
                      CONCAT('-', CAST(p.discount AS UNSIGNED), '% OFF') as discount_label,
                      DATE_FORMAT(p.date_until, '%d/%m/%Y') as valid_until,
-                     -- Comparamos la fecha actual con la de vencimiento
                      IF(p.date_until < CURDATE(), 1, 0) as is_expired,
                      cp.status, 
                      cp.date_from as obtained_at, 
@@ -143,22 +156,27 @@ function getClientPromotions($clientId) {
               JOIN promotions p ON cp.id_promotion = p.id
               JOIN stores s ON p.id_store = s.id
               WHERE cp.id_client = ?
-              ORDER BY is_expired ASC, p.date_until ASC"; // Primero las vigentes, luego las vencidas
+              ORDER BY is_expired ASC, p.date_until ASC";
     
     $stmt = mysqli_prepare($CONNECTION, $query);
     mysqli_stmt_bind_param($stmt, "i", $clientId);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    
+    $promotions = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $promotions[] = Promotion::fromArray($row);
+    }
+    return $promotions;
 }
 
 /**
  * Obtiene todas las promociones con estado 'pending'
+ * @return Promotion[]
  */
 function getPendingPromotions() {
     global $CONNECTION;
 
-    // Asegúrate de que las columnas 'status', 'id_store' (en p) e 'id' (en s) existan con esos nombres exactos
     $query = "SELECT 
                 p.*, 
                 s.name as store_name, 
@@ -166,17 +184,20 @@ function getPendingPromotions() {
               FROM promotions p 
               JOIN stores s ON p.id_store = s.id 
               WHERE p.status = 'pending' 
-              ORDER BY p.id DESC"; // Cambié created_at por id por si esa columna no existe
+              ORDER BY p.id DESC";
 
     $result = mysqli_query($CONNECTION, $query);
 
     if (!$result) {
-        // Esto te dirá el error exacto de SQL en la consola del navegador o pantalla
         error_log("Error en getPendingPromotions: " . mysqli_error($CONNECTION));
         return [];
     }
 
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $promotions = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $promotions[] = Promotion::fromArray($row);
+    }
+    return $promotions;
 }
 
 /**

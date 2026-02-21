@@ -1,6 +1,8 @@
 <?php  
 require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
+
 /**
  * Función para validar email
  * @param string $email
@@ -12,14 +14,13 @@ function validateEmail($email) {
 
 /**
  * Función para autenticar usuario
- * @param string $email
+ * @param string $userName
  * @param string $password
- * @return array|false
+ * @return User|false
  */
 function authenticateUser($userName, $password) {
     global $CONNECTION;
     
-    // Debug: verificar conexión
     if (!$CONNECTION) {
         error_log("Error: No hay conexión a la base de datos");
         return false;
@@ -30,7 +31,6 @@ function authenticateUser($userName, $password) {
 
     $result = mysqli_query($CONNECTION, $query);
     
-    // Debug: verificar errores de consulta
     if (!$result) {
         error_log("Error en la consulta: " . mysqli_error($CONNECTION));
         return false;
@@ -41,21 +41,27 @@ function authenticateUser($userName, $password) {
         return false;
     } 
 
-    // Verificar la contraseña
-    $user = $result->fetch_assoc();
-    if (!password_verify($password, $user['password'])) {
-        return false; // Contraseña incorrecta
+    $userData = $result->fetch_assoc();
+    if (!password_verify($password, $userData['password'])) {
+        return false;
     }
 
+    $user = User::fromArray($userData);
+    
     session_start();
-    $_SESSION['user'] = $user;
+    $_SESSION['user'] = $userData; // Guardamos el array para compatibilidad
     mysqli_close($CONNECTION);
     AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
     return $user;
 }
 
+/**
+ * Obtiene el usuario actual de la sesión
+ * @return User|null
+ */
 function getCurrentUser(){
-    return $_SESSION['user'] ?? null;
+    $userData = $_SESSION['user'] ?? null;
+    return $userData ? User::fromArray($userData) : null;
 }
 
 function getUserRole() {
