@@ -1,12 +1,6 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php'; // Usamos __DIR__ para rutas seguras
-
-if(isset($_GET['action']) && $_GET['action'] === 'logout') {
-    logout();
-    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-    header("Location: " . $baseUrl . "/public/Pages/Login/login.php");
-    exit();
-}
+// El logout se procesa en cada página ANTES del HTML, no aquí
+// Este archivo solo renderiza el navbar
 ?>
 
 <link rel="stylesheet" href="<?php echo defined('BASE_URL') ? BASE_URL : ''; ?>/public/Components/navbar/navbar.css">

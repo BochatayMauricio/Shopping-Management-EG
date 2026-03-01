@@ -69,10 +69,24 @@ function getUserRole() {
 }
 
 function logout(){
+    // Asegurar que la sesión está iniciada
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
     session_unset();
     session_destroy();
-    AlertService::success("Sesión cerrada correctamente.");
-    header("Location: ./../../../public/Pages/Home/home.php");
+    
+    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+    $redirectUrl = $baseUrl . "/public/Pages/Home/home.php";
+    
+    // Si ya se enviaron headers, usar JavaScript
+    if (headers_sent()) {
+        echo '<script>window.location.href = "' . $redirectUrl . '";</script>';
+        exit();
+    }
+    
+    header("Location: " . $redirectUrl);
     exit();
 }
 

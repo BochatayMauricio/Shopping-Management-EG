@@ -1,10 +1,8 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/contact.service.php';
 include_once __DIR__ . '/../../../app/controllers/contact.controller.php';
-
-session_start();
-$user = getCurrentUser();
 ?>
 
 <!DOCTYPE html>

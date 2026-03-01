@@ -1,9 +1,7 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
-
-session_start();
-$user = getCurrentUser();
 
 if (!$user || $user['type'] !== 'owner') {
     header("Location: ../Login/login.php");

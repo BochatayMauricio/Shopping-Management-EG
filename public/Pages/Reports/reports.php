@@ -1,13 +1,9 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user = getCurrentUser();
 
 // Seguridad: Solo admin
 if (!$user || $user['type'] !== 'admin') { 

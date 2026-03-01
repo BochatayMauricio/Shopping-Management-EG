@@ -1,14 +1,10 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/controllers/store.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
-include_once __DIR__ . '/../../../app/Services/user.services.php'; // Inclusión para la barra de progreso
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user = getCurrentUser();
+include_once __DIR__ . '/../../../app/Services/user.services.php';
 
 // Si no está logueado, al login
 if (!$user) {

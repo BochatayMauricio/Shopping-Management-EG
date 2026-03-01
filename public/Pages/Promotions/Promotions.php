@@ -1,15 +1,11 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
-include_once __DIR__ . '/../../../app/Services/user.services.php'; 
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user = getCurrentUser();
+include_once __DIR__ . '/../../../app/Services/user.services.php';
 
 // --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

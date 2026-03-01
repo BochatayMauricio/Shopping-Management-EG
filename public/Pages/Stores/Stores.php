@@ -1,12 +1,10 @@
 <?php
-// public/Pages/Stores/Stores.php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/controllers/store.controller.php';
 
-session_start();
-$user = getCurrentUser();
 $stores = getAllStores();
 
 // Identificar locales del dueño
