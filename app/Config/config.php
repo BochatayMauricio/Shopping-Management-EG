@@ -2,9 +2,17 @@
 // Cargar autoload de Composer
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-// Cargar variables de entorno desde .env usando phpdotenv
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->load();
+// Cargar variables de entorno desde .env usando phpdotenv (solo si existe)
+$envFile = __DIR__ . '/../../.env';
+if (file_exists($envFile)) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+    $dotenv->load();
+}
+
+// Función helper para obtener variables de entorno
+function env($key, $default = null) {
+    return $_ENV[$key] ?? getenv($key) ?: $default;
+}
 
 // Configuración de la aplicación
 define('APP_NAME', 'Shopping Rosario');
@@ -17,11 +25,11 @@ date_default_timezone_set(TIMEZONE);
 /**
  * Conexion a la base de datos
  */
-$hostname = $_ENV['DB_HOST'];
-$username = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASS'];
-$dbname = $_ENV['DB_NAME'];
-$dbport = $_ENV['DB_PORT'] ?? 3306;
+$hostname = env('DB_HOST', 'localhost');
+$username = env('DB_USER', 'root');
+$password = env('DB_PASS', '');
+$dbname = env('DB_NAME', 'shopping_management');
+$dbport = env('DB_PORT', 3306);
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
