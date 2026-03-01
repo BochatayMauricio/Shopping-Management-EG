@@ -79,7 +79,7 @@
     </div>
     <script>
         setTimeout(function(){
-            window.location.href = "./Pages/Home/home.php";
+            window.location.href = "public/Pages/Home/home.php";
         }, 2000);
     </script>
 </body>
