@@ -1,7 +1,7 @@
 <?php
 // app/Services/news.services.php
 
-require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/News.php';
 
 /**
