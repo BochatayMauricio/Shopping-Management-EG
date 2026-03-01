@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Sesión manejada por init.php o login.controller.php
 require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
