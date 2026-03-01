@@ -4,9 +4,17 @@
  * Incluir al inicio de TODAS las páginas, ANTES de cualquier HTML
  */
 
+// Cargar el modelo User ANTES de session_start para evitar __PHP_Incomplete_Class
+require_once __DIR__ . '/models/User.php';
+
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+// Limpiar sesión corrupta si existe
+if (isset($_SESSION['user']) && $_SESSION['user'] instanceof __PHP_Incomplete_Class) {
+    unset($_SESSION['user']);
 }
 
 // Cargar configuración y servicios base

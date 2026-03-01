@@ -1,6 +1,8 @@
 <?php
-    include_once __DIR__ . '/../../app/Services/user.services.php';
-    include_once __DIR__ . '/../../app/Services/alert.service.php';
+    // Cargar configuración primero
+    include_once __DIR__ . '/../Config/config.php';
+    include_once __DIR__ . '/../Services/user.services.php';
+    include_once __DIR__ . '/../Services/alert.service.php';
 
     // Procesar el formulario de login
 if (!empty($_POST)) {
@@ -34,8 +36,9 @@ if (!empty($_POST)) {
             $loginSuccess = 'Registro exitoso. ¡Bienvenido!';
             AlertService::success($loginSuccess);
             
-            // Redirigir al Portal del Cliente
-            header("Location: ./../../../public/Pages/Client Portal/clientPortal.php");
+            // Redirigir al Login
+            $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+            header("Location: " . $baseUrl . "/public/Pages/Login/login.php");
             exit();
 
         } elseif ($result === "email_exists") {

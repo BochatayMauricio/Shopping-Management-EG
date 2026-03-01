@@ -1,6 +1,14 @@
 <?php
-    include_once __DIR__ . '/../../app/Services/login.services.php';
-    include_once __DIR__ . '/../../app/Services/alert.service.php';
+    // Cargar User antes de session_start para evitar __PHP_Incomplete_Class
+    require_once __DIR__ . '/../models/User.php';
+    
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    include_once __DIR__ . '/../Config/config.php';
+    include_once __DIR__ . '/../Services/login.services.php';
+    include_once __DIR__ . '/../Services/alert.service.php';
 
     // Procesar el formulario de login
     if (!empty($_POST)) {
@@ -20,11 +28,10 @@
             $user = authenticateUser($userName, $password);
             if ($user) {
                 $loginSuccess = 'Inicio de sesión exitoso. Redirigiendo...';
-                // Redirigir a la página principal o dashboard
                 AlertService::success($loginSuccess);
-                $_SESSION['user'] = $user;
                 
-                header("Location: ./../../../public/Pages/Home/home.php");
+                $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+                header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
                 exit();
             } else {
                 $loginError = 'Credenciales incorrectas. Verifica tu email y contraseña.';
@@ -32,6 +39,4 @@
             }
         }
     }
-    
-
 ?>

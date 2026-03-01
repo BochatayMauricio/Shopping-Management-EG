@@ -46,22 +46,53 @@ function authenticateUser($userName, $password) {
         return false;
     }
 
-    $user = User::fromArray($userData);
+    // Iniciar sesión si no está iniciada
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     
-    session_start();
-    $_SESSION['user'] = $userData; // Guardamos el array para compatibilidad
-    mysqli_close($CONNECTION);
+    // Guardamos el array para evitar problemas de serialización
+    $_SESSION['user'] = $userData;
+    
     AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
-    return $user;
+    return $userData; // Retornamos array en lugar de objeto User
 }
 
 /**
  * Obtiene el usuario actual de la sesión
- * @return User|null
+ * @return array|null Retorna array para evitar problemas de serialización
  */
 function getCurrentUser(){
     $userData = $_SESSION['user'] ?? null;
-    return $userData ? User::fromArray($userData) : null;
+    
+    // Si no hay datos, retornar null
+    if (!$userData) {
+        return null;
+    }
+    
+    // Si es un objeto incompleto (sesión corrupta), limpiar y retornar null
+    if ($userData instanceof __PHP_Incomplete_Class) {
+        unset($_SESSION['user']);
+        return null;
+    }
+    
+    // Si ya es un array, retornarlo directamente
+    if (is_array($userData)) {
+        return $userData;
+    }
+    
+    // Si es un objeto User, convertirlo a array
+    if ($userData instanceof User) {
+        return [
+            'cod' => $userData['cod'],
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'type' => $userData['type'],
+            'category' => $userData['category']
+        ];
+    }
+    
+    return null;
 }
 
 function getUserRole() {
