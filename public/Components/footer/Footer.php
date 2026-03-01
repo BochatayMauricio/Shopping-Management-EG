@@ -32,15 +32,35 @@
                             <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/Contact/Contact.php">Contacto</a>
+                            <a class="nav-link text-white" href="../../Pages/Contact/contact.php">Contacto</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($user && $user['type'] === 'client'): ?>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Tiendas</a>
+                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/Promotions/Promotions.php">Ofertas</a>
+                            <a class="nav-link text-white" href="../../Pages/Promotions/Promotions.php">Promociones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Contact/contact.php">Contacto</a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if ($user && $user['type'] === 'owner'): ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Locales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Promotions/Promotions.php">Promociones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Contact/contact.php">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Client%20Requests/clientRequests.php">Solicitudes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="../../Pages/Redeem%20Promo/redeemPromo.php">Activar Promo</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($user && $user['type'] === 'admin'): ?>
@@ -48,13 +68,10 @@
                             <a class="nav-link text-white" href="../../Pages/Stores/Stores.php">Gestión Locales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/Requests/Requests.php">Solicitudes</a>
+                            <a class="nav-link text-white" href="../../Pages/Requests/requests.php">Solicitudes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/News/News.php">Novedades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="../../Pages/Reports/Reports.php">Reportes</a>
+                            <a class="nav-link text-white" href="../../Pages/Reports/reports.php">Reportes</a>
                         </li>
                     <?php endif; ?>
                 </ul>
