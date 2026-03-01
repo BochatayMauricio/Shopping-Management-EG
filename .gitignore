@@ -1,0 +1,8 @@
+# Dependencias
+/vendor/
+
+# Variables de entorno (contiene credenciales)
+.env
+
+# Composer local
+composer.phar

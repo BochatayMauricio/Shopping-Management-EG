@@ -1,0 +1,14 @@
+{
+    "name": "shopping/management",
+    "description": "Shopping Management System",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Bochatay Mauricio",
+            "email": "bochataymauricio01@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

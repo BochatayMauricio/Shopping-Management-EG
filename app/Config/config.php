@@ -1,9 +1,15 @@
 <?php
+// Cargar autoload de Composer
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+// Cargar variables de entorno desde .env usando phpdotenv
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
 // Configuración de la aplicación
 define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
-define('BASE_URL', 'http://localhost/Shopping-Management-EG/');
 
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
@@ -11,11 +17,11 @@ date_default_timezone_set(TIMEZONE);
 /**
  * Conexion a la base de datos
  */
-$hostname = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "shopping_management";
-$dbport = 3306;
+$hostname = $_ENV['DB_HOST'];
+$username = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASS'];
+$dbname = $_ENV['DB_NAME'];
+$dbport = $_ENV['DB_PORT'] ?? 3306;
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
