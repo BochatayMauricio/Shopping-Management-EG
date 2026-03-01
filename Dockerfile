@@ -1,5 +1,11 @@
 FROM php:8.2-apache
 
+# Instalar dependencias del sistema necesarias para Composer
+RUN apt-get update && apt-get install -y \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Instalar extensiones de PHP necesarias
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
@@ -18,11 +24,11 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar composer.json primero para aprovechar cache de Docker
-COPY composer.json ./
+# Copiar composer files primero para aprovechar cache de Docker
+COPY composer.json composer.lock* ./
 
 # Instalar dependencias de PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copiar el resto de archivos de la aplicación
 COPY . .
