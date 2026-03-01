@@ -31,14 +31,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Crear script de inicio
-RUN echo '#!/bin/bash\n\
-PORT=${PORT:-80}\n\
-echo "Listen $PORT" > /etc/apache2/ports.conf\n\
-sed -i "s/<VirtualHost \\*:.*>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf\n\
-echo "Starting Apache on port $PORT"\n\
-apache2-foreground' > /start.sh && chmod +x /start.sh
-
 EXPOSE 80
 
-CMD ["/start.sh"]
+# Comando de inicio con sustitución de puerto
+CMD PORT="${PORT:-${WEB_PORT:-80}}" && \
+    echo "Listen $PORT" > /etc/apache2/ports.conf && \
+    sed -i "s/<VirtualHost \*:.*>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf && \
+    echo "Starting Apache on port $PORT" && \
+    apache2-foreground
