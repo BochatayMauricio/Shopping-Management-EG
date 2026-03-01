@@ -71,8 +71,8 @@ if ($user && $user['type'] === 'client') {
     // Obtener las que ya usó para el check visual "YA UTILIZADA"
     $myPromos = getClientPromotions($userId);
     foreach ($myPromos as $mp) {
-        // Usamos request_status que es el alias de tu SQL
-        if (($mp['request_status'] ?? $mp['status']) === 'used') {
+        // El modelo Promotion usa 'status' para el estado de la solicitud
+        if ($mp['status'] === 'used') {
             $myUsedPromoIds[] = $mp['id'];
         }
     }
@@ -134,6 +134,42 @@ function buildFilterUrl($paramName, $paramValue) {
 </head>
 <body>
     <?php include_once '../../Components/navbar/NavBar.php'; ?>
+
+    <?php if (isset($_GET['request'])): ?>
+        <div class="container-custom mt-3">
+            <?php if ($_GET['request'] === 'success'): ?>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>¡Solicitud enviada!</strong> Tu solicitud fue enviada al dueño del local. Recibirás la promoción cuando sea aprobada.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['request'] === 'duplicate'): ?>
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Ya has solicitado esta promoción anteriormente.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['request'] === 'error'): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Ocurrió un error al procesar tu solicitud. Intenta nuevamente.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['request'] === 'denied'): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-ban me-2"></i>
+                    Solo los clientes pueden solicitar promociones.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php elseif ($_GET['request'] === 'level_low'): ?>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-lock me-2"></i>
+                    No tienes el nivel requerido para solicitar esta promoción.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <main class="main-content">
         <div class="container-custom">
@@ -275,8 +311,16 @@ function buildFilterUrl($paramName, $paramValue) {
                                             <button type="button" class="promo-request-btn" style="background-color: #198754; border-color: #198754; color: white;" disabled>
                                                 Utilizada con éxito
                                             </button>
+                                        <?php elseif ($requestStatus === 'pending'): ?>
+                                            <button type="button" class="promo-request-btn" style="background-color: #ffc107; border-color: #ffc107; color: #212529;" disabled>
+                                                <i class="fas fa-clock me-1"></i>Pendiente de aprobación
+                                            </button>
                                         <?php elseif ($requestStatus === 'active'): ?>
                                             <button type="button" class="promo-request-btn btn-obtained" disabled>Promoción Obtenida</button>
+                                        <?php elseif ($requestStatus === 'rejected'): ?>
+                                            <button type="button" class="promo-request-btn" style="background-color: #dc3545; border-color: #dc3545; color: white;" disabled>
+                                                <i class="fas fa-times-circle me-1"></i>Solicitud Rechazada
+                                            </button>
                                         <?php elseif ($isLocked): ?>
                                             <button type="button" class="promo-request-btn btn-locked" disabled>Bloqueado (Nivel <?= ucfirst($promo['client_category']) ?>)</button>
                                         <?php else: ?>

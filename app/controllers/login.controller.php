@@ -12,8 +12,8 @@
         if (!isset($userName) || !isset($password)) {
             $loginError = 'Por favor, completa todos los campos.';
             AlertService::error($loginError);
-        } elseif (strlen($password) < 6 || strlen($password) > 8) {
-            $loginError = 'La contraseña debe tener entre 6 y 8 caracteres.';
+        } elseif (strlen($password) < 6 || strlen($password) > 20) {
+            $loginError = 'La contraseña debe tener entre 6 y 20 caracteres.';
             AlertService::error($loginError);
         } else {
             // Verificar credenciales

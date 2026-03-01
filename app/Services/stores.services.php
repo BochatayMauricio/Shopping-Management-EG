@@ -1,12 +1,15 @@
 <?php
 include_once __DIR__ . '/../Config/config.php';
+include_once __DIR__ . '/../models/Store.php';
+include_once __DIR__ . '/../models/User.php';
 // app/Services/store.services.php
 
 /**
  * Trae todos los locales para la vista general
+ * @return Store[]
  */
 function getAllStores() {
-    global $CONNECTION; // Usamos la variable de conexión definida en db.php o config.php
+    global $CONNECTION;
 
     $query = "SELECT * FROM stores ORDER BY name ASC";
     $result = mysqli_query($CONNECTION, $query);
@@ -15,11 +18,16 @@ function getAllStores() {
         return [];
     }
 
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $stores = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stores[] = Store::fromArray($row);
+    }
+    return $stores;
 }
 
 /**
  * Trae solo los locales de un dueño específico
+ * @return Store[]
  */
 function getStoresByOwner($id_owner) {
     global $CONNECTION;
@@ -35,11 +43,16 @@ function getStoresByOwner($id_owner) {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $stores = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stores[] = Store::fromArray($row);
+    }
+    return $stores;
 }
 
 /**
  * Obtiene un local específico por su ID
+ * @return Store|null
  */
 function getStoreById($id) {
     global $CONNECTION;
@@ -47,7 +60,9 @@ function getStoreById($id) {
     $stmt = mysqli_prepare($CONNECTION, $query);
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
-    return mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    
+    return $row ? Store::fromArray($row) : null;
 }
 
 /**
@@ -74,12 +89,18 @@ function createStore($name, $local_number, $floor, $category, $color, $logo_icon
 
 /**
  * Obtiene todos los usuarios que son de tipo 'owner' para el select del formulario
+ * @return User[]
  */
 function getAllOwners() {
     global $CONNECTION;
-    $query = "SELECT cod, name FROM users WHERE type = 'owner'";
+    $query = "SELECT * FROM users WHERE type = 'owner'";
     $result = mysqli_query($CONNECTION, $query);
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    
+    $owners = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $owners[] = User::fromArray($row);
+    }
+    return $owners;
 }
 
 function updateStore($id, $name, $ubication, $local_number) {

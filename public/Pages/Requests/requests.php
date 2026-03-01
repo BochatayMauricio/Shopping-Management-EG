@@ -111,7 +111,7 @@ if (isset($_POST['action_promo'])) {
                 <h4 class="text-muted">¡Todo al día!</h4>
                 <p class="text-muted mb-0">No hay nuevas promociones esperando aprobación.</p>
                 <div class="mt-4">
-                    <a href="userPortal.php" class="btn btn-primary rounded-pill px-4">Volver al Portal</a>
+                    <a href="../User%20Portal/userPortal.php" class="btn btn-primary rounded-pill px-4">Volver al Portal</a>
                 </div>
             </div>
         <?php endif; ?>

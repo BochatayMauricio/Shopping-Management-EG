@@ -1,10 +1,12 @@
 <?php
 session_start();
 require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 
 /**
  * Función de registro actualizada con Email y Sentencias Preparadas
+ * @return bool|string
  */
 function registerUser($userName, $email, $password, $type = 'client') {
     global $CONNECTION;
@@ -17,18 +19,17 @@ function registerUser($userName, $email, $password, $type = 'client') {
     $userName = strtolower(trim($userName));
     $email = strtolower(trim($email));
 
-    // 1. Validar si el EMAIL ya existe (es nuestra nueva clave única)
+    // 1. Validar si el EMAIL ya existe
     $checkEmail = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
     $checkEmail->bind_param("s", $email);
     $checkEmail->execute();
     $resEmail = $checkEmail->get_result();
     
     if ($resEmail->num_rows > 0) {
-        // Retornamos el string que el controlador ya sabe manejar
         return "email_exists";
     }
 
-    // 2. Hashear la contraseña de forma segura
+    // 2. Hashear la contraseña
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
 
     // 3. Insertar el nuevo usuario
@@ -40,7 +41,7 @@ function registerUser($userName, $email, $password, $type = 'client') {
         return false;
     }
 
-    // 4. Obtener los datos del usuario recién creado para la sesión
+    // 4. Obtener datos del usuario recién creado
     $codUser = $CONNECTION->insert_id;
     $getUser = $CONNECTION->prepare("SELECT * FROM users WHERE cod = ?");
     $getUser->bind_param("i", $codUser);
@@ -51,13 +52,11 @@ function registerUser($userName, $email, $password, $type = 'client') {
         return false;
     }
 
-    $userLogued = $result->fetch_assoc();
+    $userData = $result->fetch_assoc();
+    $user = User::fromArray($userData);
 
     // 5. Iniciar la sesión automáticamente
-    $_SESSION['user'] = $userLogued;
-
-    // Nota: No cerramos la conexión aquí si el controlador aún debe usarse, 
-    // pero si lo haces, asegúrate que sea al final del proceso.
+    $_SESSION['user'] = $userData; // Guardamos array para compatibilidad
     
     mysqli_close($CONNECTION);
     

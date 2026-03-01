@@ -19,8 +19,8 @@ if (!empty($_POST)) {
         // Validar formato de email
         AlertService::error('El formato del correo electrónico no es válido.');
 
-    } elseif (strlen($password) < 6 || strlen($password) > 8) {
-        AlertService::error('La contraseña debe tener entre 6 y 8 caracteres.');
+    } elseif (strlen($password) < 6 || strlen($password) > 20) {
+        AlertService::error('La contraseña debe tener entre 6 y 20 caracteres.');
 
     } elseif ($password !== $confirmPassword) {
         AlertService::error('Las contraseñas no coinciden.');

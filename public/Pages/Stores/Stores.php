@@ -226,7 +226,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold small">Ubicación</label>
-                            <select name="floor" id="edit_floor" class="form-select rounded-pill">
+                            <select name="ubication" id="edit_ubication" class="form-select rounded-pill">
                                 <option value="Planta Baja">Planta Baja</option>
                                 <option value="Primer Piso">Primer Piso</option>
                             </select>
@@ -274,7 +274,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
         function openManageModal(id, name, ubication, number) {
             document.getElementById('edit_store_id').value = id;
             document.getElementById('edit_name').value = name;
-            document.getElementById('edit_floor').value = ubication;
+            document.getElementById('edit_ubication').value = ubication;
             document.getElementById('edit_local_number').value = number;
             new bootstrap.Modal(document.getElementById('manageStoreModal')).show();
         }
@@ -284,7 +284,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
 
 <?php
 function renderStoreCard($store, $isMine) {
-    $logo_db = $store['logo_icon'] ?? $store['logo'] ?? '';
+    $logo_db = $store['logo'] ?? '';
     $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
     $brand_color = $store['color'] ?? '#0d6efd';
     $mineClass = $isMine ? 'is-mine-card' : '';

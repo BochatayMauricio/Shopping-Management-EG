@@ -1,76 +1,92 @@
 * {
-    font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 footer {
-    background: var(--primary-gradient) !important;
-    box-shadow: var(--shadow-md);
-    width: 100% !important;
-    padding: 1rem 0;
+  background: var(--primary-gradient) !important;
+  box-shadow: var(--shadow-md);
+  width: 100% !important;
+  padding: 0.5rem 0;
+  position: relative;
+  z-index: 100;
+  margin-top: auto;
 }
 
 footer .container-fluid {
-    width: 100% !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
+  width: 100% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
 }
 
 footer .row {
-    margin: 0 !important;
+  margin: 0 !important;
+  align-items: flex-start;
 }
 
 footer .navbar-nav.footer-nav {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0.5rem !important;
-    padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.15rem !important;
+  padding: 0 !important;
 }
 
 footer .navbar-nav.footer-nav .nav-item {
-    margin: 0 !important;
-    width: 100%;
+  margin: 0 !important;
+  width: 100%;
 }
 
 footer .navbar-nav.footer-nav .nav-link {
-    padding: 0.25rem 0 !important;
-    display: block;
+  padding: 0.1rem 0 !important;
+  display: block;
 }
 
 footer .nav-link {
-    color: var(--white) !important;
-    font-size: 0.9rem;
-    transition: var(--transition-normal);
+  color: var(--white) !important;
+  font-size: 0.8rem;
+  transition: var(--transition-normal);
 }
 
 footer .nav-link:hover {
-    color: var(--medium-gray) !important;
+  color: var(--medium-gray) !important;
 }
 
 footer .navbar-text {
-    font-size: 0.8rem;
-    text-align: center;
-    margin-top: 1rem;
+  font-size: 0.7rem;
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
-footer .contact-info{
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+footer .contact-info {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+footer .contact-info a,
+footer .contact-info span {
+  font-size: 0.75rem;
+}
+
+footer > .container-fluid > span:first-of-type {
+  font-size: 0.85rem;
 }
 
 body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
-    flex: 1;
-}
-#map { 
-    height: 150px; 
-    width: 100%;
+  flex: 1;
 }
 
+#map {
+  height: 180px;
+  width: 100%;
+  border-radius: 8px;
+}
 
-
+.map-container {
+  padding-top: 0.25rem;
+}
