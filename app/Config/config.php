@@ -19,6 +19,10 @@ define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
 
+// Detectar BASE_URL automáticamente
+$isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
+define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
+
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
 

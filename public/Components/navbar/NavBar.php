@@ -3,12 +3,13 @@ include_once __DIR__ . '/../../../app/Services/login.services.php'; // Usamos __
 
 if(isset($_GET['action']) && $_GET['action'] === 'logout') {
     logout();
-    header("Location: /Shopping-Management-EG/public/Pages/Login/login.php");
+    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+    header("Location: " . $baseUrl . "/public/Pages/Login/login.php");
     exit();
 }
 ?>
 
-<link rel="stylesheet" href="/Shopping-Management-EG/public/Components/navbar/navbar.css">
+<link rel="stylesheet" href="<?php echo defined('BASE_URL') ? BASE_URL : ''; ?>/public/Components/navbar/navbar.css">
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
