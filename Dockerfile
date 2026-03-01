@@ -3,19 +3,29 @@ FROM php:8.2-apache
 # Instalar extensiones de PHP necesarias
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Habilitar mod_rewrite de Apache
 RUN a2enmod rewrite
 
-# Configurar Apache para usar el puerto dinámico (Railway usa $PORT)
+# Configurar Apache para usar el puerto dinámico
 ENV PORT=8080
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/ports.conf && \
-    sed -i 's/:80/:${PORT}/g' /etc/apache2/sites-available/000-default.conf
 
 # Configurar Apache para permitir .htaccess y AllowOverride
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
-# Copiar archivos de la aplicación
-COPY . /var/www/html/
+# Establecer directorio de trabajo
+WORKDIR /var/www/html
+
+# Copiar composer.json primero para aprovechar cache de Docker
+COPY composer.json ./
+
+# Instalar dependencias de PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copiar el resto de archivos de la aplicación
+COPY . .
 
 # Establecer permisos correctos
 RUN chown -R www-data:www-data /var/www/html && \
@@ -29,4 +39,4 @@ RUN mkdir -p /var/www/html/assets/stores && \
 EXPOSE 8080
 
 # Usar script de inicio para puerto dinámico
-CMD sed -i "s/\${PORT}/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && apache2-foreground
+CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && apache2-foreground
