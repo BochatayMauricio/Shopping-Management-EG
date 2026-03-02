@@ -77,7 +77,11 @@
                 </ul>
             </div>
             <div class="col-md-4 map-container">
-                <div id="map"></div>
+                <div id="map">
+                    <div id="map-fallback" style="height:180px; background:#ddd; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#666;">
+                        <span><i class="fas fa-map-marker-alt me-2"></i>Mapa no disponible</span>
+                    </div>
+                </div>
             </div>
             <span class="navbar-text text-white">
                 &copy; <?php echo date('Y'); ?> Shopping Management EG. Todos los derechos reservados.
@@ -88,13 +92,49 @@
 
 
 <script>
-    var map = L.map('map').setView([-32.927741122548404, -60.666928740713516], 10);
+(function() {
+    // Solo inicializar si el mapa no existe aún
+    if (window.mapInitialized) return;
+    
+    function initMap() {
+        var mapContainer = document.getElementById('map');
+        var fallback = document.getElementById('map-fallback');
+        
+        if (!mapContainer || typeof L === 'undefined') {
+            // Leaflet no cargó, mostrar fallback
+            return;
+        }
+        
+        // Evitar reinicialización
+        if (mapContainer._leaflet_id) return;
+        window.mapInitialized = true;
+        
+        try {
+            // Ocultar fallback
+            if (fallback) fallback.style.display = 'none';
+            
+            var map = L.map('map').setView([-32.927741122548404, -60.666928740713516], 15);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-    L.marker([-32.927741122548404, -60.666928740713516]).addTo(map)
-        .bindPopup('Shopping Rosario')
-        .openPopup();
+            L.marker([-32.927741122548404, -60.666928740713516]).addTo(map)
+                .bindPopup('Shopping Rosario')
+                .openPopup();
+
+            setTimeout(function() { map.invalidateSize(); }, 200);
+        } catch(e) {
+            console.error('Error mapa:', e);
+            if (fallback) fallback.style.display = 'flex';
+        }
+    }
+    
+    if (document.readyState === 'complete') {
+        initMap();
+    } else {
+        window.addEventListener('load', initMap);
+    }
+})();
 </script>

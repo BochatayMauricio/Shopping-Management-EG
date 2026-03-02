@@ -97,7 +97,20 @@ $filteredPromotions = array_filter($promotions, function($promo) use ($filterCat
     }
     return $categoryMatch && $storeMatch && $clientCategoryMatch && $discountMatch;
 });
-$activeCount = count($filteredPromotions);
+
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaPromo = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaPromo < 1) $paginaPromo = 1;
+
+$totalRegistrosPromo = count($filteredPromotions);
+$totalPaginasPromo = ceil($totalRegistrosPromo / $cantPorPag);
+
+$inicioPromo = ($paginaPromo - 1) * $cantPorPag;
+$filteredPromotions = array_slice($filteredPromotions, $inicioPromo, $cantPorPag);
+// ================================
+
+$activeCount = $totalRegistrosPromo;
 
 $activeFilters = [];
 if ($filterCategory !== 'all') $activeFilters['category'] = "Rubro: " . ucfirst($filterCategory);
@@ -329,6 +342,33 @@ function buildFilterUrl($paramName, $paramValue) {
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
+
+            <?php if ($totalPaginasPromo > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <?php 
+                    $queryParams = $_GET;
+                    unset($queryParams['pagina']);
+                    $baseUrl = '?' . http_build_query($queryParams) . (empty($queryParams) ? '' : '&');
+                    ?>
+                    
+                    <li class="page-item <?= $paginaPromo <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $paginaPromo - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasPromo; $i++): ?>
+                        <li class="page-item <?= $i === $paginaPromo ? 'active' : '' ?>">
+                            <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaPromo >= $totalPaginasPromo ? 'disabled' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $paginaPromo + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaPromo ?> de <?= $totalPaginasPromo ?> (<?= $totalRegistrosPromo ?> promociones)</p>
+            <?php endif; ?>
         </div>
 
         <?php if($user && $user['type'] === 'owner'): ?>

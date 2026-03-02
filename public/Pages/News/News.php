@@ -4,7 +4,18 @@ include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/Services/news.services.php';
 
-$news = getNews();
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaNews = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaNews < 1) $paginaNews = 1;
+
+$inicioNews = ($paginaNews - 1) * $cantPorPag;
+
+$totalRegistrosNews = getTotalNews();
+$totalPaginasNews = ceil($totalRegistrosNews / $cantPorPag);
+
+$news = getNewsPaginated($inicioNews, $cantPorPag);
+// ================================
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +86,27 @@ $news = getNews();
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php if ($totalPaginasNews > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item <?= $paginaNews <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaNews - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasNews; $i++): ?>
+                        <li class="page-item <?= $i === $paginaNews ? 'active' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaNews >= $totalPaginasNews ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaNews + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaNews ?> de <?= $totalPaginasNews ?> (<?= $totalRegistrosNews ?> novedades)</p>
+            <?php endif; ?>
 
             <?php if($user && $user['type'] === 'admin'): ?>
                 <div class="text-center mt-5 mb-5">

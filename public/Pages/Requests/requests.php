@@ -9,7 +9,19 @@ if (!$user || $user['type'] !== 'admin') {
     exit(); 
 }
 
-$pendingPromos = getPendingPromotions();
+$allPendingPromos = getPendingPromotions();
+
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaReq = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaReq < 1) $paginaReq = 1;
+
+$totalRegistrosReq = count($allPendingPromos);
+$totalPaginasReq = $totalRegistrosReq > 0 ? ceil($totalRegistrosReq / $cantPorPag) : 1;
+
+$inicioReq = ($paginaReq - 1) * $cantPorPag;
+$pendingPromos = array_slice($allPendingPromos, $inicioReq, $cantPorPag);
+// ================================
 
 // Procesar aprobación o rechazo
 if (isset($_POST['action_promo'])) {
@@ -44,10 +56,10 @@ if (isset($_POST['action_promo'])) {
                 <h2 class="fw-bold mb-0">Solicitudes de Promociones</h2>
                 <p class="text-muted">Revisa las sugerencias enviadas por los locatarios.</p>
             </div>
-            <span class="badge bg-primary rounded-pill px-3 py-2"><?= count($pendingPromos) ?> Pendientes</span>
+            <span class="badge bg-primary rounded-pill px-3 py-2"><?= $totalRegistrosReq ?> Pendientes</span>
         </div>
         
-        <?php if (count($pendingPromos) > 0): ?>
+        <?php if ($totalRegistrosReq > 0): ?>
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -67,7 +79,7 @@ if (isset($_POST['action_promo'])) {
                                         <div class="rounded-3 overflow-hidden" style="width: 80px; height: 60px;">
                                             <img src="<?= htmlspecialchars($p['image']) ?>" 
                                                  class="w-100 h-100 object-fit-cover" 
-                                                 onerror="this.src='https://via.placeholder.com/80x60?text=No+Img';">
+                                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDgwIDYwIj48cmVjdCBmaWxsPSIjZWVlIiB3aWR0aD0iODAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiPkltZzwvdGV4dD48L3N2Zz4=';">
                                         </div>
                                     </td>
                                     <td>
@@ -99,6 +111,27 @@ if (isset($_POST['action_promo'])) {
                     </table>
                 </div>
             </div>
+            
+            <?php if ($totalPaginasReq > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item <?= $paginaReq <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaReq - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasReq; $i++): ?>
+                        <li class="page-item <?= $i === $paginaReq ? 'active' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaReq >= $totalPaginasReq ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaReq + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaReq ?> de <?= $totalPaginasReq ?> (<?= $totalRegistrosReq ?> solicitudes)</p>
+            <?php endif; ?>
         <?php else: ?>
             <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
                 <i class="fas fa-clipboard-check fa-4x text-light mb-3"></i>

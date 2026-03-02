@@ -5,6 +5,39 @@ require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/News.php';
 
 /**
+ * Cuenta el total de noticias
+ */
+function getTotalNews() {
+    global $CONNECTION;
+    
+    $query = "SELECT COUNT(*) as total FROM news";
+    $result = mysqli_query($CONNECTION, $query);
+    $row = mysqli_fetch_assoc($result);
+    
+    return $row['total'] ?? 0;
+}
+
+/**
+ * Obtiene noticias paginadas
+ * @return News[]
+ */
+function getNewsPaginated($inicio, $cantPorPag) {
+    global $CONNECTION;
+    
+    $query = "SELECT id, title, description, image, author, date FROM news ORDER BY date DESC LIMIT ?, ?";
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "ii", $inicio, $cantPorPag);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    $news = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $news[] = News::fromArray($row);
+    }
+    return $news;
+}
+
+/**
  * Obtiene todas las noticias
  * @return News[]
  */

@@ -10,7 +10,19 @@ if (!$user || $user['type'] !== 'owner') {
 }
 
 $ownerId = $user['cod'];
-$pendingRequests = getPendingClientRequests($ownerId);
+$allPendingRequests = getPendingClientRequests($ownerId);
+
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaCR = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaCR < 1) $paginaCR = 1;
+
+$totalRegistrosCR = count($allPendingRequests);
+$totalPaginasCR = $totalRegistrosCR > 0 ? ceil($totalRegistrosCR / $cantPorPag) : 1;
+
+$inicioCR = ($paginaCR - 1) * $cantPorPag;
+$pendingRequests = array_slice($allPendingRequests, $inicioCR, $cantPorPag);
+// ================================
 
 // Procesar aprobación o rechazo
 if (isset($_POST['action_request'])) {
@@ -48,7 +60,7 @@ if (isset($_POST['action_request'])) {
                 <p class="text-muted">Revisa y aprueba las solicitudes de promociones de tus clientes.</p>
             </div>
             <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6">
-                <i class="fas fa-hourglass-half me-1"></i><?= count($pendingRequests) ?> Pendientes
+                <i class="fas fa-hourglass-half me-1"></i><?= $totalRegistrosCR ?> Pendientes
             </span>
         </div>
         
@@ -60,7 +72,7 @@ if (isset($_POST['action_request'])) {
             </div>
         <?php endif; ?>
         
-        <?php if (count($pendingRequests) > 0): ?>
+        <?php if ($totalRegistrosCR > 0): ?>
             <div class="row g-4">
                 <?php foreach ($pendingRequests as $req): ?>
                     <div class="col-md-6 col-lg-4">
@@ -113,6 +125,27 @@ if (isset($_POST['action_request'])) {
                     </div>
                 <?php endforeach; ?>
             </div>
+            
+            <?php if ($totalPaginasCR > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item <?= $paginaCR <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaCR - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasCR; $i++): ?>
+                        <li class="page-item <?= $i === $paginaCR ? 'active' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaCR >= $totalPaginasCR ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaCR + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaCR ?> de <?= $totalPaginasCR ?> (<?= $totalRegistrosCR ?> solicitudes)</p>
+            <?php endif; ?>
         <?php else: ?>
             <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
                 <i class="fas fa-inbox fa-4x text-muted mb-3" style="opacity: 0.3;"></i>

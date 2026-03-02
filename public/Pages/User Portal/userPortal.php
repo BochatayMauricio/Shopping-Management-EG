@@ -14,8 +14,20 @@ if (!$user) {
 
 // Cargamos datos específicos según el tipo de usuario
 $userId = $user['cod'] ?? $user['id'];
-$myPromos = ($user['type'] === 'client') ? getClientPromotions($userId) : [];
+$allMyPromos = ($user['type'] === 'client') ? getClientPromotions($userId) : [];
 $myStores = ($user['type'] === 'owner') ? getStoresByOwner($userId) : [];
+
+// ========== PAGINACIÓN PARA PROMOCIONES DEL CLIENTE ==========
+$cantPorPagPortal = 4;
+$paginaPortal = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaPortal < 1) $paginaPortal = 1;
+
+$totalRegistrosPortal = count($allMyPromos);
+$totalPaginasPortal = $totalRegistrosPortal > 0 ? ceil($totalRegistrosPortal / $cantPorPagPortal) : 1;
+
+$inicioPortal = ($paginaPortal - 1) * $cantPorPagPortal;
+$myPromos = array_slice($allMyPromos, $inicioPortal, $cantPorPagPortal);
+// =============================================================
 
 // Lógica de progreso para la barra (3 para Medium, 5 para Premium)
 $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : null;
@@ -88,7 +100,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
         <div class="text-start mt-3">
             <p class="small mb-2"><strong>Tipo de cuenta:</strong> <?php echo ucfirst($user['type']); ?></p>
             <?php if($user['type'] === 'client'): ?>
-                <p class="small mb-0"><strong>Promos obtenidas:</strong> <?php echo count($myPromos); ?></p>
+                <p class="small mb-0"><strong>Promos obtenidas:</strong> <?php echo $totalRegistrosPortal; ?></p>
             <?php else: ?>
                 <p class="small mb-0"><strong>ID Interno:</strong> #<?php echo $user['cod'] ?? $user['id']; ?></p>
             <?php endif; ?>
@@ -150,7 +162,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                                     ?>
                                         <div class="d-flex align-items-center p-3 border rounded-3 bg-light">
                                             <div class="store-logo-circle me-3" style="background-color: <?= $brand_color ?>10; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                                <img src="<?= $final_url ?>" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;" onerror="this.src='https://via.placeholder.com/150';">
+                                                <img src="<?= $final_url ?>" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkxvZ288L3RleHQ+PC9zdmc+';">
                                             </div>
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-0 fw-bold"><?= htmlspecialchars($store['name'] ?? 'Sin nombre'); ?></h6>
@@ -183,7 +195,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                     <?php else: ?>
     <h3 class="fw-bold mb-4">Mis Cupones Obtenidos</h3>
     
-    <?php if (count($myPromos) > 0): ?>
+    <?php if ($totalRegistrosPortal > 0): ?>
         <div class="row g-3">
             <?php foreach ($myPromos as $promo): 
                 // Forzamos la lectura del status y eliminamos posibles espacios
@@ -273,6 +285,27 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                 </div>
             <?php endforeach; ?>
         </div>
+        
+        <?php if ($totalPaginasPortal > 1): ?>
+        <nav class="pagination-container mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item <?= $paginaPortal <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $paginaPortal - 1 ?>">Anterior</a>
+                </li>
+                
+                <?php for ($i = 1; $i <= $totalPaginasPortal; $i++): ?>
+                    <li class="page-item <?= $i === $paginaPortal ? 'active' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                
+                <li class="page-item <?= $paginaPortal >= $totalPaginasPortal ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $paginaPortal + 1 ?>">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted small">Mostrando página <?= $paginaPortal ?> de <?= $totalPaginasPortal ?> (<?= $totalRegistrosPortal ?> cupones)</p>
+        <?php endif; ?>
     <?php else: ?>
         <div class="card border-0 shadow-sm p-5 text-center rounded-4">
             <i class="fas fa-ticket-alt fa-3x text-light mb-3"></i>

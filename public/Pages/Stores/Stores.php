@@ -5,8 +5,6 @@ include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/controllers/store.controller.php';
 
-$stores = getAllStores();
-
 // Identificar locales del dueño
 $myStoreIds = [];
 if ($user && $user['type'] === 'owner') {
@@ -22,12 +20,18 @@ $filterCategory = $_GET['category'] ?? 'all';
 $filterFloor = $_GET['ubication'] ?? 'all';
 $searchName = trim($_GET['search'] ?? '');
 
-$filteredStores = array_filter($stores, function($store) use ($filterCategory, $filterFloor, $searchName) {
-    $categoryMatch = ($filterCategory === 'all') || (strtolower($store['category'] ?? '') === strtolower($filterCategory));
-    $floorMatch = ($filterFloor === 'all') || (($store['ubication'] ?? '') === $filterFloor);
-    $nameMatch = empty($searchName) || (stripos($store['name'] ?? '', $searchName) !== false);
-    return $categoryMatch && $floorMatch && $nameMatch;
-});
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina < 1) $pagina = 1;
+
+$inicio = ($pagina - 1) * $cantPorPag;
+
+$totalRegistros = getTotalStores($filterCategory, $filterFloor, $searchName);
+$totalPaginas = ceil($totalRegistros / $cantPorPag);
+
+$filteredStores = getStoresPaginated($inicio, $cantPorPag, $filterCategory, $filterFloor, $searchName);
+// ================================
 
 $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($searchName));
 ?>
@@ -120,6 +124,33 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                 renderStoreCard($store, $isMine); 
             endforeach; ?>
         </section>
+
+        <?php if ($totalPaginas > 1): ?>
+        <nav class="pagination-container mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <?php 
+                $queryParams = $_GET;
+                unset($queryParams['pagina']);
+                $baseUrl = '?' . http_build_query($queryParams) . (empty($queryParams) ? '' : '&');
+                ?>
+                
+                <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $pagina - 1 ?>">Anterior</a>
+                </li>
+                
+                <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                    <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                
+                <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                    <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $pagina + 1 ?>">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted small">Mostrando página <?= $pagina ?> de <?= $totalPaginas ?> (<?= $totalRegistros ?> locales)</p>
+        <?php endif; ?>
     </main>
 
     <?php if ($user && $user['type'] === 'admin'): ?>
@@ -286,11 +317,14 @@ function renderStoreCard($store, $isMine) {
     $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
     $brand_color = $store['color'] ?? '#0d6efd';
     $mineClass = $isMine ? 'is-mine-card' : '';
+    // Placeholder SVG en base64 (funciona offline)
+    $placeholder = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkxvZ288L3RleHQ+PC9zdmc+";
     ?>
     <article class="store-card-modern shadow-sm <?= $mineClass ?>" style="border-left: 5px solid <?= $brand_color ?>;">
         <div class="store-card-body">
             <div class="store-logo-wrapper" style="background-color: <?= $brand_color ?>10;">
-                <img src="<?= $final_url ?>" class="store-img" onerror="this.src='https://via.placeholder.com/150';">
+                <img src="<?= $final_url ?>" class="store-img" onerror="this.onerror=null; this.src='<?= $placeholder ?>';">
+            </div>
             </div>
             <div class="flex-grow-1">
                 <div class="d-flex align-items-center gap-2 mb-1">

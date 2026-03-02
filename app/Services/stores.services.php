@@ -5,6 +5,88 @@ include_once __DIR__ . '/../models/User.php';
 // app/Services/store.services.php
 
 /**
+ * Cuenta el total de locales (con filtros opcionales)
+ */
+function getTotalStores($filterCategory = 'all', $filterFloor = 'all', $searchName = '') {
+    global $CONNECTION;
+    
+    $query = "SELECT COUNT(*) as total FROM stores WHERE 1=1";
+    $params = [];
+    $types = "";
+    
+    if ($filterCategory !== 'all') {
+        $query .= " AND LOWER(category) = LOWER(?)";
+        $params[] = $filterCategory;
+        $types .= "s";
+    }
+    if ($filterFloor !== 'all') {
+        $query .= " AND ubication = ?";
+        $params[] = $filterFloor;
+        $types .= "s";
+    }
+    if (!empty($searchName)) {
+        $query .= " AND name LIKE ?";
+        $params[] = "%$searchName%";
+        $types .= "s";
+    }
+    
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    if ($params) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    
+    return $row['total'] ?? 0;
+}
+
+/**
+ * Trae locales paginados (con filtros opcionales)
+ */
+function getStoresPaginated($inicio, $cantPorPag, $filterCategory = 'all', $filterFloor = 'all', $searchName = '') {
+    global $CONNECTION;
+    
+    $query = "SELECT * FROM stores WHERE 1=1";
+    $params = [];
+    $types = "";
+    
+    if ($filterCategory !== 'all') {
+        $query .= " AND LOWER(category) = LOWER(?)";
+        $params[] = $filterCategory;
+        $types .= "s";
+    }
+    if ($filterFloor !== 'all') {
+        $query .= " AND ubication = ?";
+        $params[] = $filterFloor;
+        $types .= "s";
+    }
+    if (!empty($searchName)) {
+        $query .= " AND name LIKE ?";
+        $params[] = "%$searchName%";
+        $types .= "s";
+    }
+    
+    $query .= " ORDER BY name ASC LIMIT ?, ?";
+    $params[] = $inicio;
+    $params[] = $cantPorPag;
+    $types .= "ii";
+    
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    if ($params) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    $stores = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $stores[] = Store::fromArray($row);
+    }
+    return $stores;
+}
+
+/**
  * Trae todos los locales para la vista general
  * @return Store[]
  */
