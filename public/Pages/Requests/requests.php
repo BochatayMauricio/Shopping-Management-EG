@@ -33,6 +33,26 @@ if (isset($_POST['action_promo'])) {
         exit();
     }
 }
+
+// ========== PROCESAR NUEVO ADMIN ==========
+if (isset($_POST['btnCreateAdmin'])) {
+    $adminName = trim($_POST['adminName']);
+    $adminEmail = trim($_POST['adminEmail']);
+    $adminPass = $_POST['adminPassword'];
+
+    // Usamos la función registerUser con tipo 'admin'
+    // Como type !== 'client', no afectará tu sesión actual
+    $result = registerUser($adminName, $adminEmail, $adminPass, 'admin');
+
+    if ($result === true) {
+        header("Location: requests.php?admin_created=1");
+        exit();
+    } else {
+        $error_msg = ($result === "email_exists") ? "El email ya existe." : "Error al crear administrador.";
+        header("Location: requests.php?admin_error=" . urlencode($error_msg));
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -50,7 +70,7 @@ if (isset($_POST['action_promo'])) {
 <body class="bg-light">
     <?php include_once '../../Components/navbar/NavBar.php'; ?>
 
-    <div class="container py-5">
+    <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-0">Solicitudes de Promociones</h2>

@@ -99,25 +99,34 @@ function getUserRole() {
     return $_SESSION['user']['role'] ?? 'guest';
 }
 
-function logout(){
-    // Asegurar que la sesión está iniciada
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+// function logout(){
+//     // Asegurar que la sesión está iniciada
+//     if (session_status() === PHP_SESSION_NONE) {
+//         session_start();
+//     }
     
+//     session_unset();
+//     session_destroy();
+    
+//     $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+//     $redirectUrl = $baseUrl . "public/Pages/Home/home.php";
+    
+//     // Si ya se enviaron headers, usar JavaScript
+//     if (headers_sent()) {
+//         echo '<script>window.location.href = "' . $redirectUrl . '";</script>';
+//         exit();
+//     }
+    
+//     header("Location: " . $redirectUrl);
+//     exit();
+// }
+
+// Función en local
+function logout(){
     session_unset();
     session_destroy();
-    
-    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-    $redirectUrl = $baseUrl . "/public/Pages/Home/home.php";
-    
-    // Si ya se enviaron headers, usar JavaScript
-    if (headers_sent()) {
-        echo '<script>window.location.href = "' . $redirectUrl . '";</script>';
-        exit();
-    }
-    
-    header("Location: " . $redirectUrl);
+    AlertService::success("Sesión cerrada correctamente.");
+    header("Location: ./../../../public/Pages/Home/home.php");
     exit();
 }
 

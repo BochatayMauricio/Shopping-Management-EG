@@ -8,60 +8,110 @@ include_once __DIR__ . '/alert.service.php';
  * Función de registro actualizada con Email y Sentencias Preparadas
  * @return bool|string
  */
-function registerUser($userName, $email, $password, $type = 'client') {
+// function registerUser($userName, $email, $password, $type = 'client') {
+//     global $CONNECTION;
+    
+//     if (!$CONNECTION) {
+//         AlertService::error("Error: No hay conexión a la base de datos");
+//         return false;
+//     }
+
+//     $userName = strtolower(trim($userName));
+//     $email = strtolower(trim($email));
+
+//     // 1. Validar si el EMAIL ya existe
+//     $checkEmail = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
+//     $checkEmail->bind_param("s", $email);
+//     $checkEmail->execute();
+//     $resEmail = $checkEmail->get_result();
+    
+//     if ($resEmail->num_rows > 0) {
+//         return "email_exists";
+//     }
+
+//     // 2. Hashear la contraseña
+//     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
+
+//     // 3. Insertar el nuevo usuario
+//     $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, 'inicial')");
+//     $stmt->bind_param("ssss", $userName, $email, $passwordHashed, $type);
+    
+//     if (!$stmt->execute()) {
+//         AlertService::error("Error al registrar: " . $CONNECTION->error);
+//         return false;
+//     }
+
+//     // 4. Obtener datos del usuario recién creado
+//     $codUser = $CONNECTION->insert_id;
+//     $getUser = $CONNECTION->prepare("SELECT * FROM users WHERE cod = ?");
+//     $getUser->bind_param("i", $codUser);
+//     $getUser->execute();
+//     $result = $getUser->get_result();
+    
+//     if ($result->num_rows === 0) {
+//         return false;
+//     }
+
+//     $userData = $result->fetch_assoc();
+//     $user = User::fromArray($userData);
+
+//     // 5. Iniciar la sesión automáticamente
+//     $_SESSION['user'] = $userData; // Guardamos array para compatibilidad
+    
+//     mysqli_close($CONNECTION);
+    
+//     return true;
+// }
+
+/**
+ * Función Base: Solo inserta en la DB y devuelve el array del usuario
+ */
+function insertUserDatabase($userName, $email, $password, $type = 'client') {
     global $CONNECTION;
     
-    if (!$CONNECTION) {
-        AlertService::error("Error: No hay conexión a la base de datos");
-        return false;
-    }
-
     $userName = strtolower(trim($userName));
     $email = strtolower(trim($email));
 
-    // 1. Validar si el EMAIL ya existe
+    // 1. Validar duplicados
     $checkEmail = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
     $checkEmail->bind_param("s", $email);
     $checkEmail->execute();
-    $resEmail = $checkEmail->get_result();
-    
-    if ($resEmail->num_rows > 0) {
-        return "email_exists";
-    }
+    if ($checkEmail->get_result()->num_rows > 0) return "email_exists";
 
-    // 2. Hashear la contraseña
+    // 2. Insertar
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
-
-    // 3. Insertar el nuevo usuario
     $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, 'inicial')");
     $stmt->bind_param("ssss", $userName, $email, $passwordHashed, $type);
     
-    if (!$stmt->execute()) {
-        AlertService::error("Error al registrar: " . $CONNECTION->error);
-        return false;
-    }
+    if (!$stmt->execute()) return false;
 
-    // 4. Obtener datos del usuario recién creado
+    // 3. Retornar datos del nuevo usuario
     $codUser = $CONNECTION->insert_id;
     $getUser = $CONNECTION->prepare("SELECT * FROM users WHERE cod = ?");
     $getUser->bind_param("i", $codUser);
     $getUser->execute();
-    $result = $getUser->get_result();
-    
-    if ($result->num_rows === 0) {
-        return false;
+    return $getUser->get_result()->fetch_assoc();
+}
+
+/**
+ * Función Pública: La que usarás en tus formularios
+ */
+function registerUser($userName, $email, $password, $type = 'client') {
+    $userData = insertUserDatabase($userName, $email, $password, $type);
+
+    if ($userData === "email_exists") return "email_exists";
+    if (!$userData) return false;
+
+    // LÓGICA DE SESIÓN: Solo si es cliente se loguea automáticamente
+    if ($type === 'client') {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['user'] = $userData;
     }
 
-    $userData = $result->fetch_assoc();
-    $user = User::fromArray($userData);
-
-    // 5. Iniciar la sesión automáticamente
-    $_SESSION['user'] = $userData; // Guardamos array para compatibilidad
-    
-    mysqli_close($CONNECTION);
-    
     return true;
 }
+
+
 
 function getClientsStatsByLevel() {
     global $CONNECTION;
@@ -134,4 +184,53 @@ function getClientLevelProgress($userId) {
     }
 
     return $progress;
+}
+
+/**
+ * Actualiza la contraseña de un usuario verificando primero su contraseña actual.
+ * * @param int $userId El ID (cod) del usuario.
+ * @param string $currentPassword La contraseña actual ingresada en el formulario.
+ * @param string $newPassword La nueva contraseña elegida.
+ * @return bool|string true en éxito, "incorrect_password" si falla la validación, false en error.
+ */
+function updateUserPassword($userId, $currentPassword, $newPassword) {
+    global $CONNECTION;
+    
+    if (!$CONNECTION) return false;
+
+    // 1. Obtener el hash de la contraseña actual desde la base de datos
+    // Usamos 'cod' ya que es el identificador primario que vimos en tu tabla users
+    $stmt = $CONNECTION->prepare("SELECT password FROM users WHERE cod = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        return false; // El usuario no existe
+    }
+
+    $userData = $result->fetch_assoc();
+    $savedHash = $userData['password'];
+
+    // 2. Verificar que la contraseña actual ingresada sea la correcta
+    if (!password_verify($currentPassword, $savedHash)) {
+        return "incorrect_password";
+    }
+
+    // 3. Generar el hash para la nueva contraseña
+    $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
+
+    // 4. Actualizar la contraseña en la base de datos
+    $updateStmt = $CONNECTION->prepare("UPDATE users SET password = ? WHERE cod = ?");
+    $updateStmt->bind_param("si", $newHash, $userId);
+    
+    if ($updateStmt->execute()) {
+        // Opcional: Si guardas el hash en la variable de sesión, actualízalo para mantener consistencia
+        if (isset($_SESSION['user']['password'])) {
+            $_SESSION['user']['password'] = $newHash;
+        }
+        return true;
+    }
+
+    return false;
 }

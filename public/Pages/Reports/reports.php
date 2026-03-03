@@ -11,6 +11,27 @@ if (!$user || $user['type'] !== 'admin') {
     exit(); 
 }
 
+// ========== PROCESAR NUEVO ADMIN ==========
+if (isset($_POST['btnCreateAdmin'])) {
+    $adminName = trim($_POST['adminName']);
+    $adminEmail = trim($_POST['adminEmail']);
+    $adminPass = $_POST['adminPassword'];
+
+    // Usamos la función registerUser con tipo 'admin'
+    $result = registerUser($adminName, $adminEmail, $adminPass, 'admin');
+
+    if ($result === true) {
+        header("Location: reports.php?admin_created=1");
+        exit();
+    } else {
+        $error_msg = ($result === "email_exists") ? "El email ya existe." : "Error al crear administrador.";
+        if ($result === "password_too_short") $error_msg = "La contraseña es muy corta.";
+        
+        header("Location: reports.php?admin_error=" . urlencode($error_msg));
+        exit();
+    }
+}
+
 // --- 1. PROCESAMIENTO DE DATOS REALES ---
 
 // Estadísticas de Promociones
@@ -52,9 +73,26 @@ $totalClients = array_sum($clientValues);
     <?php include_once '../../Components/navbar/NavBar.php'; ?>
 
     <main class="container py-5">
-        <header class="reports-header mb-5">
-            <h1 class="reports-title">Análisis Operativo</h1>
+        
+        <header class="reports-header mb-4 d-flex justify-content-between align-items-center">
+            <h1 class="reports-title mb-0">Análisis Operativo</h1>
+            <button class="btn btn-dark rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAdmin">
+                <i class="fas fa-user-plus me-2"></i> Alta Administrador
+            </button>
         </header>
+
+        <?php if(isset($_GET['admin_created'])): ?>
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> Nuevo administrador creado correctamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        <?php if(isset($_GET['admin_error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> <?= htmlspecialchars($_GET['admin_error']) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
 
         <section class="row g-4 mb-5">
             <div class="col-md-4">
@@ -105,8 +143,49 @@ $totalClients = array_sum($clientValues);
                 </div>
             </div>
         </section>
-    </main>
 
+        <div class="modal fade" id="modalAdmin" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow">
+                    <div class="modal-header bg-dark text-white rounded-top-4">
+                        <h5 class="modal-title fw-bold"><i class="fas fa-user-shield me-2"></i>Alta de Administrador</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Nombre Completo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                    <input type="text" name="adminName" class="form-control bg-light border-start-0" placeholder="Ej: Juan Pérez" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Correo Electrónico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                                    <input type="email" name="adminEmail" class="form-control bg-light border-start-0" placeholder="admin@shopping.com" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold small">Contraseña Temporal</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                                    <input type="password" name="adminPassword" class="form-control bg-light border-start-0" placeholder="Min. 6 caracteres" minlength="6" required>
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" name="btnCreateAdmin" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                                    Registrar Administrador
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

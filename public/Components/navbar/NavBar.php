@@ -24,7 +24,6 @@
                 <li class="nav-item">
                         <a class="nav-link" href="../../Pages/News/News.php">Novedades</a>
                 </li>
-                <?php if(!$user || $user['type'] === 'client' || $user['type'] === 'owner'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Stores/Stores.php">Locales</a>
                     </li>
@@ -35,11 +34,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Contact/contact.php">Contacto</a>
                     </li>
-                <?php endif; ?>
                 <?php if($user && $user['type'] === 'owner'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Client%20Requests/clientRequests.php">
-                            <i class="fas fa-user-clock me-1"></i>Solicitudes
+                            Solicitudes
                         </a>
                     </li>
                     <li class="nav-item">
@@ -47,9 +45,6 @@
                     </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../Pages/Stores/Stores.php">Gestion Locales</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Requests/requests.php">Solicitudes</a>
                     </li>
@@ -88,4 +83,38 @@
             </div>
         </div>
     </nav>
+    
+<?php 
+// RENDERIZADO GLOBAL DE ALERTAS
+// Al estar aquí, cualquier redirección que traiga una alerta en $_SESSION la mostrará justo debajo del navbar.
+if (class_exists('AlertService')) {
+    AlertService::render(); 
+}
+?>
 
+<script>
+    // Función para cerrar la alerta manualmente al hacer clic en la "X"
+    function closeAlert() {
+        const alertBox = document.getElementById('flash-alert');
+        if (alertBox) {
+            // Le damos una pequeña transición de opacidad (opcional, depende de tu CSS)
+            alertBox.style.opacity = '0';
+            alertBox.style.transition = 'opacity 0.3s ease';
+            
+            // Lo eliminamos del DOM después de la transición
+            setTimeout(() => {
+                alertBox.remove();
+            }, 300);
+        }
+    }
+
+    // Función para auto-cerrar la alerta después de 5 segundos
+    document.addEventListener('DOMContentLoaded', () => {
+        const alertBox = document.getElementById('flash-alert');
+        if (alertBox && alertBox.getAttribute('data-auto-hide') === 'true') {
+            setTimeout(() => {
+                closeAlert();
+            }, 5000); // 5000 milisegundos = 5 segundos
+        }
+    });
+</script>

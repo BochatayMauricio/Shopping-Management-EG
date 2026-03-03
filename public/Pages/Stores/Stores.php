@@ -44,9 +44,13 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <title>Locales - Shopping Rosario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="stores.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+
+
 </head>
 <body>
     <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
@@ -170,64 +174,91 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                                 </div>
                                 <small class="text-muted">Vista previa del logo</small>
                             </div>
-<div class="col-md-8">
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label small fw-bold">URL del Logo</label>
-            <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://...">
-        </div>
-        <div class="col-12">
-            <label class="form-label small fw-bold">O subir archivo</label>
-            <input type="file" id="input_file" name="logo_file" class="form-control" accept="image/*">
-        </div>
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">URL del Logo</label>
+                                        <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://...">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">O subir archivo</label>
+                                        <input type="file" id="input_file" name="logo_file" class="form-control" accept="image/*">
+                                    </div>
 
-        <div class="col-md-7">
-            <label class="form-label small fw-bold">Nombre del Local</label>
-            <input type="text" name="name" class="form-control rounded-pill px-3" required placeholder="Ej: Samsung Store">
-        </div>
-        <div class="col-md-5">
-            <label class="form-label small fw-bold">Rubro / Categoría</label>
-            <select name="category" class="form-select rounded-pill px-3" required>
-                <option value="" selected disabled>Seleccionar...</option>
-                <option value="tecnologia">Tecnología</option>
-                <option value="gastronomia">Gastronomía</option>
-                <option value="ropa">Ropa</option>
-                <option value="hogar">Hogar</option>
-                <option value="otros">Otros</option>
-            </select>
-        </div>
+                                    <div class="col-md-7">
+                                        <label class="form-label small fw-bold">Nombre del Local</label>
+                                        <input type="text" name="name" class="form-control rounded-pill px-3" required placeholder="Ej: Samsung Store">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Rubro / Categoría</label>
+                                        <select name="category" class="form-select rounded-pill px-3" required>
+                                            <option value="" selected disabled>Seleccionar...</option>
+                                            <option value="tecnologia">Tecnología</option>
+                                            <option value="gastronomia">Gastronomía</option>
+                                            <option value="ropa">Ropa</option>
+                                            <option value="hogar">Hogar</option>
+                                            <option value="otros">Otros</option>
+                                        </select>
+                                    </div>
 
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">Ubicación</label>
-            <select name="ubication" class="form-select rounded-pill px-3">
-                <option value="Planta Baja">Planta Baja</option>
-                <option value="Primer Piso">Primer Piso</option>
-                <option value="Segundo Piso">Segundo Piso</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">N° Local</label>
-            <input type="text" name="local_number" class="form-control rounded-pill px-3" required placeholder="Ej: L-45">
-        </div>
-<div class="col-md-12">
-    <label class="form-label small fw-bold">Color de Marca</label>
-    <div class="d-flex align-items-center gap-2">
-        <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
-        <small class="text-muted">Se usará en el borde de la tarjeta.</small>
-    </div>
-</div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Ubicación</label>
+                                        <select name="ubication" class="form-select rounded-pill px-3">
+                                            <option value="Planta Baja">Planta Baja</option>
+                                            <option value="Primer Piso">Primer Piso</option>
+                                            <option value="Segundo Piso">Segundo Piso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">N° Local</label>
+                                        <input type="text" name="local_number" class="form-control rounded-pill px-3" required placeholder="Ej: L-45">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-bold">Color de Marca</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
+                                            <small class="text-muted">Se usará en el borde de la tarjeta.</small>
+                                        </div>
+                                    </div>
 
-        <div class="col-12">
-            <label class="form-label small fw-bold">Dueño Responsable</label>
-            <select name="id_owner" class="form-select rounded-pill px-3" required>
-                <option value="" selected disabled>Asignar un dueño...</option>
-                <?php $owners = getAllOwners(); foreach($owners as $owner): ?>
-                    <option value="<?= $owner['cod'] ?>"><?= $owner['name'] ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </div>
-</div>
+                                    <div class="col-12 border-top pt-3 mt-3">
+                                        <label class="form-label small fw-bold mb-2 d-block">Dueño Responsable</label>
+                                        <div class="d-flex gap-3 mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="owner_mode" id="owner_mode_existing" value="existing" checked onchange="toggleOwnerFields()">
+                                                <label class="form-check-label small" for="owner_mode_existing">Seleccionar Existente</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="owner_mode" id="owner_mode_new" value="new" onchange="toggleOwnerFields()">
+                                                <label class="form-check-label small" for="owner_mode_new">Crear Nuevo Dueño</label>
+                                            </div>
+                                        </div>
+
+                                        <div id="div_existing_owner">
+                                            <select name="id_owner" id="id_owner_select" class="form-select rounded-pill px-3" required>
+                                                <option value="" selected disabled>Asignar un dueño...</option>
+                                                <?php $owners = getAllOwners(); foreach($owners as $owner): ?>
+                                                    <option value="<?= $owner['cod'] ?>"><?= $owner['name'] ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div id="div_new_owner" class="d-none">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <input type="text" name="new_owner_name" id="new_owner_name" class="form-control rounded-pill px-3" placeholder="Nombre completo">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="email" name="new_owner_email" id="new_owner_email" class="form-control rounded-pill px-3" placeholder="Correo electrónico">
+                                                </div>
+                                                <div class="col-12 mt-2">
+                                                    <input type="password" name="new_owner_password" id="new_owner_password" class="form-control rounded-pill px-3" placeholder="Contraseña provisoria (Mín. 6 caract.)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-0 p-4">
@@ -299,6 +330,33 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
             });
         }
 
+        // Lógica de Toggles para Crear/Asignar Dueño
+        function toggleOwnerFields() {
+            const mode = document.querySelector('input[name="owner_mode"]:checked').value;
+            const divExisting = document.getElementById('div_existing_owner');
+            const divNew = document.getElementById('div_new_owner');
+            const selectExisting = document.getElementById('id_owner_select');
+            const inputName = document.getElementById('new_owner_name');
+            const inputEmail = document.getElementById('new_owner_email');
+            const inputPass = document.getElementById('new_owner_password');
+
+            if (mode === 'existing') {
+                divExisting.classList.remove('d-none');
+                divNew.classList.add('d-none');
+                selectExisting.setAttribute('required', 'required');
+                inputName.removeAttribute('required');
+                inputEmail.removeAttribute('required');
+                inputPass.removeAttribute('required');
+            } else {
+                divExisting.classList.add('d-none');
+                divNew.classList.remove('d-none');
+                selectExisting.removeAttribute('required');
+                inputName.setAttribute('required', 'required');
+                inputEmail.setAttribute('required', 'required');
+                inputPass.setAttribute('required', 'required');
+            }
+        }
+
         // Abrir modal de gestión
         function openManageModal(id, name, ubication, number) {
             document.getElementById('edit_store_id').value = id;
@@ -325,7 +383,7 @@ function renderStoreCard($store, $isMine) {
             <div class="store-logo-wrapper" style="background-color: <?= $brand_color ?>10;">
                 <img src="<?= $final_url ?>" class="store-img" onerror="this.onerror=null; this.src='<?= $placeholder ?>';">
             </div>
-            </div>
+            
             <div class="flex-grow-1">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <h3 class="h6 fw-bold mb-0"><?= htmlspecialchars($store['name']) ?></h3>
