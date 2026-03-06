@@ -4,6 +4,8 @@ $base_path = realpath(__DIR__ . '/../../');
 
 include_once $base_path . '/app/Config/config.php'; 
 include_once $base_path . '/app/Services/stores.services.php';
+include_once $base_path . '/app/Services/user.services.php';
+include_once $base_path . '/app/Services/validation.service.php';
 
 if (isset($_POST['btnCreateStore'])) {
     
@@ -23,18 +25,33 @@ if (isset($_POST['btnCreateStore'])) {
         $newEmail = trim($_POST['new_owner_email'] ?? '');
         $newPass = $_POST['new_owner_password'] ?? '';
 
+        // Validación de formato de email
+        if (!ValidationService::isValidEmail($newEmail)) {
+            AlertService::error(ValidationService::getEmailErrorMessage());
+            header("Location: Stores.php?openModal=addStore"); exit();
+        }
+
+        // Validación de longitud de contraseña
+        if (!ValidationService::isValidPassword($newPass)) {
+            AlertService::error('La contraseña del dueño debe tener entre 6 y 20 caracteres.');
+            header("Location: Stores.php?openModal=addStore"); exit();
+        }
+
         // Creamos al usuario con rol 'owner'
         $ownerResult = registerUser($newName, $newEmail, $newPass, 'owner');
 
-        if ($ownerResult === "email_exists") {
+        if ($ownerResult === "username_exists") {
+            AlertService::error('No se pudo crear el local: El nombre de usuario del dueño ya está registrado.');
+            header("Location: Stores.php?openModal=addStore"); exit();
+        } elseif ($ownerResult === "email_exists") {
             AlertService::error('No se pudo crear el local: El email del dueño ya está registrado.');
-            header("Location: Stores.php"); exit();
+            header("Location: Stores.php?openModal=addStore"); exit();
         } elseif ($ownerResult === "password_too_short") {
             AlertService::error('No se pudo crear el local: La contraseña del dueño es muy corta.');
-            header("Location: Stores.php"); exit();
+            header("Location: Stores.php?openModal=addStore"); exit();
         } elseif (!$ownerResult) {
             AlertService::error('Error al crear el dueño responsable.');
-            header("Location: Stores.php"); exit();
+            header("Location: Stores.php?openModal=addStore"); exit();
         }
 
         // Para no tocar tu user.services.php, buscamos el ID del dueño que acabamos de crear
@@ -59,7 +76,7 @@ if (isset($_POST['btnCreateStore'])) {
     // Validación de seguridad por si alguien manipula el HTML
     if (!$id_owner) {
         AlertService::error('Debes asignar un dueño al local.');
-        header("Location: Stores.php"); exit();
+        header("Location: Stores.php?openModal=addStore"); exit();
     }
 
     // 3. Lógica del Logo (URL vs Archivo)

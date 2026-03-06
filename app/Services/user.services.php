@@ -72,7 +72,13 @@ function insertUserDatabase($userName, $email, $password, $type = 'client') {
     $userName = strtolower(trim($userName));
     $email = strtolower(trim($email));
 
-    // 1. Validar duplicados
+    // 1. Validar duplicado de username
+    $checkUsername = $CONNECTION->prepare("SELECT cod FROM users WHERE name = ?");
+    $checkUsername->bind_param("s", $userName);
+    $checkUsername->execute();
+    if ($checkUsername->get_result()->num_rows > 0) return "username_exists";
+
+    // 2. Validar duplicado de email
     $checkEmail = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
     $checkEmail->bind_param("s", $email);
     $checkEmail->execute();
@@ -99,6 +105,7 @@ function insertUserDatabase($userName, $email, $password, $type = 'client') {
 function registerUser($userName, $email, $password, $type = 'client') {
     $userData = insertUserDatabase($userName, $email, $password, $type);
 
+    if ($userData === "username_exists") return "username_exists";
     if ($userData === "email_exists") return "email_exists";
     if (!$userData) return false;
 

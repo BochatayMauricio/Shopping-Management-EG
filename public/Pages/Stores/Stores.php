@@ -365,6 +365,29 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
             document.getElementById('edit_local_number').value = number;
             new bootstrap.Modal(document.getElementById('manageStoreModal')).show();
         }
+
+        // Reabrir modal si hay error de validación
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const openModal = urlParams.get('openModal');
+            
+            if (openModal === 'addStore') {
+                const modal = document.getElementById('addStoreModal');
+                if (modal) {
+                    // Activar modo "nuevo dueño" si veníamos de crear uno
+                    const newOwnerRadio = document.getElementById('owner_mode_new');
+                    if (newOwnerRadio) {
+                        newOwnerRadio.checked = true;
+                        toggleOwnerFields();
+                    }
+                    new bootstrap.Modal(modal).show();
+                    
+                    // Limpiar el parámetro de la URL sin recargar
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+            }
+        });
     </script>
 </body>
 </html>

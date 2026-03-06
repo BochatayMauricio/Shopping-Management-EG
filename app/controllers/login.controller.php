@@ -9,6 +9,7 @@
     include_once __DIR__ . '/../Config/config.php';
     include_once __DIR__ . '/../Services/login.services.php';
     include_once __DIR__ . '/../Services/alert.service.php';
+    include_once __DIR__ . '/../Services/validation.service.php';
 
     // Procesar el formulario de login
     if (!empty($_POST)) {
@@ -18,10 +19,10 @@
         
         // Validar campos
         if (!isset($userName) || !isset($password)) {
-            $loginError = 'Por favor, completa todos los campos.';
+            $loginError = ValidationService::getEmptyFieldsMessage();
             AlertService::error($loginError);
-        } elseif (strlen($password) < 6 || strlen($password) > 20) {
-            $loginError = 'La contraseña debe tener entre 6 y 20 caracteres.';
+        } elseif (!ValidationService::isValidPassword($password)) {
+            $loginError = ValidationService::getPasswordErrorMessage();
             AlertService::error($loginError);
         } else {
             // Verificar credenciales

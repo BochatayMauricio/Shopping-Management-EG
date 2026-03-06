@@ -3,6 +3,8 @@ $base_path = realpath(__DIR__ . '/../../');
 
 include_once $base_path . '/app/Config/config.php'; 
 include_once $base_path . '/app/Services/contact.service.php';
+include_once $base_path . '/app/Services/alert.service.php';
+include_once $base_path . '/app/Services/validation.service.php';
 
 
 if (isset($_POST['btnSendMessage'])) {
@@ -10,6 +12,13 @@ if (isset($_POST['btnSendMessage'])) {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $subject = $_POST['subject'];
     $message = htmlspecialchars($_POST['message']);
+
+    // Validar formato del email
+    if (!ValidationService::isValidEmail($email)) {
+        AlertService::error(ValidationService::getEmailErrorMessage());
+        header("Location: Contact.php");
+        exit();
+    }
 
     $isProcessed = simulateContactProcess($name, $email, $subject);
 
