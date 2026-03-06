@@ -31,7 +31,7 @@ date_default_timezone_set(TIMEZONE);
  */
 $hostname = env('DB_HOST', 'localhost');
 $username = env('DB_USER', 'root');
-$password = env('DB_PASS', 'vicen');
+$password = env('DB_PASS', 'root');
 $dbname = env('DB_NAME', 'shopping_management');
 $dbport = env('DB_PORT', 3306);
 
@@ -127,6 +127,8 @@ foreach ($tables as $table) {
 
 // ============================================
 // SEED DATA - Datos iniciales
+// Los niveles de cliente están sincronizados con:
+// app/Services/clientLevel.service.php (ClientLevel::INICIAL, MEDIUM, PREMIUM)
 // ============================================
 
 // Verificar si ya hay datos insertados
@@ -139,14 +141,19 @@ if ($userCount == 0) {
     $clientPassword = password_hash('cliente123', PASSWORD_DEFAULT);
     $ownerPassword = password_hash('tienda123', PASSWORD_DEFAULT);
 
+    // Niveles de cliente (sincronizados con ClientLevel::INICIAL, MEDIUM, PREMIUM)
+    $levelInicial = 'inicial';
+    $levelMedium = 'medium';
+    $levelPremium = 'premium';
+
     // Insertar usuarios
     $users = [
         "INSERT INTO users (name, email, password, type, category) VALUES 
-            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', 'premium'),
-            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', 'gold'),
-            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', 'silver'),
-            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', 'premium'),
-            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', 'standard')"
+            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', '$levelPremium'),
+            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', '$levelMedium'),
+            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', '$levelInicial'),
+            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', '$levelPremium'),
+            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', '$levelInicial')"
     ];
 
     foreach ($users as $sql) {
@@ -167,13 +174,13 @@ if ($userCount == 0) {
         error_log("Error inserting stores: " . $CONNECTION->error);
     }
 
-    // Insertar promociones
+    // Insertar promociones (client_category usa los mismos niveles)
     $promotions = "INSERT INTO promotions (title, description, image, date_from, date_until, client_category, week_days, status, discount, price, original_price, id_store) VALUES 
-        ('2x1 en Café', 'Llevá dos cafés por el precio de uno', 'promo_cafe.png', '2026-02-01', '2026-03-31', 'gold', 'Lunes,Martes,Miércoles', 'active', 50.00, 500.00, 1000.00, 1),
-        ('20% en Electrónica', 'Descuento en toda la línea de smartphones', 'promo_tech.png', '2026-02-15', '2026-02-28', 'premium', 'Todos', 'active', 20.00, 80000.00, 100000.00, 2),
-        ('Outlet de Ropa', 'Hasta 40% en ropa de temporada', 'promo_fashion.png', '2026-02-01', '2026-04-30', 'silver', 'Viernes,Sábado,Domingo', 'active', 40.00, 6000.00, 10000.00, 3),
-        ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'promo_libros.png', '2026-02-10', '2026-03-10', 'gold', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
-        ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'promo_helado.png', '2026-02-01', '2026-02-28', 'premium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5)";
+        ('2x1 en Café', 'Llevá dos cafés por el precio de uno', 'promo_cafe.png', '2026-02-01', '2026-03-31', '$levelMedium', 'Lunes,Martes,Miércoles', 'active', 50.00, 500.00, 1000.00, 1),
+        ('20% en Electrónica', 'Descuento en toda la línea de smartphones', 'promo_tech.png', '2026-02-15', '2026-02-28', '$levelPremium', 'Todos', 'active', 20.00, 80000.00, 100000.00, 2),
+        ('Outlet de Ropa', 'Hasta 40% en ropa de temporada', 'promo_fashion.png', '2026-02-01', '2026-04-30', '$levelInicial', 'Viernes,Sábado,Domingo', 'active', 40.00, 6000.00, 10000.00, 3),
+        ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'promo_libros.png', '2026-02-10', '2026-03-10', '$levelMedium', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
+        ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'promo_helado.png', '2026-02-01', '2026-02-28', '$levelPremium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5)";
 
     if (!$CONNECTION->query($promotions)) {
         error_log("Error inserting promotions: " . $CONNECTION->error);

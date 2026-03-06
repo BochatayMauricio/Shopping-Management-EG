@@ -6,6 +6,7 @@ include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
+include_once __DIR__ . '/../../../app/Services/clientLevel.service.php';
 
 // --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -59,10 +60,8 @@ if ($user && $user['type'] === 'client') {
     $userId = $user['cod'] ?? $user['id'];
     $progress = getClientLevelProgress($userId);
     
-    // Peso dinámico para bloquear/desbloquear cards
-    if ($progress['used'] >= 5) $userWeight = 3;
-    elseif ($progress['used'] >= 3) $userWeight = 2;
-    else $userWeight = 1;
+    // Peso dinámico usando ClientLevel
+    $userWeight = ClientLevel::getWeight(ClientLevel::calculateLevel($progress['used']));
 
     // Obtener las que ya usó para el check visual "YA UTILIZADA"
     $myPromos = getClientPromotions($userId);
@@ -74,7 +73,7 @@ if ($user && $user['type'] === 'client') {
     }
 }
 
-$levelWeights = ['inicial' => 1, 'medium' => 2, 'premium' => 3];
+$levelWeights = ClientLevel::WEIGHTS;
 
 // Filtros URL
 $filterCategory = isset($_GET['category']) ? trim($_GET['category']) : 'all';
@@ -227,9 +226,9 @@ function buildFilterUrl($paramName, $paramValue) {
                         <label for="dropdown-client-category" class="dropdown-toggle-custom">Categoría <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
                             <a href="<?php echo buildFilterUrl('client_category', 'all'); ?>" class="dropdown-item-custom">Todas</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'inicial'); ?>" class="dropdown-item-custom">Inicial</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'medium'); ?>" class="dropdown-item-custom">Medium</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'premium'); ?>" class="dropdown-item-custom">Premium</a>
+                            <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
+                                <a href="<?php echo buildFilterUrl('client_category', $value); ?>" class="dropdown-item-custom"><?php echo $label; ?></a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -434,9 +433,9 @@ function buildFilterUrl($paramName, $paramValue) {
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Categoría Cliente</label>
                                 <select name="client_category" class="form-select">
-                                    <option value="Inicial">Inicial</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Premium">Premium</option>
+                                    <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
+                                        <option value="<?php echo $label; ?>"><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">

@@ -3,6 +3,7 @@
 require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
+include_once __DIR__ . '/clientLevel.service.php';
 
 /**
  * Función Base: Solo inserta en la DB y devuelve el array del usuario
@@ -27,8 +28,9 @@ function insertUserDatabase($userName, $email, $password, $type = 'client') {
 
     // 2. Insertar
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, 'inicial')");
-    $stmt->bind_param("ssss", $userName, $email, $passwordHashed, $type);
+    $initialLevel = ClientLevel::INICIAL;
+    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $userName, $email, $passwordHashed, $type, $initialLevel);
     
     if (!$stmt->execute()) return false;
 
@@ -78,18 +80,14 @@ function checkAndUpgradeLevel($userId) {
     mysqli_stmt_execute($stmt);
     $usedCount = mysqli_stmt_get_result($stmt)->fetch_assoc()['total'];
 
-    // 2. Determinar nuevo nivel
-    $newLevel = 'inicial';
-    if ($usedCount >= 5) {
-        $newLevel = 'premium';
-    } elseif ($usedCount >= 3) {
-        $newLevel = 'medium';
-    }
+    // 2. Determinar nuevo nivel usando ClientLevel
+    $newLevel = ClientLevel::calculateLevel($usedCount);
 
-    // 3. Actualizar la tabla de usuarios
-    $qUpdate = "UPDATE users SET category = ? WHERE id = ? AND category != 'premium'"; // No bajamos de nivel si ya es premium
+    // 3. Actualizar la tabla de usuarios (no bajamos de nivel si ya es premium)
+    $premiumLevel = ClientLevel::PREMIUM;
+    $qUpdate = "UPDATE users SET category = ? WHERE id = ? AND category != ?";
     $stmtUp = mysqli_prepare($CONNECTION, $qUpdate);
-    mysqli_stmt_bind_param($stmtUp, "si", $newLevel, $userId);
+    mysqli_stmt_bind_param($stmtUp, "sis", $newLevel, $userId, $premiumLevel);
     mysqli_stmt_execute($stmtUp);
 
     return $newLevel;
@@ -115,20 +113,22 @@ function getClientLevelProgress($userId) {
         'is_premium' => false
     ];
 
-    // Regla: 3 para Medium, 5 para Premium
-    if ($count < 3) {
-        $progress['next_level'] = 'Medium';
-        $progress['goal'] = 3;
-    } elseif ($count < 5) {
-        $progress['next_level'] = 'Premium';
-        $progress['goal'] = 5;
-    } else {
+    // Usar ClientLevel para determinar progreso
+    $levelInfo = ClientLevel::getNextLevelInfo($count);
+    
+    if ($levelInfo['is_max']) {
         $progress['is_premium'] = true;
-    }
-
-    if (!$progress['is_premium']) {
+    } else {
+        $progress['next_level'] = ClientLevel::getLabel($levelInfo['next_level']);
+        $progress['missing'] = $levelInfo['remaining'];
+        
+        // Calcular goal y porcentaje
+        if ($count < ClientLevel::THRESHOLD_MEDIUM) {
+            $progress['goal'] = ClientLevel::THRESHOLD_MEDIUM;
+        } else {
+            $progress['goal'] = ClientLevel::THRESHOLD_PREMIUM;
+        }
         $progress['percentage'] = ($count / $progress['goal']) * 100;
-        $progress['missing'] = $progress['goal'] - $count;
     }
 
     return $progress;

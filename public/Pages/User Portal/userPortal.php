@@ -6,6 +6,7 @@ include_once __DIR__ . '/../../../app/controllers/store.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/controllers/user.controller.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
+include_once __DIR__ . '/../../../app/Services/clientLevel.service.php';
 
 // Si no está logueado, al login
 if (!$user) {
@@ -30,7 +31,7 @@ $inicioPortal = ($paginaPortal - 1) * $cantPorPagPortal;
 $myPromos = array_slice($allMyPromos, $inicioPortal, $cantPorPagPortal);
 // =============================================================
 
-// Lógica de progreso para la barra (3 para Medium, 5 para Premium)
+// Lógica de progreso para la barra usando ClientLevel
 $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : null;
 
 
@@ -97,9 +98,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                         <p class="text-muted small mb-3"><?php echo htmlspecialchars($user['email']); ?></p>
                         
                         <?php if ($user['type'] === 'client'): 
-                            $displayLevel = 'Inicial';
-                            if ($progress['used'] >= 5) $displayLevel = 'Premium';
-                            elseif ($progress['used'] >= 3) $displayLevel = 'Medium';
+                            $displayLevel = ClientLevel::getLabel(ClientLevel::calculateLevel($progress['used']));
                         ?>
                             <div class="mb-3">
                                 <span class="badge badge-<?php echo strtolower($displayLevel); ?> rounded-pill px-3 py-2">

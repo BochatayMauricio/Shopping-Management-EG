@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/Promotion.php';
+include_once __DIR__ . '/clientLevel.service.php';
 
 function getAllPromotions() {
     global $CONNECTION;
@@ -272,13 +273,9 @@ function redeemPromotionCode($fullCode) {
     mysqli_stmt_execute($stmtCount);
     $totalUsed = mysqli_stmt_get_result($stmtCount)->fetch_assoc()['total'];
 
-    // 5. Lógica de Categorías (3 -> Medium, 5 -> Premium)
-    $newCategory = 'Inicial';
-    if ($totalUsed >= 5) {
-        $newCategory = 'Premium';
-    } elseif ($totalUsed >= 3) {
-        $newCategory = 'Medium';
-    }
+    // 5. Lógica de Categorías usando ClientLevel
+    $newCategory = ClientLevel::calculateLevel($totalUsed);
+    $newCategoryLabel = ClientLevel::getLabel($newCategory);
 
     // 6. Actualizar la categoría en la tabla de usuarios
     $userUpdateQ = "UPDATE users SET category = ? WHERE cod = ?";
@@ -296,7 +293,7 @@ function redeemPromotionCode($fullCode) {
 
     return [
         "success" => true, 
-        "message" => "¡Canje exitoso! El cliente ($clientName) ahora tiene $totalUsed promociones usadas y su categoría es $newCategory."
+        "message" => "¡Canje exitoso! El cliente ($clientName) ahora tiene $totalUsed promociones usadas y su categoría es $newCategoryLabel."
     ];
 }
 
