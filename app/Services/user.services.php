@@ -5,65 +5,6 @@ require_once __DIR__. '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 
 /**
- * Función de registro actualizada con Email y Sentencias Preparadas
- * @return bool|string
- */
-// function registerUser($userName, $email, $password, $type = 'client') {
-//     global $CONNECTION;
-    
-//     if (!$CONNECTION) {
-//         AlertService::error("Error: No hay conexión a la base de datos");
-//         return false;
-//     }
-
-//     $userName = strtolower(trim($userName));
-//     $email = strtolower(trim($email));
-
-//     // 1. Validar si el EMAIL ya existe
-//     $checkEmail = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
-//     $checkEmail->bind_param("s", $email);
-//     $checkEmail->execute();
-//     $resEmail = $checkEmail->get_result();
-    
-//     if ($resEmail->num_rows > 0) {
-//         return "email_exists";
-//     }
-
-//     // 2. Hashear la contraseña
-//     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
-
-//     // 3. Insertar el nuevo usuario
-//     $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, 'inicial')");
-//     $stmt->bind_param("ssss", $userName, $email, $passwordHashed, $type);
-    
-//     if (!$stmt->execute()) {
-//         AlertService::error("Error al registrar: " . $CONNECTION->error);
-//         return false;
-//     }
-
-//     // 4. Obtener datos del usuario recién creado
-//     $codUser = $CONNECTION->insert_id;
-//     $getUser = $CONNECTION->prepare("SELECT * FROM users WHERE cod = ?");
-//     $getUser->bind_param("i", $codUser);
-//     $getUser->execute();
-//     $result = $getUser->get_result();
-    
-//     if ($result->num_rows === 0) {
-//         return false;
-//     }
-
-//     $userData = $result->fetch_assoc();
-//     $user = User::fromArray($userData);
-
-//     // 5. Iniciar la sesión automáticamente
-//     $_SESSION['user'] = $userData; // Guardamos array para compatibilidad
-    
-//     mysqli_close($CONNECTION);
-    
-//     return true;
-// }
-
-/**
  * Función Base: Solo inserta en la DB y devuelve el array del usuario
  */
 function insertUserDatabase($userName, $email, $password, $type = 'client') {

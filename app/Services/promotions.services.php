@@ -286,9 +286,17 @@ function redeemPromotionCode($fullCode) {
     mysqli_stmt_bind_param($stmtUser, "si", $newCategory, $clientId);
     mysqli_stmt_execute($stmtUser);
 
+    // 7. Obtener el nombre del cliente para el mensaje
+    $userSelectQ = "SELECT name FROM users WHERE cod = ?";
+    $stmtSelect = mysqli_prepare($CONNECTION, $userSelectQ);
+    mysqli_stmt_bind_param($stmtSelect, "i", $clientId);
+    mysqli_stmt_execute($stmtSelect);
+    $userData = mysqli_stmt_get_result($stmtSelect)->fetch_assoc();
+    $clientName = $userData['name'] ?? "Cliente #$clientId";
+
     return [
         "success" => true, 
-        "message" => "¡Canje exitoso! El cliente (ID: $clientId) ahora tiene $totalUsed promociones usadas y es nivel $newCategory."
+        "message" => "¡Canje exitoso! El cliente ($clientName) ahora tiene $totalUsed promociones usadas y su categoría es $newCategory."
     ];
 }
 
