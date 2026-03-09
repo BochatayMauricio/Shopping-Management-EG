@@ -48,9 +48,6 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <link rel="stylesheet" href="stores.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-
-
 </head>
 <body>
     <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
@@ -161,7 +158,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <div class="modal fade" id="addStoreModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4">
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form action="" method="POST">
                     <div class="modal-header bg-primary text-white p-4">
                         <h5 class="modal-title fw-bold">Registrar Nuevo Local</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -178,11 +175,8 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="form-label small fw-bold">URL del Logo</label>
-                                        <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://...">
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label small fw-bold">O subir archivo</label>
-                                        <input type="file" id="input_file" name="logo_file" class="form-control" accept="image/*">
+                                        <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://ejemplo.com/logo.png">
+                                        <small class="text-muted">Pega el enlace de la imagen del local.</small>
                                     </div>
 
                                     <div class="col-md-7">
@@ -307,26 +301,14 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
 
     <script>
-        // Lógica de Vista Previa Dinámica
+        // Lógica de Vista Previa Dinámica (Solo URL)
         const inputUrl = document.getElementById('input_url');
-        const inputFile = document.getElementById('input_file');
         const preview = document.getElementById('createLogoPreview');
 
         if(inputUrl) {
             inputUrl.addEventListener('input', () => {
                 if(inputUrl.value) preview.innerHTML = `<img src="${inputUrl.value}" style="width:100%; height:100%; object-fit:contain;">`;
                 else preview.innerHTML = '<i class="fas fa-image text-muted fa-3x"></i>';
-            });
-        }
-
-        if(inputFile) {
-            inputFile.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:contain;">`;
-                    reader.readAsDataURL(file);
-                }
             });
         }
 
@@ -371,8 +353,16 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
 
 <?php
 function renderStoreCard($store, $isMine) {
-    $logo_db = $store['logo'] ?? '';
-    $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
+    $logo_db = trim($store['logo'] ?? '');
+    
+    // Verificamos de forma robusta si es una URL externa (http o https)
+    if (preg_match('/^https?:\/\//i', $logo_db)) {
+        $final_url = htmlspecialchars($logo_db, ENT_QUOTES, 'UTF-8');
+    } else {
+        // Fallback a un archivo local o logo por defecto
+        $final_url = "../../../assets/stores/" . htmlspecialchars($logo_db ?: 'default_logo.png', ENT_QUOTES, 'UTF-8');
+    }
+
     $brand_color = $store['color'] ?? '#0d6efd';
     $mineClass = $isMine ? 'is-mine-card' : '';
     // Placeholder SVG en base64 (funciona offline)
@@ -389,14 +379,14 @@ function renderStoreCard($store, $isMine) {
                     <h3 class="h6 fw-bold mb-0"><?= htmlspecialchars($store['name']) ?></h3>
                     <?php if($isMine): ?> <span class="badge rounded-pill bg-warning text-dark" style="font-size: 0.6rem;">MÍO</span> <?php endif; ?>
                 </div>
-                <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= $store['ubication'] ?></div>
-                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= $store['local_number'] ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= htmlspecialchars($store['ubication']) ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= htmlspecialchars($store['local_number']) ?></div>
             </div>
         </div>
         <div class="store-card-footer d-flex gap-2">
             <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>
             <?php if($isMine): ?>
-                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= $store['ubication'] ?>', '<?= $store['local_number'] ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
+                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= addslashes($store['ubication']) ?>', '<?= addslashes($store['local_number']) ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
             <?php endif; ?>
         </div>
     </article>
