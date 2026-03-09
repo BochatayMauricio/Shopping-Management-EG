@@ -1,28 +1,15 @@
 <?php
 // Cargar autoload de Composer
-// require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// // Cargar variables de entorno desde .env usando phpdotenv (solo si existe)
-// $envFile = __DIR__ . '/../../.env';
-// if (file_exists($envFile)) {
-//     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-//     $dotenv->load();
-// }
-
-// // Función helper para obtener variables de entorno
-// function env($key, $default = null) {
-//     return $_ENV[$key] ?? getenv($key) ?: $default;
-// }
+// Cargar variables de entorno desde .env usando phpdotenv
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
 
 // Configuración de la aplicación
 define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
-
-// // Detectar BASE_URL automáticamente
-// $isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
-// define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
-define('BASE_URL', '/Shopping-Management-EG');
 
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
@@ -30,17 +17,11 @@ date_default_timezone_set(TIMEZONE);
 /**
  * Conexion a la base de datos
  */
-// $hostname = env('DB_HOST', 'localhost');
-// $username = env('DB_USER', 'root');
-// $password = env('DB_PASS', 'vicen');
-// $dbname = env('DB_NAME', 'shopping_management');
-// $dbport = env('DB_PORT', 3306);
-
-$hostname = "localhost";
-$username = "root";
-$password = "vicen";
-$dbname = "shopping_management";
-$dbport = 3306;
+$hostname = $_ENV['DB_HOST'];
+$username = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASS'];
+$dbname = $_ENV['DB_NAME'];
+$dbport = $_ENV['DB_PORT'] ?? 3306;
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
