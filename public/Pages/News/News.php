@@ -1,10 +1,21 @@
 <?php
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/controllers/news.controller.php';
-include_once __DIR__ . '/../../../app/Services/login.services.php';
 include_once __DIR__ . '/../../../app/Services/news.services.php';
-session_start();
-$user = getCurrentUser();
-$news = getNews();
+
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaNews = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaNews < 1) $paginaNews = 1;
+
+$inicioNews = ($paginaNews - 1) * $cantPorPag;
+
+$totalRegistrosNews = getTotalNews();
+$totalPaginasNews = ceil($totalRegistrosNews / $cantPorPag);
+
+$news = getNewsPaginated($inicioNews, $cantPorPag);
+// ================================
 ?>
 
 <!DOCTYPE html>
@@ -76,6 +87,27 @@ $news = getNews();
                 <?php endforeach; ?>
             </div>
 
+            <?php if ($totalPaginasNews > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item <?= $paginaNews <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaNews - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasNews; $i++): ?>
+                        <li class="page-item <?= $i === $paginaNews ? 'active' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaNews >= $totalPaginasNews ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $paginaNews + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaNews ?> de <?= $totalPaginasNews ?> (<?= $totalRegistrosNews ?> novedades)</p>
+            <?php endif; ?>
+
             <?php if($user && $user['type'] === 'admin'): ?>
                 <div class="text-center mt-5 mb-5">
                     <button type="button" class="btn btn-primary admin-fab" data-bs-toggle="modal" data-bs-target="#createNewsModal">
@@ -84,48 +116,49 @@ $news = getNews();
                 </div>
             <?php endif; ?>
         </div>
-
-        <?php if($user && $user['type'] === 'admin'): ?>
-        <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content shadow-lg">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel"><i class="fa-solid fa-pen-to-square me-2"></i>Nueva Publicación</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <form action="" method="POST">
-                            <div class="row">
-                                <div class="col-md-8 mb-3">
-                                    <label class="form-label fw-semibold">Título</label>
-                                    <input type="text" name="title" class="form-control" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-semibold">Fecha</label>
-                                    <input type="date" name="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label class="form-label fw-semibold">URL de la Imagen</label>
-                                    <input type="url" name="image" class="form-control" placeholder="https://..." required>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label class="form-label fw-semibold">Descripción</label>
-                                    <textarea name="description" class="form-control" rows="5" required></textarea>
-                                </div>
-                                <input type="hidden" name="author" value="<?php echo htmlspecialchars($user['name']); ?>">
-                            </div>
-                            <div class="text-end mt-3">
-                                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" name="btnCreateNews" class="btn btn-success px-4">Publicar Novedad</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
     </main>
 
     <?php include_once '../../Components/footer/Footer.php'; ?>
+
+    <?php if($user && $user['type'] === 'admin'): ?>
+    <!-- Modal movido fuera del main para evitar problemas de z-index -->
+    <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel"><i class="fa-solid fa-pen-to-square me-2"></i>Nueva Publicación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="" method="POST">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-semibold">Título</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Fecha</label>
+                                <input type="date" name="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-semibold">URL de la Imagen</label>
+                                <input type="url" name="image" class="form-control" placeholder="https://..." required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-semibold">Descripción</label>
+                                <textarea name="description" class="form-control" rows="5" required></textarea>
+                            </div>
+                            <input type="hidden" name="author" value="<?php echo htmlspecialchars($user['name']); ?>">
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" name="btnCreateNews" class="btn btn-success px-4">Publicar Novedad</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </body>
 </html>

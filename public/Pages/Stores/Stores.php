@@ -1,13 +1,9 @@
 <?php
-// public/Pages/Stores/Stores.php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/controllers/store.controller.php';
-
-session_start();
-$user = getCurrentUser();
-$stores = getAllStores();
 
 // Identificar locales del dueño
 $myStoreIds = [];
@@ -24,12 +20,18 @@ $filterCategory = $_GET['category'] ?? 'all';
 $filterFloor = $_GET['ubication'] ?? 'all';
 $searchName = trim($_GET['search'] ?? '');
 
-$filteredStores = array_filter($stores, function($store) use ($filterCategory, $filterFloor, $searchName) {
-    $categoryMatch = ($filterCategory === 'all') || (strtolower($store['category'] ?? '') === strtolower($filterCategory));
-    $floorMatch = ($filterFloor === 'all') || (($store['ubication'] ?? '') === $filterFloor);
-    $nameMatch = empty($searchName) || (stripos($store['name'] ?? '', $searchName) !== false);
-    return $categoryMatch && $floorMatch && $nameMatch;
-});
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina < 1) $pagina = 1;
+
+$inicio = ($pagina - 1) * $cantPorPag;
+
+$totalRegistros = getTotalStores($filterCategory, $filterFloor, $searchName);
+$totalPaginas = ceil($totalRegistros / $cantPorPag);
+
+$filteredStores = getStoresPaginated($inicio, $cantPorPag, $filterCategory, $filterFloor, $searchName);
+// ================================
 
 $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($searchName));
 ?>
@@ -42,9 +44,10 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <title>Locales - Shopping Rosario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
     <link rel="stylesheet" href="stores.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
@@ -122,13 +125,40 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                 renderStoreCard($store, $isMine); 
             endforeach; ?>
         </section>
+
+        <?php if ($totalPaginas > 1): ?>
+        <nav class="pagination-container mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <?php 
+                $queryParams = $_GET;
+                unset($queryParams['pagina']);
+                $baseUrl = '?' . http_build_query($queryParams) . (empty($queryParams) ? '' : '&');
+                ?>
+                
+                <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $pagina - 1 ?>">Anterior</a>
+                </li>
+                
+                <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                    <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                
+                <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                    <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $pagina + 1 ?>">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted small">Mostrando página <?= $pagina ?> de <?= $totalPaginas ?> (<?= $totalRegistros ?> locales)</p>
+        <?php endif; ?>
     </main>
 
     <?php if ($user && $user['type'] === 'admin'): ?>
     <div class="modal fade" id="addStoreModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4">
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form action="" method="POST">
                     <div class="modal-header bg-primary text-white p-4">
                         <h5 class="modal-title fw-bold">Registrar Nuevo Local</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -141,64 +171,88 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                                 </div>
                                 <small class="text-muted">Vista previa del logo</small>
                             </div>
-<div class="col-md-8">
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label small fw-bold">URL del Logo</label>
-            <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://...">
-        </div>
-        <div class="col-12">
-            <label class="form-label small fw-bold">O subir archivo</label>
-            <input type="file" id="input_file" name="logo_file" class="form-control" accept="image/*">
-        </div>
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">URL del Logo</label>
+                                        <input type="url" id="input_url" name="logo_icon" class="form-control rounded-pill px-3" placeholder="https://ejemplo.com/logo.png">
+                                        <small class="text-muted">Pega el enlace de la imagen del local.</small>
+                                    </div>
 
-        <div class="col-md-7">
-            <label class="form-label small fw-bold">Nombre del Local</label>
-            <input type="text" name="name" class="form-control rounded-pill px-3" required placeholder="Ej: Samsung Store">
-        </div>
-        <div class="col-md-5">
-            <label class="form-label small fw-bold">Rubro / Categoría</label>
-            <select name="category" class="form-select rounded-pill px-3" required>
-                <option value="" selected disabled>Seleccionar...</option>
-                <option value="tecnologia">Tecnología</option>
-                <option value="gastronomia">Gastronomía</option>
-                <option value="ropa">Ropa</option>
-                <option value="hogar">Hogar</option>
-                <option value="otros">Otros</option>
-            </select>
-        </div>
+                                    <div class="col-md-7">
+                                        <label class="form-label small fw-bold">Nombre del Local</label>
+                                        <input type="text" name="name" class="form-control rounded-pill px-3" required placeholder="Ej: Samsung Store">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Rubro / Categoría</label>
+                                        <select name="category" class="form-select rounded-pill px-3" required>
+                                            <option value="" selected disabled>Seleccionar...</option>
+                                            <option value="tecnologia">Tecnología</option>
+                                            <option value="gastronomia">Gastronomía</option>
+                                            <option value="ropa">Ropa</option>
+                                            <option value="hogar">Hogar</option>
+                                            <option value="otros">Otros</option>
+                                        </select>
+                                    </div>
 
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">Ubicación</label>
-            <select name="ubication" class="form-select rounded-pill px-3">
-                <option value="Planta Baja">Planta Baja</option>
-                <option value="Primer Piso">Primer Piso</option>
-                <option value="Segundo Piso">Segundo Piso</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label small fw-bold">N° Local</label>
-            <input type="text" name="local_number" class="form-control rounded-pill px-3" required placeholder="Ej: L-45">
-        </div>
-<div class="col-md-12">
-    <label class="form-label small fw-bold">Color de Marca</label>
-    <div class="d-flex align-items-center gap-2">
-        <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
-        <small class="text-muted">Se usará en el borde de la tarjeta.</small>
-    </div>
-</div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Ubicación</label>
+                                        <select name="ubication" class="form-select rounded-pill px-3">
+                                            <option value="Planta Baja">Planta Baja</option>
+                                            <option value="Primer Piso">Primer Piso</option>
+                                            <option value="Segundo Piso">Segundo Piso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">N° Local</label>
+                                        <input type="text" name="local_number" class="form-control rounded-pill px-3" required placeholder="Ej: L-45">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-bold">Color de Marca</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
+                                            <small class="text-muted">Se usará en el borde de la tarjeta.</small>
+                                        </div>
+                                    </div>
 
-        <div class="col-12">
-            <label class="form-label small fw-bold">Dueño Responsable</label>
-            <select name="id_owner" class="form-select rounded-pill px-3" required>
-                <option value="" selected disabled>Asignar un dueño...</option>
-                <?php $owners = getAllOwners(); foreach($owners as $owner): ?>
-                    <option value="<?= $owner['cod'] ?>"><?= $owner['name'] ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </div>
-</div>
+                                    <div class="col-12 border-top pt-3 mt-3">
+                                        <label class="form-label small fw-bold mb-2 d-block">Dueño Responsable</label>
+                                        <div class="d-flex gap-3 mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="owner_mode" id="owner_mode_existing" value="existing" checked onchange="toggleOwnerFields()">
+                                                <label class="form-check-label small" for="owner_mode_existing">Seleccionar Existente</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="owner_mode" id="owner_mode_new" value="new" onchange="toggleOwnerFields()">
+                                                <label class="form-check-label small" for="owner_mode_new">Crear Nuevo Dueño</label>
+                                            </div>
+                                        </div>
+
+                                        <div id="div_existing_owner">
+                                            <select name="id_owner" id="id_owner_select" class="form-select rounded-pill px-3" required>
+                                                <option value="" selected disabled>Asignar un dueño...</option>
+                                                <?php $owners = getAllOwners(); foreach($owners as $owner): ?>
+                                                    <option value="<?= $owner['cod'] ?>"><?= $owner['name'] ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div id="div_new_owner" class="d-none">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <input type="text" name="new_owner_name" id="new_owner_name" class="form-control rounded-pill px-3" placeholder="Nombre completo">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="email" name="new_owner_email" id="new_owner_email" class="form-control rounded-pill px-3" placeholder="Correo electrónico">
+                                                </div>
+                                                <div class="col-12 mt-2">
+                                                    <input type="password" name="new_owner_password" id="new_owner_password" class="form-control rounded-pill px-3" placeholder="Contraseña provisoria (Mín. 6 caract.)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-0 p-4">
@@ -247,9 +301,8 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
 
     <script>
-        // Lógica de Vista Previa Dinámica
+        // Lógica de Vista Previa Dinámica (Solo URL)
         const inputUrl = document.getElementById('input_url');
-        const inputFile = document.getElementById('input_file');
         const preview = document.getElementById('createLogoPreview');
 
         if(inputUrl) {
@@ -259,15 +312,31 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
             });
         }
 
-        if(inputFile) {
-            inputFile.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:contain;">`;
-                    reader.readAsDataURL(file);
-                }
-            });
+        // Lógica de Toggles para Crear/Asignar Dueño
+        function toggleOwnerFields() {
+            const mode = document.querySelector('input[name="owner_mode"]:checked').value;
+            const divExisting = document.getElementById('div_existing_owner');
+            const divNew = document.getElementById('div_new_owner');
+            const selectExisting = document.getElementById('id_owner_select');
+            const inputName = document.getElementById('new_owner_name');
+            const inputEmail = document.getElementById('new_owner_email');
+            const inputPass = document.getElementById('new_owner_password');
+
+            if (mode === 'existing') {
+                divExisting.classList.remove('d-none');
+                divNew.classList.add('d-none');
+                selectExisting.setAttribute('required', 'required');
+                inputName.removeAttribute('required');
+                inputEmail.removeAttribute('required');
+                inputPass.removeAttribute('required');
+            } else {
+                divExisting.classList.add('d-none');
+                divNew.classList.remove('d-none');
+                selectExisting.removeAttribute('required');
+                inputName.setAttribute('required', 'required');
+                inputEmail.setAttribute('required', 'required');
+                inputPass.setAttribute('required', 'required');
+            }
         }
 
         // Abrir modal de gestión
@@ -284,29 +353,40 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
 
 <?php
 function renderStoreCard($store, $isMine) {
-    $logo_db = $store['logo'] ?? '';
-    $final_url = filter_var($logo_db, FILTER_VALIDATE_URL) ? $logo_db : "../../../assets/stores/" . ($logo_db ?: 'default_logo.png');
+    $logo_db = trim($store['logo'] ?? '');
+    
+    // Verificamos de forma robusta si es una URL externa (http o https)
+    if (preg_match('/^https?:\/\//i', $logo_db)) {
+        $final_url = htmlspecialchars($logo_db, ENT_QUOTES, 'UTF-8');
+    } else {
+        // Fallback a un archivo local o logo por defecto
+        $final_url = "../../../assets/stores/" . htmlspecialchars($logo_db ?: 'default_logo.png', ENT_QUOTES, 'UTF-8');
+    }
+
     $brand_color = $store['color'] ?? '#0d6efd';
     $mineClass = $isMine ? 'is-mine-card' : '';
+    // Placeholder SVG en base64 (funciona offline)
+    $placeholder = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkxvZ288L3RleHQ+PC9zdmc+";
     ?>
     <article class="store-card-modern shadow-sm <?= $mineClass ?>" style="border-left: 5px solid <?= $brand_color ?>;">
         <div class="store-card-body">
             <div class="store-logo-wrapper" style="background-color: <?= $brand_color ?>10;">
-                <img src="<?= $final_url ?>" class="store-img" onerror="this.src='https://via.placeholder.com/150';">
+                <img src="<?= $final_url ?>" class="store-img" onerror="this.onerror=null; this.src='<?= $placeholder ?>';">
             </div>
+            
             <div class="flex-grow-1">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <h3 class="h6 fw-bold mb-0"><?= htmlspecialchars($store['name']) ?></h3>
                     <?php if($isMine): ?> <span class="badge rounded-pill bg-warning text-dark" style="font-size: 0.6rem;">MÍO</span> <?php endif; ?>
                 </div>
-                <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= $store['ubication'] ?></div>
-                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= $store['local_number'] ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= htmlspecialchars($store['ubication']) ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= htmlspecialchars($store['local_number']) ?></div>
             </div>
         </div>
         <div class="store-card-footer d-flex gap-2">
             <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>
             <?php if($isMine): ?>
-                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= $store['ubication'] ?>', '<?= $store['local_number'] ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
+                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= addslashes($store['ubication']) ?>', '<?= addslashes($store['local_number']) ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
             <?php endif; ?>
         </div>
     </article>

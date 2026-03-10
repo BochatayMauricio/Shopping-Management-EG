@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__. '/../Services/news.services.php';
 require_once __DIR__. '/../Services/alert.service.php';
-require_once __DIR__. '/../config/config.php';
+require_once __DIR__. '/../Config/config.php';
 
 if (isset($_POST['btnCreateNews'])) {
     $title = $_POST['title'];

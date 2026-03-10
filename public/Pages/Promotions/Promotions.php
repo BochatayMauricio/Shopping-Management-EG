@@ -1,15 +1,11 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
-include_once __DIR__ . '/../../../app/Services/user.services.php'; 
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user = getCurrentUser();
+include_once __DIR__ . '/../../../app/Services/user.services.php';
 
 // --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -101,7 +97,20 @@ $filteredPromotions = array_filter($promotions, function($promo) use ($filterCat
     }
     return $categoryMatch && $storeMatch && $clientCategoryMatch && $discountMatch;
 });
-$activeCount = count($filteredPromotions);
+
+// ========== PAGINACIÓN ==========
+$cantPorPag = 6;
+$paginaPromo = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaPromo < 1) $paginaPromo = 1;
+
+$totalRegistrosPromo = count($filteredPromotions);
+$totalPaginasPromo = ceil($totalRegistrosPromo / $cantPorPag);
+
+$inicioPromo = ($paginaPromo - 1) * $cantPorPag;
+$filteredPromotions = array_slice($filteredPromotions, $inicioPromo, $cantPorPag);
+// ================================
+
+$activeCount = $totalRegistrosPromo;
 
 $activeFilters = [];
 if ($filterCategory !== 'all') $activeFilters['category'] = "Rubro: " . ucfirst($filterCategory);
@@ -333,6 +342,33 @@ function buildFilterUrl($paramName, $paramValue) {
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
+
+            <?php if ($totalPaginasPromo > 1): ?>
+            <nav class="pagination-container mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <?php 
+                    $queryParams = $_GET;
+                    unset($queryParams['pagina']);
+                    $baseUrl = '?' . http_build_query($queryParams) . (empty($queryParams) ? '' : '&');
+                    ?>
+                    
+                    <li class="page-item <?= $paginaPromo <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $paginaPromo - 1 ?>">Anterior</a>
+                    </li>
+                    
+                    <?php for ($i = 1; $i <= $totalPaginasPromo; $i++): ?>
+                        <li class="page-item <?= $i === $paginaPromo ? 'active' : '' ?>">
+                            <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <li class="page-item <?= $paginaPromo >= $totalPaginasPromo ? 'disabled' : '' ?>">
+                        <a class="page-link" href="<?= $baseUrl ?>pagina=<?= $paginaPromo + 1 ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center text-muted small">Mostrando página <?= $paginaPromo ?> de <?= $totalPaginasPromo ?> (<?= $totalRegistrosPromo ?> promociones)</p>
+            <?php endif; ?>
         </div>
 
         <?php if($user && $user['type'] === 'owner'): ?>
@@ -341,77 +377,81 @@ function buildFilterUrl($paramName, $paramValue) {
                     <i class="fa-solid fa-plus me-2"></i> Nueva Promo
                 </button>
             </div>
-            <div class="modal fade" id="createPromoModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content shadow-lg border-0 rounded-4">
-                        <div class="modal-header bg-warning text-dark">
-                            <h5 class="modal-title fw-bold">Sugerir Nueva Promoción</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <form action="" method="POST">
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label fw-bold">¿Para qué local es la promo?</label>
-                                        <select name="id_store" class="form-select border-primary" required>
-                                            <option value="" disabled selected>Selecciona un local...</option>
-                                            <?php foreach ($myStores as $s): ?>
-                                                <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?> (Local <?= $s['local_number'] ?>)</option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label fw-bold">Título de la Promo</label>
-                                        <input type="text" name="title" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Fecha Inicio</label>
-                                        <input type="date" name="date_from" class="form-control" value="<?= $today ?>" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Fecha Fin</label>
-                                        <input type="date" name="date_until" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-bold">% Descuento</label>
-                                        <input type="number" name="discount" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-bold">Precio Promo</label>
-                                        <input type="number" name="price" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-bold">Precio Original</label>
-                                        <input type="number" name="original_price" class="form-control">
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <label class="form-label fw-bold">URL Imagen</label>
-                                        <input type="url" name="image" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Categoría Cliente</label>
-                                        <select name="client_category" class="form-select">
-                                            <option value="Inicial">Inicial</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Premium">Premium</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Días de validez</label>
-                                        <input type="text" name="week_days" class="form-control" placeholder="Lunes a Jueves">
-                                    </div>
-                                </div>
-                                <div class="text-end mt-3">
-                                    <button type="submit" name="btnCreatePromo" class="btn btn-dark px-4 rounded-pill">Enviar para Revisión</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
         <?php endif; ?>
     </main>
 
     <?php include_once '../../Components/footer/Footer.php'; ?>
+
+    <?php if($user && $user['type'] === 'owner'): ?>
+    <!-- Modal movido fuera del main para evitar problemas de z-index -->
+    <div class="modal fade" id="createPromoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold">Sugerir Nueva Promoción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="" method="POST">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">¿Para qué local es la promo?</label>
+                                <select name="id_store" class="form-select border-primary" required>
+                                    <option value="" disabled selected>Selecciona un local...</option>
+                                    <?php foreach ($myStores as $s): ?>
+                                        <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?> (Local <?= $s['local_number'] ?>)</option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Título de la Promo</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Fecha Inicio</label>
+                                <input type="date" name="date_from" class="form-control" value="<?= $today ?>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Fecha Fin</label>
+                                <input type="date" name="date_until" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">% Descuento</label>
+                                <input type="number" name="discount" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Precio Promo</label>
+                                <input type="number" name="price" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Precio Original</label>
+                                <input type="number" name="original_price" class="form-control">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-bold">URL Imagen</label>
+                                <input type="url" name="image" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Categoría Cliente</label>
+                                <select name="client_category" class="form-select">
+                                    <option value="Inicial">Inicial</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Premium">Premium</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Días de validez</label>
+                                <input type="text" name="week_days" class="form-control" placeholder="Lunes a Jueves">
+                            </div>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="submit" name="btnCreatePromo" class="btn btn-dark px-4 rounded-pill">Enviar para Revisión</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </body>
 </html>

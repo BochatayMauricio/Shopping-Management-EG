@@ -1,9 +1,11 @@
 <?php
-    include_once __DIR__ . '/../../app/Services/user.services.php';
-    include_once __DIR__ . '/../../app/Services/alert.service.php';
+    // Cargar configuración primero
+    include_once __DIR__ . '/../Config/config.php';
+    include_once __DIR__ . '/../Services/user.services.php';
+    include_once __DIR__ . '/../Services/alert.service.php';
 
     // Procesar el formulario de login
-if (!empty($_POST)) {
+if (isset($_POST['btnRegister'])) {
     
     // Captura y limpieza de datos
     $userName = trim($_POST['userName']);
@@ -34,8 +36,9 @@ if (!empty($_POST)) {
             $loginSuccess = 'Registro exitoso. ¡Bienvenido!';
             AlertService::success($loginSuccess);
             
-            // Redirigir al Portal del Cliente
-            header("Location: ./../../../public/Pages/Client Portal/clientPortal.php");
+            // Redirigir al Login
+            $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+            header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
             exit();
 
         } elseif ($result === "email_exists") {
@@ -47,6 +50,44 @@ if (!empty($_POST)) {
         }
     }
 }
+// ========== PROCESAR CAMBIO DE CONTRASEÑA ==========
+// Usamos isset en el botón específico por si a futuro agregas más formularios en esta vista
+if (isset($_POST['btnChangePassword']) && $user) {
+    
+    $currentPassword = trim($_POST['currentPassword']);
+    $newPassword = trim($_POST['newPassword']);
+    $confirmNewPassword = trim($_POST['confirmNewPassword']);
+    $userId = $user['cod'] ?? $user['id'];
+
+    if (empty($currentPassword) || empty($newPassword) || empty($confirmNewPassword)) {
+        AlertService::error('Por favor, completa todos los campos.');
+        
+    } elseif (strlen($newPassword) < 6 || strlen($newPassword) > 20) {
+        AlertService::error('La nueva contraseña debe tener entre 6 y 20 caracteres.');
+
+    } elseif ($newPassword !== $confirmNewPassword) {
+        AlertService::error('Las contraseñas nuevas no coinciden.');
+
+    } else {
+        // Llamamos a la función del servicio
+        $updateResult = updateUserPassword($userId, $currentPassword, $newPassword);
+
+        if ($updateResult === true) {
+            AlertService::success('Contraseña actualizada con éxito.');
+            
+            // Redirigimos para limpiar la petición POST y evitar reenvíos al recargar
+            header("Location: userPortal.php"); 
+            exit();
+
+        } elseif ($updateResult === "incorrect_password") {
+            AlertService::error('La contraseña actual es incorrecta.');
+            
+        } else {
+            AlertService::error('Error al actualizar la contraseña. Intenta nuevamente.');
+        }
+    }
+}
+// =====================================================
     
 
 ?>

@@ -1,14 +1,11 @@
 <?php
-include_once __DIR__ . '/../../../app/Services/login.services.php';
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 include_once __DIR__ . '/../../../app/controllers/store.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
-include_once __DIR__ . '/../../../app/Services/user.services.php'; // Inclusión para la barra de progreso
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user = getCurrentUser();
+include_once __DIR__ . '/../../../app/controllers/user.controller.php';
+include_once __DIR__ . '/../../../app/Services/user.services.php';
 
 // Si no está logueado, al login
 if (!$user) {
@@ -18,11 +15,25 @@ if (!$user) {
 
 // Cargamos datos específicos según el tipo de usuario
 $userId = $user['cod'] ?? $user['id'];
-$myPromos = ($user['type'] === 'client') ? getClientPromotions($userId) : [];
+$allMyPromos = ($user['type'] === 'client') ? getClientPromotions($userId) : [];
 $myStores = ($user['type'] === 'owner') ? getStoresByOwner($userId) : [];
+
+// ========== PAGINACIÓN PARA PROMOCIONES DEL CLIENTE ==========
+$cantPorPagPortal = 4;
+$paginaPortal = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaPortal < 1) $paginaPortal = 1;
+
+$totalRegistrosPortal = count($allMyPromos);
+$totalPaginasPortal = $totalRegistrosPortal > 0 ? ceil($totalRegistrosPortal / $cantPorPagPortal) : 1;
+
+$inicioPortal = ($paginaPortal - 1) * $cantPorPagPortal;
+$myPromos = array_slice($allMyPromos, $inicioPortal, $cantPorPagPortal);
+// =============================================================
 
 // Lógica de progreso para la barra (3 para Medium, 5 para Premium)
 $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : null;
+
+
 ?>
 
 <!DOCTYPE html>
@@ -42,64 +53,97 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
 <body>
     <?php include_once '../../Components/navbar/NavBar.php'; ?>
 
-    <main class="main-content py-5">
-        <div class="container">
-            <div class="row g-4">
-                
-                <div class="col-lg-4">
-    <div class="card profile-card shadow-sm rounded-4 p-4 text-center">
-        <div class="user-avatar-circle rounded-circle mb-3 mx-auto">
-            <i class="fas <?php echo ($user['type'] === 'admin') ? 'fa-user-shield' : 'fa-user'; ?>"></i>
-        </div>
-        <h4 class="fw-bold mb-1"><?php echo htmlspecialchars($user['name']); ?></h4>
-        <p class="text-muted small mb-3"><?php echo htmlspecialchars($user['email']); ?></p>
-        
-        <?php if ($user['type'] === 'client'): 
-            // Determinamos el nivel visual según la contabilidad de promos
-            // Si tiene 5 o más es Premium, si tiene 3 o más es Medium, sino es Inicial
-            $displayLevel = 'Inicial';
-            if ($progress['used'] >= 5) $displayLevel = 'Premium';
-            elseif ($progress['used'] >= 3) $displayLevel = 'Medium';
-        ?>
-            <div class="mb-3">
-                <span class="badge badge-<?php echo strtolower($displayLevel); ?> rounded-pill px-3 py-2">
-                    Nivel <?php echo $displayLevel; ?>
-                </span>
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-dark text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold" id="changePasswordModalLabel"><i class="fas fa-lock me-2"></i>Cambiar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label fw-semibold small">Contraseña Actual</label>
+                            <input type="password" class="form-control bg-light" id="currentPassword" name="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label fw-semibold small">Nueva Contraseña</label>
+                            <input type="password" class="form-control bg-light" id="newPassword" name="newPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirmNewPassword" class="form-label fw-semibold small">Confirmar Nueva Contraseña</label>
+                            <input type="password" class="form-control bg-light" id="confirmNewPassword" name="confirmNewPassword" minlength="6" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" name="btnChangePassword" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                                Actualizar Contraseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <?php if ($progress && !$progress['is_premium']): ?>
-                <div class="level-progress-container mt-4 mb-3 text-start">
-                    <div class="d-flex justify-content-between align-items-end mb-1">
-                        <small class="fw-bold text-muted" style="font-size: 0.7rem;">PROGRESO A <?= strtoupper($progress['next_level']) ?></small>
-                        <small class="text-primary fw-bold"><?= $progress['used'] ?>/<?= $progress['goal'] ?></small>
-                    </div>
-                    <div class="progress rounded-pill" style="height: 8px; background-color: #eee;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
-                             style="width: <?= $progress['percentage'] ?>%"></div>
-                    </div>
-                    <p class="text-muted mt-2 mb-0" style="font-size: 0.75rem;">
-                        <i class="fas fa-info-circle me-1"></i> Falta<?= $progress['missing'] > 1 ? 'n' : '' ?> <b><?= $progress['missing'] ?></b> para subir de nivel.
-                    </p>
-                </div>
-            <?php elseif ($progress && $progress['is_premium']): ?>
-                <div class="alert alert-warning border-0 rounded-3 py-2 mt-3 mb-0 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-crown me-2"></i> <small class="fw-bold">¡USUARIO PREMIUM!</small>
-                </div>
-            <?php endif; ?>
-        <?php endif; ?>
-
-        <hr>
-        <div class="text-start mt-3">
-            <p class="small mb-2"><strong>Tipo de cuenta:</strong> <?php echo ucfirst($user['type']); ?></p>
-            <?php if($user['type'] === 'client'): ?>
-                <p class="small mb-0"><strong>Promos obtenidas:</strong> <?php echo count($myPromos); ?></p>
-            <?php else: ?>
-                <p class="small mb-0"><strong>ID Interno:</strong> #<?php echo $user['cod'] ?? $user['id']; ?></p>
-            <?php endif; ?>
         </div>
     </div>
-</div>
 
+    <main class="main-content py-5">
+        <div class="container">
+            <div class="row g-4">     
+                <div class="col-lg-4">
+                    <div class="card profile-card shadow-sm rounded-4 p-4 text-center">
+                        <div class="user-avatar-circle rounded-circle mb-3 mx-auto">
+                            <i class="fas <?php echo ($user['type'] === 'admin') ? 'fa-user-shield' : 'fa-user'; ?>"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1"><?php echo htmlspecialchars($user['name']); ?></h4>
+                        <p class="text-muted small mb-3"><?php echo htmlspecialchars($user['email']); ?></p>
+                        
+                        <?php if ($user['type'] === 'client'): 
+                            $displayLevel = 'Inicial';
+                            if ($progress['used'] >= 5) $displayLevel = 'Premium';
+                            elseif ($progress['used'] >= 3) $displayLevel = 'Medium';
+                        ?>
+                            <div class="mb-3">
+                                <span class="badge badge-<?php echo strtolower($displayLevel); ?> rounded-pill px-3 py-2">
+                                    Nivel <?php echo $displayLevel; ?>
+                                </span>
+                            </div>
+
+                            <?php if ($progress && !$progress['is_premium']): ?>
+                                <div class="level-progress-container mt-4 mb-3 text-start">
+                                    <div class="d-flex justify-content-between align-items-end mb-1">
+                                        <small class="fw-bold text-muted" style="font-size: 0.7rem;">PROGRESO A <?= strtoupper($progress['next_level']) ?></small>
+                                        <small class="text-primary fw-bold"><?= $progress['used'] ?>/<?= $progress['goal'] ?></small>
+                                    </div>
+                                    <div class="progress rounded-pill" style="height: 8px; background-color: #eee;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                            style="width: <?= $progress['percentage'] ?>%"></div>
+                                    </div>
+                                    <p class="text-muted mt-2 mb-0" style="font-size: 0.75rem;">
+                                        <i class="fas fa-info-circle me-1"></i> Falta<?= $progress['missing'] > 1 ? 'n' : '' ?> <b><?= $progress['missing'] ?></b> para subir de nivel.
+                                    </p>
+                                </div>
+                            <?php elseif ($progress && $progress['is_premium']): ?>
+                                <div class="alert alert-warning border-0 rounded-3 py-2 mt-3 mb-0 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-crown me-2"></i> <small class="fw-bold">¡USUARIO PREMIUM!</small>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                            <hr>
+                            <div class="text-start mt-3 mb-4">
+                                <p class="small mb-2"><strong>Tipo de cuenta:</strong> <?php echo ucfirst($user['type']); ?></p>
+                                <?php if($user['type'] === 'client'): ?>
+                                    <p class="small mb-0"><strong>Promos obtenidas:</strong> <?php echo $totalRegistrosPortal; ?></p>
+                                <?php else: ?>
+                                    <p class="small mb-0"><strong>ID Interno:</strong> #<?php echo $user['cod'] ?? $user['id']; ?></p>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill w-100 mt-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                <i class="fas fa-key me-2"></i> Cambiar Contraseña
+                            </button>
+
+                        </div>
+                    </div>
                 <div class="col-lg-8">
                     
                     <?php if ($user['type'] === 'admin'): ?>
@@ -154,7 +198,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                                     ?>
                                         <div class="d-flex align-items-center p-3 border rounded-3 bg-light">
                                             <div class="store-logo-circle me-3" style="background-color: <?= $brand_color ?>10; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                                <img src="<?= $final_url ?>" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;" onerror="this.src='https://via.placeholder.com/150';">
+                                                <img src="<?= $final_url ?>" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkxvZ288L3RleHQ+PC9zdmc+';">
                                             </div>
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-0 fw-bold"><?= htmlspecialchars($store['name'] ?? 'Sin nombre'); ?></h6>
@@ -187,7 +231,7 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                     <?php else: ?>
     <h3 class="fw-bold mb-4">Mis Cupones Obtenidos</h3>
     
-    <?php if (count($myPromos) > 0): ?>
+    <?php if ($totalRegistrosPortal > 0): ?>
         <div class="row g-3">
             <?php foreach ($myPromos as $promo): 
                 // Forzamos la lectura del status y eliminamos posibles espacios
@@ -277,6 +321,27 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                 </div>
             <?php endforeach; ?>
         </div>
+        
+        <?php if ($totalPaginasPortal > 1): ?>
+        <nav class="pagination-container mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item <?= $paginaPortal <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $paginaPortal - 1 ?>">Anterior</a>
+                </li>
+                
+                <?php for ($i = 1; $i <= $totalPaginasPortal; $i++): ?>
+                    <li class="page-item <?= $i === $paginaPortal ? 'active' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                
+                <li class="page-item <?= $paginaPortal >= $totalPaginasPortal ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $paginaPortal + 1 ?>">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted small">Mostrando página <?= $paginaPortal ?> de <?= $totalPaginasPortal ?> (<?= $totalRegistrosPortal ?> cupones)</p>
+        <?php endif; ?>
     <?php else: ?>
         <div class="card border-0 shadow-sm p-5 text-center rounded-4">
             <i class="fas fa-ticket-alt fa-3x text-light mb-3"></i>

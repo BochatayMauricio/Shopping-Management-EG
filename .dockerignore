@@ -1,0 +1,29 @@
+# Git
+
+.git
+.gitignore
+
+# Variables de entorno locales
+
+.env
+.env.local
+.env.\*.local
+
+# Documentación
+
+README.md
+\*.md
+
+# IDE
+
+.vscode
+.idea
+
+# OS
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+\*.log

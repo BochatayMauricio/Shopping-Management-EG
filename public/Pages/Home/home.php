@@ -1,9 +1,7 @@
 <?php
-// Incluir servicios y iniciar sesión
-include_once '../../../app/Services/login.services.php';
-include_once '../../../app/Services/news.services.php';
-session_start();
-$user = getCurrentUser();
+// Inicialización (sesión, logout, usuario)
+include_once __DIR__ . '/../../../app/init.php';
+include_once __DIR__ . '/../../../app/Services/news.services.php';
 
 $news = getNews();
 ?>
