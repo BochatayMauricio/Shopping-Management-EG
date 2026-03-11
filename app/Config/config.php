@@ -29,13 +29,11 @@ date_default_timezone_set(TIMEZONE);
 /**
  * Conexion a la base de datos
  */
-$hostname = env('DB_HOST', 'localhost');
-$username = env('DB_USER', 'root');
-$password = env('DB_PASS', 'root');
-$dbname = env('DB_NAME', 'shopping_management');
-$dbport = env('DB_PORT', 3306);
-
-
+$hostname = $_ENV['DB_HOST'];
+$username = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASS'];
+$dbname = $_ENV['DB_NAME'];
+$dbport = $_ENV['DB_PORT'] ?? 3306;
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
