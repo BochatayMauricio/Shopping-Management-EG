@@ -410,7 +410,7 @@ function buildFilterUrl($paramName, $paramValue) {
                                 <label class="form-label fw-bold">Categoría Cliente</label>
                                 <select name="client_category" class="form-select">
                                     <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
-                                        <option value="<?php echo $label; ?>"><?php echo $label; ?></option>
+                                        <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
