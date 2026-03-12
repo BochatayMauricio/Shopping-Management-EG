@@ -128,3 +128,18 @@ if (isset($_POST['btnUpdateStore'])) {
     }
     exit();
 }
+
+// Procesar la baja de un local
+if (isset($_POST['btnDeleteStore'])) {
+    $storeId = $_POST['store_id'];
+    
+    if (deleteStore($storeId)) {
+        AlertService::success("Local eliminado con éxito.");
+    } else {
+        // Aquí entrará si countStorePromotions > 0
+        AlertService::error("No se puede eliminar: El local tiene promociones activas.");
+    }
+    
+    header("Location: Stores.php");
+    exit();
+}
