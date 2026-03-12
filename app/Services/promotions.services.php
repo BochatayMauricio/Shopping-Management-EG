@@ -372,3 +372,17 @@ function countPendingClientRequests($ownerId) {
     
     return $row['total'] ?? 0;
 }
+
+// Función para eliminar una promoción y sus solicitudes
+function deletePromotion($promoId) {
+    global $CONNECTION;
+    
+    if (!$CONNECTION) {
+        include_once __DIR__ . '/../Config/config.php';
+    }
+    
+    $stmt = $CONNECTION->prepare("UPDATE promotions SET status = 'cancelled' WHERE id = ?");
+    $stmt->bind_param("i", $promoId);
+    
+    return $stmt->execute();
+}

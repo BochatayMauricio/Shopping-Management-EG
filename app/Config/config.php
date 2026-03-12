@@ -1,6 +1,6 @@
 <?php
 // Cargar autoload de Composer
- require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // // Cargar variables de entorno desde .env usando phpdotenv (solo si existe)
  $envFile = __DIR__ . '/../../.env';
@@ -22,6 +22,11 @@ define('TIMEZONE', 'America/Argentina/Buenos_Aires');
 // // Detectar BASE_URL automáticamente
 $isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
 define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
+
+$envFilePath = __DIR__ . '/../../env.local.php'; // Ajusta la ruta si config.php está en otra carpeta
+if (file_exists($envFilePath)) {
+    include_once $envFilePath;
+}
 
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);

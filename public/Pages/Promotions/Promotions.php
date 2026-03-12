@@ -8,49 +8,19 @@ include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
 include_once __DIR__ . '/../../../app/Services/clientLevel.service.php';
 
-// --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // SI ES OWNER CREANDO PROMO:
-    if (isset($_POST['btnCreatePromo'])) {
-        $_POST['id'] = $_POST['id_store']; // Adaptamos para el controlador
-        if(isset($_POST['discount'])) {
-            $_POST['discount'] = intval(preg_replace('/[^0-9]/', '', $_POST['discount']));
-        }
-
-        $storeId = isset($_POST['id_store']) ? intval($_POST['id_store']) : 0;
-        if ($storeId > 0) {
-            $promoData = [
-                'title'           => $_POST['title'],
-                'image'           => $_POST['image'],
-                'date_from'       => $_POST['date_from'],
-                'date_until'      => $_POST['date_until'],
-                'client_category' => $_POST['client_category'],
-                'week_days'       => $_POST['week_days'],
-                'discount'        => $_POST['discount'],
-                'price'           => $_POST['price'],
-                'original_price'  => !empty($_POST['original_price']) ? $_POST['original_price'] : 0,
-                'id_store'        => $storeId
-            ];
-            if (createPromotion($promoData)) {
-                header("Location: Promotions.php?status=submitted");
-                exit(); 
-            }
-        }
-    }
-    
-    // SI ES CLIENTE SOLICITANDO PROMO:
-    // Aseguramos que el controlador reciba 'id' que es lo que suele buscar
-    if (isset($_POST['btnRequestPromo'])) {
-        $_POST['id'] = $_POST['id_promotion'];
-    }
-}
-
 // Datos de BD
 $promotions = getPromotionsWithStoreData();
 $allStores = getAllStores();
 $myStores = ($user && $user['type'] === 'owner') ? getStoresByOwner($user['cod'] ?? $user['id']) : [];
 $today = date('Y-m-d');
+
+// Extraer IDs de mis locales para la validación de botones
+$myStoreIds = [];
+if (!empty($myStores)) {
+    foreach ($myStores as $ms) {
+        $myStoreIds[] = $ms['id'];
+    }
+}
 
 // --- LÓGICA DE NIVEL DINÁMICO ---
 $userWeight = 1;
@@ -336,6 +306,12 @@ function buildFilterUrl($paramName, $paramValue) {
                                         <?php endif; ?>
                                     </form>
                                 <?php endif; ?>
+
+                                <?php if ($user && $user['type'] === 'owner' && in_array($promo['id_store'], $myStoreIds)): ?>
+                                    <button type="button" class="promo-request-btn mt-2 shadow-sm" style="background-color: #dc3545; border-color: #dc3545; color: white;" onclick="prepareDeletePromoModal('<?= $promo['id'] ?>', '<?= addslashes($promo['title']) ?>')">
+                                        <i class="fas fa-ban me-2"></i> Dar de baja
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -382,7 +358,6 @@ function buildFilterUrl($paramName, $paramValue) {
     <?php include_once '../../Components/footer/Footer.php'; ?>
 
     <?php if($user && $user['type'] === 'owner'): ?>
-    <!-- Modal movido fuera del main para evitar problemas de z-index -->
     <div class="modal fade" id="createPromoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content shadow-lg border-0 rounded-4">
@@ -451,6 +426,42 @@ function buildFilterUrl($paramName, $paramValue) {
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deletePromoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Dar de baja Promoción</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-1 text-muted fw-bold small">Se cancelará la oferta:</p>
+                    <h4 id="deletePromoName" class="mb-3 text-dark"></h4>
+                    <div class="alert alert-warning small mb-0 text-start">
+                        <i class="fas fa-info-circle me-1"></i> 
+                        Esta acción cambiará el estado de la promoción a "Cancelada". Los clientes ya no podrán verla ni solicitarla, pero quedará en tu historial.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 d-flex justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Volver</button>
+                    <form method="POST" action="">
+                        <input type="hidden" name="promo_id" id="deletePromoId">
+                        <button type="submit" name="btnDeletePromo" class="btn btn-danger px-4 shadow-sm">
+                            Confirmar Baja
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prepareDeletePromoModal(id, name) {
+            document.getElementById('deletePromoId').value = id;
+            document.getElementById('deletePromoName').innerText = name;
+            new bootstrap.Modal(document.getElementById('deletePromoModal')).show();
+        }
+    </script>
     <?php endif; ?>
 </body>
 </html>

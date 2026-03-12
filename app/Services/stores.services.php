@@ -169,6 +169,31 @@ function createStore($name, $local_number, $floor, $category, $color, $logo_icon
     return mysqli_stmt_execute($stmt);
 }
 
+// Función para contar promociones de un local
+function countStorePromotions($storeId) {
+    global $CONNECTION;
+    $stmt = $CONNECTION->prepare("SELECT COUNT(*) as total FROM promotions WHERE id_store = ?");
+    $stmt->bind_param("i", $storeId); // "i" significa que el ID es un entero
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    return $row['total'];
+}
+
+// Función de eliminar local con validación de promociones asociadas
+function deleteStore($storeId) {
+    global $CONNECTION;
+    // 1. Verificamos si tiene promociones
+    if (countStorePromotions($storeId) > 0) {
+        return false; // No permitimos borrar si tiene promos
+    }
+
+    // 2. Si no tiene, procedemos al borrado
+    $stmt = $CONNECTION->prepare("DELETE FROM stores WHERE id = ?");
+    return $stmt->execute([$storeId]);
+}
+
 /**
  * Obtiene todos los usuarios que son de tipo 'owner' para el select del formulario
  * @return User[]
