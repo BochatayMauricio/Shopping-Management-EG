@@ -80,14 +80,13 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
 | **Contraseña** | `admin123`         |
 | **Email**      | admin@shopping.com |
 | **Tipo**       | admin              |
-| **Categoría**  | premium            |
 
 ### Clientes
 
-| Usuario    | Contraseña   | Categoría |
-| ---------- | ------------ | --------- |
-| `cliente1` | `cliente123` | gold      |
-| `cliente2` | `cliente123` | silver    |
+| Usuario    | Contraseña   |
+| ---------- | ------------ |
+| `cliente1` | `cliente123` |
+| `cliente2` | `cliente123` |
 
 ### Dueños de Tiendas
 
@@ -159,7 +158,7 @@ Shopping-Management-EG/
 - Registro e inicio de sesión
 - Explorar tiendas y promociones
 - Filtrar promociones por categoría
-- Canjear promociones según nivel de membresía (silver/gold/premium)
+- Canjear promociones según nivel de membresía (inicial/medium/premium)
 - Ver noticias y eventos del shopping
 
 ### 🏪 Dueños de Tiendas
