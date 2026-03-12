@@ -221,9 +221,10 @@ function buildFilterUrl($paramName, $paramValue) {
                         <?php 
                             $promoCategory = strtolower($promo['client_category']);
                             $promoWeight = $levelWeights[$promoCategory] ?? 1;
+                            $isClientUser = ($user && $user['type'] === 'client');
                             
                             // LOGICA DINÁMICA
-                            $isLocked = ($userWeight < $promoWeight);
+                            $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
                         ?>
