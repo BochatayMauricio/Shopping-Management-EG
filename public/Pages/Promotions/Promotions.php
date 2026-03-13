@@ -221,9 +221,10 @@ function buildFilterUrl($paramName, $paramValue) {
                         <?php 
                             $promoCategory = strtolower($promo['client_category']);
                             $promoWeight = $levelWeights[$promoCategory] ?? 1;
+                            $isClientUser = ($user && $user['type'] === 'client');
                             
                             // LOGICA DINÁMICA
-                            $isLocked = ($userWeight < $promoWeight);
+                            $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
                         ?>
@@ -391,15 +392,16 @@ function buildFilterUrl($paramName, $paramValue) {
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">% Descuento</label>
-                                <input type="number" name="discount" class="form-control" required>
+                                <input type="number" name="discount" id="promoDiscount" class="form-control" min="0" max="100" step="0.01" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Precio Promo</label>
-                                <input type="number" name="price" class="form-control" required>
+                                <label class="form-label fw-bold">Precio Promo (calculado)</label>
+                                <input type="text" id="promoCalculatedPrice" class="form-control" readonly>
+                                <input type="hidden" name="price" id="promoPriceHidden">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Precio Original</label>
-                                <input type="number" name="original_price" class="form-control">
+                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
                             </div>
                             <div class="col-12 mb-3">
                                 <label class="form-label fw-bold">URL Imagen</label>
@@ -409,7 +411,7 @@ function buildFilterUrl($paramName, $paramValue) {
                                 <label class="form-label fw-bold">Categoría Cliente</label>
                                 <select name="client_category" class="form-select">
                                     <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
-                                        <option value="<?php echo $label; ?>"><?php echo $label; ?></option>
+                                        <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -461,6 +463,46 @@ function buildFilterUrl($paramName, $paramValue) {
             document.getElementById('deletePromoName').innerText = name;
             new bootstrap.Modal(document.getElementById('deletePromoModal')).show();
         }
+
+        (function () {
+            const discountInput = document.getElementById('promoDiscount');
+            const originalInput = document.getElementById('promoOriginalPrice');
+            const calculatedInput = document.getElementById('promoCalculatedPrice');
+            const hiddenPriceInput = document.getElementById('promoPriceHidden');
+            const arsFormatter = new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            if (!discountInput || !originalInput || !calculatedInput || !hiddenPriceInput) {
+                return;
+            }
+
+            function recalculatePromoPrice() {
+                const original = parseFloat(originalInput.value);
+                const discount = parseFloat(discountInput.value);
+
+                if (isNaN(original) || isNaN(discount)) {
+                    calculatedInput.value = '';
+                    hiddenPriceInput.value = '';
+                    return;
+                }
+
+                const boundedDiscount = Math.max(0, Math.min(100, discount));
+                const finalPrice = original * (1 - (boundedDiscount / 100));
+                const roundedNumeric = Math.max(0, finalPrice);
+                const rounded = roundedNumeric.toFixed(2);
+
+                calculatedInput.value = arsFormatter.format(roundedNumeric);
+                hiddenPriceInput.value = rounded;
+            }
+
+            discountInput.addEventListener('input', recalculatePromoPrice);
+            originalInput.addEventListener('input', recalculatePromoPrice);
+            recalculatePromoPrice();
+        })();
     </script>
     <?php endif; ?>
 </body>

@@ -8,6 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__. '/../Services/stores.services.php';
 require_once __DIR__. '/../Services/promotions.services.php';
 require_once __DIR__. '/../Services/alert.service.php';
+require_once __DIR__. '/../Services/user.services.php';
+require_once __DIR__. '/../Services/clientLevel.service.php';
 
 // Bloque central de peticiones POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -22,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $cleanDiscount = intval(preg_replace('/[^0-9]/', '', $_POST['discount'] ?? '0'));
         $selectedStoreId = isset($_POST['id_store']) ? intval($_POST['id_store']) : 0;
+        $originalPrice = isset($_POST['original_price']) ? floatval($_POST['original_price']) : 0;
+        $safeDiscount = max(0, min(100, $cleanDiscount));
+        $calculatedPrice = max(0, $originalPrice * (1 - ($safeDiscount / 100)));
 
         if ($selectedStoreId > 0) {
             $data = [
@@ -32,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'date_until'      => $_POST['date_until'],
                 'client_category' => $_POST['client_category'],
                 'week_days'       => !empty($_POST['week_days']) ? $_POST['week_days'] : 'Todos los días',
-                'discount'        => $cleanDiscount,
-                'price'           => $_POST['price'],
-                'original_price'  => !empty($_POST['original_price']) ? $_POST['original_price'] : 0,
+                'discount'        => $safeDiscount,
+                'price'           => $calculatedPrice,
+                'original_price'  => $originalPrice,
                 'id_store'        => $selectedStoreId
             ];
 
@@ -77,10 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $clientId = $currentUser['cod'] ?? $currentUser['id'];
         $promoId = $_POST['id_promotion'];
-        $userCategory = $currentUser['category'] ?? 'inicial';
-
-        // Validación de Seguridad por Niveles
-        $levelWeights = ['inicial' => 1, 'medium' => 2, 'premium' => 3, 'silver' => 1, 'gold' => 2];
         
         $allPromos = getPromotionsWithStoreData();
         $currentPromo = null;
@@ -92,10 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($currentPromo) {
-            $userWeight = $levelWeights[strtolower($userCategory)] ?? 1;
-            $promoWeight = $levelWeights[strtolower($currentPromo['client_category'])] ?? 1;
+            $progress = getClientLevelProgress($clientId);
+            $dynamicUserLevel = ClientLevel::calculateLevel($progress['used']);
+            $promoLevel = strtolower(trim($currentPromo['client_category']));
 
-            if ($userWeight < $promoWeight) {
+            if (!ClientLevel::canAccess($dynamicUserLevel, $promoLevel)) {
                 header("Location: Promotions.php?request=level_low");
                 exit();
             }
