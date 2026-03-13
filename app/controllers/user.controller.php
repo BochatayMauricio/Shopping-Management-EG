@@ -3,6 +3,7 @@
     include_once __DIR__ . '/../Config/config.php';
     include_once __DIR__ . '/../Services/user.services.php';
     include_once __DIR__ . '/../Services/alert.service.php';
+    include_once __DIR__ . '/../Services/validation.service.php';
 
     // Procesar el formulario de login
 if (isset($_POST['btnRegister'])) {
@@ -14,18 +15,18 @@ if (isset($_POST['btnRegister'])) {
     $confirmPassword = trim($_POST['confirmPassword']);
 
     // Validar campos vacíos
-    if (empty($userName) || empty($email) || empty($password) || empty($confirmPassword)) {
-        AlertService::error('Por favor, completa todos los campos.');
+    if (!ValidationService::areFieldsNotEmpty([$userName, $email, $password, $confirmPassword])) {
+        AlertService::error(ValidationService::getEmptyFieldsMessage());
         
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!ValidationService::isValidEmail($email)) {
         // Validar formato de email
-        AlertService::error('El formato del correo electrónico no es válido.');
+        AlertService::error(ValidationService::getEmailErrorMessage());
 
-    } elseif (strlen($password) < 6 || strlen($password) > 20) {
-        AlertService::error('La contraseña debe tener entre 6 y 20 caracteres.');
+    } elseif (!ValidationService::isValidPassword($password)) {
+        AlertService::error(ValidationService::getPasswordErrorMessage());
 
-    } elseif ($password !== $confirmPassword) {
-        AlertService::error('Las contraseñas no coinciden.');
+    } elseif (!ValidationService::passwordsMatch($password, $confirmPassword)) {
+        AlertService::error(ValidationService::getPasswordMismatchMessage());
 
     } else {
         // Intentar registrar usuario
@@ -41,9 +42,12 @@ if (isset($_POST['btnRegister'])) {
             header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
             exit();
 
+        } elseif ($result === "username_exists") {
+            AlertService::error(ValidationService::getUsernameExistsMessage());
+
         } elseif ($result === "email_exists") {
             // Manejo específico del error de duplicado que vimos en SQL
-            AlertService::error('Este correo electrónico ya está registrado.');
+            AlertService::error(ValidationService::getEmailExistsMessage());
             
         } else {
             AlertService::error('Error al registrar el usuario. Intenta nuevamente.');
@@ -59,13 +63,13 @@ if (isset($_POST['btnChangePassword']) && $user) {
     $confirmNewPassword = trim($_POST['confirmNewPassword']);
     $userId = $user['cod'] ?? $user['id'];
 
-    if (empty($currentPassword) || empty($newPassword) || empty($confirmNewPassword)) {
-        AlertService::error('Por favor, completa todos los campos.');
+    if (!ValidationService::areFieldsNotEmpty([$currentPassword, $newPassword, $confirmNewPassword])) {
+        AlertService::error(ValidationService::getEmptyFieldsMessage());
         
-    } elseif (strlen($newPassword) < 6 || strlen($newPassword) > 20) {
+    } elseif (!ValidationService::isValidPassword($newPassword)) {
         AlertService::error('La nueva contraseña debe tener entre 6 y 20 caracteres.');
 
-    } elseif ($newPassword !== $confirmNewPassword) {
+    } elseif (!ValidationService::passwordsMatch($newPassword, $confirmNewPassword)) {
         AlertService::error('Las contraseñas nuevas no coinciden.');
 
     } else {

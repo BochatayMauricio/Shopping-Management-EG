@@ -3,6 +3,7 @@
 include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/contact.service.php';
 include_once __DIR__ . '/../../../app/controllers/contact.controller.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -98,17 +99,5 @@ include_once __DIR__ . '/../../../app/controllers/contact.controller.php';
     </main>
 
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
-
-    <?php if(isset($_GET['success'])): ?>
-
-        <script>
-            Swal.fire({
-                title: '¡Mensaje Enviado!',
-                text: 'Se ha simulado el envío y deberías recibir una confirmación.',
-                icon: 'success',
-                confirmButtonColor: '#0d6efd'
-            });
-        </script>
-    <?php endif; ?>
 </body>
 </html>

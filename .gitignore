@@ -4,5 +4,7 @@
 # Variables de entorno (contiene credenciales)
 .env
 
+env.local.php
+
 # Composer local
 composer.phar

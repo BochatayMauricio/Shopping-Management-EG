@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__. '/../Config/config.php';
 require_once __DIR__. '/../models/Promotion.php';
+include_once __DIR__ . '/clientLevel.service.php';
 
 function getAllPromotions() {
     global $CONNECTION;
@@ -272,13 +273,9 @@ function redeemPromotionCode($fullCode) {
     mysqli_stmt_execute($stmtCount);
     $totalUsed = mysqli_stmt_get_result($stmtCount)->fetch_assoc()['total'];
 
-    // 5. Lógica de Categorías (3 -> Medium, 5 -> Premium)
-    $newCategory = 'Inicial';
-    if ($totalUsed >= 5) {
-        $newCategory = 'Premium';
-    } elseif ($totalUsed >= 3) {
-        $newCategory = 'Medium';
-    }
+    // 5. Lógica de Categorías usando ClientLevel
+    $newCategory = ClientLevel::calculateLevel($totalUsed);
+    $newCategoryLabel = ClientLevel::getLabel($newCategory);
 
     // 6. Actualizar la categoría en la tabla de usuarios
     $userUpdateQ = "UPDATE users SET category = ? WHERE cod = ?";
@@ -286,9 +283,17 @@ function redeemPromotionCode($fullCode) {
     mysqli_stmt_bind_param($stmtUser, "si", $newCategory, $clientId);
     mysqli_stmt_execute($stmtUser);
 
+    // 7. Obtener el nombre del cliente para el mensaje
+    $userSelectQ = "SELECT name FROM users WHERE cod = ?";
+    $stmtSelect = mysqli_prepare($CONNECTION, $userSelectQ);
+    mysqli_stmt_bind_param($stmtSelect, "i", $clientId);
+    mysqli_stmt_execute($stmtSelect);
+    $userData = mysqli_stmt_get_result($stmtSelect)->fetch_assoc();
+    $clientName = $userData['name'] ?? "Cliente #$clientId";
+
     return [
         "success" => true, 
-        "message" => "¡Canje exitoso! El cliente (ID: $clientId) ahora tiene $totalUsed promociones usadas y es nivel $newCategory."
+        "message" => "¡Canje exitoso! El cliente ($clientName) ahora tiene $totalUsed promociones usadas y su categoría es $newCategoryLabel."
     ];
 }
 
@@ -366,4 +371,18 @@ function countPendingClientRequests($ownerId) {
     $row = mysqli_fetch_assoc($result);
     
     return $row['total'] ?? 0;
+}
+
+// Función para eliminar una promoción y sus solicitudes
+function deletePromotion($promoId) {
+    global $CONNECTION;
+    
+    if (!$CONNECTION) {
+        include_once __DIR__ . '/../Config/config.php';
+    }
+    
+    $stmt = $CONNECTION->prepare("UPDATE promotions SET status = 'cancelled' WHERE id = ?");
+    $stmt->bind_param("i", $promoId);
+    
+    return $stmt->execute();
 }
