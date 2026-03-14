@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
+function sendContactEmail($name, $clientEmail, $subject, $messageBody)
+{
     // true habilita las excepciones para atrapar errores
     $mail = new PHPMailer(true);
 
@@ -21,10 +22,10 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
 
         // El correo "sale" de tu cuenta para no ser Spam
         $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
-        
+
         // El correo "llega" a tu cuenta
-        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping'); 
-        
+        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping');
+
         // Si le das a "Responder", le contestas al cliente
         $mail->addReplyTo($clientEmail, $name);
 
@@ -32,7 +33,7 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = 'Nuevo mensaje web: ' . $subject;
-        
+
         // Cuerpo HTML del mensaje
         $mail->Body = "
             <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
@@ -49,9 +50,7 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->send();
         return true;
     } catch (Exception $e) {
-        // En desarrollo puedes hacer un echo $mail->ErrorInfo; para ver qué falló
-        die("Error exacto de PHPMailer: " . $mail->ErrorInfo);
+        die("Ocurrió un error con el servidor de correos: " . $mail->ErrorInfo);
         return false;
     }
 }
-?>

@@ -2,16 +2,15 @@
 // Cargar autoload de Composer
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-// // Cargar variables de entorno desde .env usando phpdotenv (solo si existe)
- $envFile = __DIR__ . '/../../.env';
- if (file_exists($envFile)) {
-     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-     $dotenv->load();
+$envFile = __DIR__ . '/../../.env';
+if (file_exists($envFile)) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+    $dotenv->load();
 }
 
-// // Función helper para obtener variables de entorno
-function env($key, $default = null) {
-     return $_ENV[$key] ?? getenv($key) ?: $default;
+function env($key, $default = null)
+{
+    return $_ENV[$key] ?? getenv($key) ?: $default;
 }
 
 // Configuración de la aplicación
@@ -23,7 +22,7 @@ define('TIMEZONE', 'America/Argentina/Buenos_Aires');
 $isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
 define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
 
-$envFilePath = __DIR__ . '/../../env.local.php'; // Ajusta la ruta si config.php está en otra carpeta
+$envFilePath = __DIR__ . '/../../env.local.php';
 if (file_exists($envFilePath)) {
     include_once $envFilePath;
 }
@@ -130,8 +129,6 @@ foreach ($tables as $table) {
 
 // ============================================
 // SEED DATA - Datos iniciales
-// Los niveles de cliente están sincronizados con:
-// app/Services/clientLevel.service.php (ClientLevel::INICIAL, MEDIUM, PREMIUM)
 // ============================================
 
 // Verificar si ya hay datos insertados
@@ -139,12 +136,10 @@ $checkUsers = $CONNECTION->query("SELECT COUNT(*) as total FROM users");
 $userCount = $checkUsers->fetch_assoc()['total'];
 
 if ($userCount == 0) {
-    // Passwords hasheados (password: "admin123" para admin, "cliente123" para clientes)
     $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
     $clientPassword = password_hash('cliente123', PASSWORD_DEFAULT);
     $ownerPassword = password_hash('tienda123', PASSWORD_DEFAULT);
 
-    // Niveles de cliente (sincronizados con ClientLevel::INICIAL, MEDIUM, PREMIUM)
     $levelInicial = 'inicial';
     $levelMedium = 'medium';
     $levelPremium = 'premium';
@@ -236,4 +231,3 @@ if ($userCount == 0) {
         error_log("Error inserting contact_messages: " . $CONNECTION->error);
     }
 }
-?>
