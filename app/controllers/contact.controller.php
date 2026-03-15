@@ -21,13 +21,13 @@ if (isset($_POST['btnSendMessage'])) {
     // Validaciones
     if (empty($name) || empty($email) || empty($subject) || empty($message)) {
         AlertService::error('Por favor, completa todos los campos.');
-        header("Location: Contact.php"); 
+        header("Location: contact.php"); 
         exit();
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         AlertService::error('El correo electrónico no es válido.');
-        header("Location: Contact.php"); 
+        header("Location: contact.php"); 
         exit();
     }
 
@@ -41,7 +41,7 @@ if (isset($_POST['btnSendMessage'])) {
     }
 
     // Redirección final para limpiar el formulario
-    header("Location: Contact.php"); 
+    header("Location: contact.php"); 
     exit();
 }
 ?>

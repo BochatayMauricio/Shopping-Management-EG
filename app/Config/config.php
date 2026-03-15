@@ -33,11 +33,16 @@ date_default_timezone_set(TIMEZONE);
 /**
  * Conexion a la base de datos
  */
-$hostname = $_ENV['DB_HOST'];
-$username = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASS'];
-$dbname = $_ENV['DB_NAME'];
-$dbport = $_ENV['DB_PORT'] ?? 3306;
+$hostname = env('DB_HOST');
+$username = env('DB_USER');
+$password = env('DB_PASS');
+$dbname   = env('DB_NAME');
+$dbport   = env('DB_PORT', 3306);
+
+// Verificación de seguridad antes de intentar conectar
+if (!$hostname || !$username) {
+    die("Error: Faltan las variables de entorno para la base de datos. Verifica tu docker-compose o el panel de Render.");
+}
 
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
