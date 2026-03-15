@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Clase de Niveles de Cliente
  * Centraliza la configuración de categorías/niveles de usuarios.
  */
 
-class ClientLevel {
+class ClientLevel
+{
     // Constantes de niveles
     const INICIAL = 'inicial';
     const MEDIUM = 'medium';
@@ -14,7 +16,7 @@ class ClientLevel {
     const THRESHOLD_MEDIUM = 3;
     const THRESHOLD_PREMIUM = 5;
 
-    // Pesos para comparación de niveles (mayor = mejor)
+    // Pesos para comparación de niveles
     const WEIGHTS = [
         self::INICIAL => 1,
         self::MEDIUM => 2,
@@ -32,7 +34,8 @@ class ClientLevel {
      * Obtiene todos los niveles disponibles
      * @return array
      */
-    public static function getAll() {
+    public static function getAll()
+    {
         return [self::INICIAL, self::MEDIUM, self::PREMIUM];
     }
 
@@ -41,7 +44,8 @@ class ClientLevel {
      * @param string $level
      * @return string
      */
-    public static function getLabel($level) {
+    public static function getLabel($level)
+    {
         $normalizedLevel = strtolower($level);
         return self::LABELS[$normalizedLevel] ?? ucfirst($level);
     }
@@ -51,7 +55,8 @@ class ClientLevel {
      * @param string $level
      * @return int
      */
-    public static function getWeight($level) {
+    public static function getWeight($level)
+    {
         $normalizedLevel = strtolower($level);
         return self::WEIGHTS[$normalizedLevel] ?? 0;
     }
@@ -61,7 +66,8 @@ class ClientLevel {
      * @param int $usedPromos Cantidad de promociones usadas
      * @return string El nivel correspondiente
      */
-    public static function calculateLevel($usedPromos) {
+    public static function calculateLevel($usedPromos)
+    {
         if ($usedPromos >= self::THRESHOLD_PREMIUM) {
             return self::PREMIUM;
         } elseif ($usedPromos >= self::THRESHOLD_MEDIUM) {
@@ -75,7 +81,8 @@ class ClientLevel {
      * @param int $usedPromos
      * @return array ['next_level' => string|null, 'remaining' => int]
      */
-    public static function getNextLevelInfo($usedPromos) {
+    public static function getNextLevelInfo($usedPromos)
+    {
         if ($usedPromos >= self::THRESHOLD_PREMIUM) {
             return ['next_level' => null, 'remaining' => 0, 'is_max' => true];
         } elseif ($usedPromos >= self::THRESHOLD_MEDIUM) {
@@ -98,7 +105,8 @@ class ClientLevel {
      * @param string $promoLevel Nivel requerido por la promo
      * @return bool
      */
-    public static function canAccess($userLevel, $promoLevel) {
+    public static function canAccess($userLevel, $promoLevel)
+    {
         return self::getWeight($userLevel) >= self::getWeight($promoLevel);
     }
 
@@ -107,7 +115,8 @@ class ClientLevel {
      * @param string $level
      * @return bool
      */
-    public static function isMaxLevel($level) {
+    public static function isMaxLevel($level)
+    {
         return strtolower($level) === self::PREMIUM;
     }
 
@@ -115,7 +124,8 @@ class ClientLevel {
      * Obtiene opciones para un select HTML
      * @return array
      */
-    public static function getSelectOptions() {
+    public static function getSelectOptions()
+    {
         return self::LABELS;
     }
 }

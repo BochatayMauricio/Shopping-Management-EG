@@ -5,7 +5,9 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
+function sendContactEmail($name, $clientEmail, $subject, $messageBody)
+{
+    // true habilita las excepciones para atrapar errores
     $mail = new PHPMailer(true);
 
     try {
@@ -21,8 +23,8 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // --- PARCHE CRÍTICO DE RED ---
-        // Esto soluciona el error "Network is unreachable" y problemas de certificados en Docker
+        // --- PARCHE CRÍTICO PARA DOCKER/RENDER ---
+        // Esto evita el error "Network is unreachable" al saltarse la verificación de certificados interna del contenedor
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => false,
@@ -31,15 +33,20 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
             )
         );
 
-        // Configuración de los correos
+        // El correo "sale" de tu cuenta (usamos getenv)
         $mail->setFrom(getenv('SMTP_USER'), 'Shopping Rosario Web');
-        $mail->addAddress(getenv('SMTP_USER'), 'Admin Shopping'); 
+
+        // El correo "llega" a tu cuenta (usamos getenv)
+        $mail->addAddress(getenv('SMTP_USER'), 'Admin Shopping');
+
+        // Si le das a "Responder", le contestas al cliente
         $mail->addReplyTo($clientEmail, $name);
 
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = 'Nuevo mensaje web: ' . $subject;
-        
+
+        // Cuerpo HTML del mensaje
         $mail->Body = "
             <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
                 <h3 style='color: #0d6efd;'>Nuevo mensaje de contacto</h3>
@@ -55,9 +62,9 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->send();
         return true;
     } catch (Exception $e) {
-        // En producción, podrías loguear esto en un archivo en vez de usar die()
-        error_log("Error de PHPMailer: " . $mail->ErrorInfo);
+        // En producción es mejor no usar die() para no romper la estética del sitio,
+        // pero para debuguear el error de Render está bien.
+        die("Ocurrió un error con el servidor de correos: " . $mail->ErrorInfo);
         return false;
     }
 }
-?>

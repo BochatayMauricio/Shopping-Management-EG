@@ -1,16 +1,16 @@
 <?php
-// Sesión manejada por init.php o login.controller.php
-require_once __DIR__. '/../Config/config.php';
-require_once __DIR__. '/../models/User.php';
+require_once __DIR__ . '/../Config/config.php';
+require_once __DIR__ . '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 include_once __DIR__ . '/clientLevel.service.php';
 
 /**
  * Función Base: Solo inserta en la DB y devuelve el array del usuario
  */
-function insertUserDatabase($userName, $email, $password, $type = 'client') {
+function insertUserDatabase($userName, $email, $password, $type = 'client')
+{
     global $CONNECTION;
-    
+
     $userName = strtolower(trim($userName));
     $email = strtolower(trim($email));
 
@@ -31,7 +31,7 @@ function insertUserDatabase($userName, $email, $password, $type = 'client') {
     $initialLevel = ClientLevel::INICIAL;
     $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $userName, $email, $passwordHashed, $type, $initialLevel);
-    
+
     if (!$stmt->execute()) return false;
 
     // 3. Retornar datos del nuevo usuario
@@ -45,14 +45,15 @@ function insertUserDatabase($userName, $email, $password, $type = 'client') {
 /**
  * Función Pública: La que usarás en tus formularios
  */
-function registerUser($userName, $email, $password, $type = 'client') {
+function registerUser($userName, $email, $password, $type = 'client')
+{
     $userData = insertUserDatabase($userName, $email, $password, $type);
 
     if ($userData === "username_exists") return "username_exists";
     if ($userData === "email_exists") return "email_exists";
     if (!$userData) return false;
 
-    // LÓGICA DE SESIÓN: Solo si es cliente se loguea automáticamente
+    // Solo si es cliente se loguea automáticamente
     if ($type === 'client') {
         if (session_status() === PHP_SESSION_NONE) session_start();
         $_SESSION['user'] = $userData;
@@ -63,14 +64,16 @@ function registerUser($userName, $email, $password, $type = 'client') {
 
 
 
-function getClientsStatsByLevel() {
+function getClientsStatsByLevel()
+{
     global $CONNECTION;
     $query = "SELECT category as level, COUNT(*) as total FROM users WHERE type = 'client' GROUP BY category";
     $result = mysqli_query($CONNECTION, $query);
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-function checkAndUpgradeLevel($userId) {
+function checkAndUpgradeLevel($userId)
+{
     global $CONNECTION;
 
     // 1. Contar promos usadas
@@ -93,9 +96,10 @@ function checkAndUpgradeLevel($userId) {
     return $newLevel;
 }
 
-function getClientLevelProgress($userId) {
+function getClientLevelProgress($userId)
+{
     global $CONNECTION;
-    
+
     // Contamos las promociones realmente usadas (estado 'used')
     $query = "SELECT COUNT(*) as total FROM user_promotions WHERE id_client = ? AND status = 'used'";
     $stmt = mysqli_prepare($CONNECTION, $query);
@@ -115,13 +119,13 @@ function getClientLevelProgress($userId) {
 
     // Usar ClientLevel para determinar progreso
     $levelInfo = ClientLevel::getNextLevelInfo($count);
-    
+
     if ($levelInfo['is_max']) {
         $progress['is_premium'] = true;
     } else {
         $progress['next_level'] = ClientLevel::getLabel($levelInfo['next_level']);
         $progress['missing'] = $levelInfo['remaining'];
-        
+
         // Calcular goal y porcentaje
         if ($count < ClientLevel::THRESHOLD_MEDIUM) {
             $progress['goal'] = ClientLevel::THRESHOLD_MEDIUM;
@@ -141,9 +145,10 @@ function getClientLevelProgress($userId) {
  * @param string $newPassword La nueva contraseña elegida.
  * @return bool|string true en éxito, "incorrect_password" si falla la validación, false en error.
  */
-function updateUserPassword($userId, $currentPassword, $newPassword) {
+function updateUserPassword($userId, $currentPassword, $newPassword)
+{
     global $CONNECTION;
-    
+
     if (!$CONNECTION) return false;
 
     // 1. Obtener el hash de la contraseña actual desde la base de datos
@@ -171,7 +176,7 @@ function updateUserPassword($userId, $currentPassword, $newPassword) {
     // 4. Actualizar la contraseña en la base de datos
     $updateStmt = $CONNECTION->prepare("UPDATE users SET password = ? WHERE cod = ?");
     $updateStmt->bind_param("si", $newHash, $userId);
-    
+
     if ($updateStmt->execute()) {
         // Opcional: Si guardas el hash en la variable de sesión, actualízalo para mantener consistencia
         if (isset($_SESSION['user']['password'])) {
