@@ -1,39 +1,45 @@
 <?php
-// Cargar PHPMailer desde la carpeta vendor que descargaste con Composer
+// Cargar PHPMailer desde la carpeta vendor
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
-    // true habilita las excepciones para atrapar errores
     $mail = new PHPMailer(true);
 
     try {
-        // Configuración del servidor SMTP
+        // --- CONFIGURACIÓN PARA PRODUCCIÓN (DOCKER/RENDER) ---
         $mail->isSMTP();
-        $mail->Host       = env('SMTP_HOST');
+        $mail->Host       = getenv('SMTP_HOST'); 
         $mail->SMTPAuth   = true;
-        $mail->Username   = env('SMTP_USER');
-        $mail->Password   = env('SMTP_PASS');
+        
+        // Usamos getenv() para leer las variables de entorno de Render
+        $mail->Username   = getenv('SMTP_USER'); 
+        $mail->Password   = getenv('SMTP_PASS'); 
+        
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // El correo "sale" de tu cuenta para no ser Spam
-        $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
-        
-        // El correo "llega" a tu cuenta
-        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping'); 
-        
-        // Si le das a "Responder", le contestas al cliente
+        // --- PARCHE CRÍTICO DE RED ---
+        // Esto soluciona el error "Network is unreachable" y problemas de certificados en Docker
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+
+        // Configuración de los correos
+        $mail->setFrom(getenv('SMTP_USER'), 'Shopping Rosario Web');
+        $mail->addAddress(getenv('SMTP_USER'), 'Admin Shopping'); 
         $mail->addReplyTo($clientEmail, $name);
 
-        // Contenido del correo
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = 'Nuevo mensaje web: ' . $subject;
         
-        // Cuerpo HTML del mensaje
         $mail->Body = "
             <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
                 <h3 style='color: #0d6efd;'>Nuevo mensaje de contacto</h3>
@@ -49,8 +55,8 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->send();
         return true;
     } catch (Exception $e) {
-        // En desarrollo puedes hacer un echo $mail->ErrorInfo; para ver qué falló
-        die("Error exacto de PHPMailer: " . $mail->ErrorInfo);
+        // En producción, podrías loguear esto en un archivo en vez de usar die()
+        error_log("Error de PHPMailer: " . $mail->ErrorInfo);
         return false;
     }
 }
