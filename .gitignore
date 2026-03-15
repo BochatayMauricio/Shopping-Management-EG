@@ -8,3 +8,5 @@ env.local.php
 
 # Composer local
 composer.phar
+
+docker-compose.yml

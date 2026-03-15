@@ -13,12 +13,12 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody)
     try {
         // --- CONFIGURACIÓN PARA PRODUCCIÓN (DOCKER/RENDER) ---
         $mail->isSMTP();
-        $mail->Host       = getenv('SMTP_HOST'); 
+        $mail->Host       = env('SMTP_HOST'); 
         $mail->SMTPAuth   = true;
         
-        // Usamos getenv() para leer las variables de entorno de Render
-        $mail->Username   = getenv('SMTP_USER'); 
-        $mail->Password   = getenv('SMTP_PASS'); 
+        // Usamos env() para leer las variables de entorno de Render
+        $mail->Username   = env('SMTP_USER'); 
+        $mail->Password   = env('SMTP_PASS'); 
         
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
@@ -34,10 +34,10 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody)
         );
 
         // El correo "sale" de tu cuenta (usamos getenv)
-        $mail->setFrom(getenv('SMTP_USER'), 'Shopping Rosario Web');
+        $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
 
         // El correo "llega" a tu cuenta (usamos getenv)
-        $mail->addAddress(getenv('SMTP_USER'), 'Admin Shopping');
+        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping');
 
         // Si le das a "Responder", le contestas al cliente
         $mail->addReplyTo($clientEmail, $name);
