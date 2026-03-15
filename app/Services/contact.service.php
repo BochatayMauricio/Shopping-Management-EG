@@ -1,5 +1,5 @@
 <?php
-// Cargar PHPMailer desde la carpeta vendor que descargaste con Composer
+// Cargar PHPMailer desde la carpeta vendor
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -11,25 +11,37 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody)
     $mail = new PHPMailer(true);
 
     try {
-        // Configuración del servidor SMTP
+        // --- CONFIGURACIÓN PARA PRODUCCIÓN (DOCKER/RENDER) ---
         $mail->isSMTP();
-        $mail->Host       = env('SMTP_HOST');
+        $mail->Host       = getenv('SMTP_HOST'); 
         $mail->SMTPAuth   = true;
-        $mail->Username   = env('SMTP_USER');
-        $mail->Password   = env('SMTP_PASS');
+        
+        // Usamos getenv() para leer las variables de entorno de Render
+        $mail->Username   = getenv('SMTP_USER'); 
+        $mail->Password   = getenv('SMTP_PASS'); 
+        
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // El correo "sale" de tu cuenta para no ser Spam
-        $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
+        // --- PARCHE CRÍTICO PARA DOCKER/RENDER ---
+        // Esto evita el error "Network is unreachable" al saltarse la verificación de certificados interna del contenedor
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
-        // El correo "llega" a tu cuenta
-        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping');
+        // El correo "sale" de tu cuenta (usamos getenv)
+        $mail->setFrom(getenv('SMTP_USER'), 'Shopping Rosario Web');
+
+        // El correo "llega" a tu cuenta (usamos getenv)
+        $mail->addAddress(getenv('SMTP_USER'), 'Admin Shopping');
 
         // Si le das a "Responder", le contestas al cliente
         $mail->addReplyTo($clientEmail, $name);
 
-        // Contenido del correo
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = 'Nuevo mensaje web: ' . $subject;
@@ -50,6 +62,8 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody)
         $mail->send();
         return true;
     } catch (Exception $e) {
+        // En producción es mejor no usar die() para no romper la estética del sitio,
+        // pero para debuguear el error de Render está bien.
         die("Ocurrió un error con el servidor de correos: " . $mail->ErrorInfo);
         return false;
     }
