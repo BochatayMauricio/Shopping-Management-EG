@@ -1,93 +1,91 @@
 /* Estilos Sóbrios con Banner y Tarjetas de Color por Rubro */
 
 :root {
-    --primary-color: #004d99; /* Azul marino oscuro para acentos (elegante) */
-    --secondary-color: #4a4a4a; /* Gris oscuro para texto */
-    --danger-color: #dc3545; /* Rojo para descuentos */
-    --background-color: #ffffff; 
-    --card-background: #fdfdfd; 
-    --border-color: #e0e0e0; 
-    --box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Sombra de profundidad */
-    --box-shadow-hover: 0 12px 20px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al hacer hover */
-    --box-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
-    --transition: all 0.3s ease;
-    --border-radius: 8px;
+  --primary-color: #004d99; /* Azul marino oscuro para acentos (elegante) */
+  --secondary-color: #4a4a4a; /* Gris oscuro para texto */
+  --danger-color: #dc3545; /* Rojo para descuentos */
+  --background-color: #ffffff;
+  --card-background: #fdfdfd;
+  --border-color: #e0e0e0;
+  --box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Sombra de profundidad */
+  --box-shadow-hover: 0 12px 20px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al hacer hover */
+  --box-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
 
-    /* --- COLORES DE RUBRO --- */
-    --rubro-ropa: #009688;     
-    --rubro-tecnologia: #9C27B0; 
-    --rubro-gastronomia: #FF9800; 
-    --rubro-servicios: #2196F3; 
-    --rubro-hogar: #795548; 
+  /* --- COLORES DE RUBRO --- */
+  --rubro-ropa: #009688;
+  --rubro-tecnologia: #9c27b0;
+  --rubro-gastronomia: #ff9800;
+  --rubro-servicios: #2196f3;
+  --rubro-hogar: #795548;
 }
 
 /* Base */
 * {
-    font-family: 'Poppins', sans-serif;
-    box-sizing: border-box;
-    max-width: 100%;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 body {
-    background-color: var(--background-color) !important;
-    color: var(--secondary-color);
+  background-color: var(--background-color) !important;
+  color: var(--secondary-color);
 }
 
 /* --- BANNER PRINCIPAL --- */
 .main-banner {
-    position: relative;
-    height: 350px; 
-    /* ¡Asegúrate de que esta imagen exista y sea grande para que el blur se vea bien! */
-    background: url('../../../assets/shopping_bg.jpg') center/cover no-repeat; 
-    overflow: hidden;
-    margin-bottom: 40px;
+  position: relative;
+  height: 350px;
+  background: url("../../../assets/shopping_bg.jpg") center/cover no-repeat;
+  overflow: hidden;
+  margin-bottom: 40px;
 }
 
 .main-banner::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Aplicar blur y oscurecimiento al pseudo-elemento para que el texto sea claro */
-    background: inherit;
-    filter: blur(5px) brightness(0.7);
-    transform: scale(1.02); 
-    z-index: 1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  filter: blur(5px) brightness(0.7);
+  transform: scale(1.02);
+  z-index: 1;
 }
 
 /* El contenido del banner (Texto) */
 .banner-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    text-align: center;
-    color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  color: #fff;
 }
 
 .banner-content h1 {
-    font-size: 4rem;
-    font-weight: 700;
-    letter-spacing: 5px;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 4rem;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 .banner-content p {
-    font-size: 1.2rem;
-    font-weight: 400;
-    margin-top: 10px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-top: 10px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-
 /* --- TÍTULOS DE SECCIÓN --- */
-.promo-carousel, .news-section {
-    padding: 2rem 0;
-    margin: 25px auto;
-    max-width: 100%;
+.promo-carousel,
+.news-section {
+  padding: 2rem 0;
+  margin: 25px auto;
+  max-width: 100%;
 }
 
 .section-title {
@@ -96,51 +94,49 @@ body {
   padding: 0 20px;
   font-size: 1.8rem;
   font-weight: 600;
-  color: var(--primary-color); 
+  color: var(--primary-color);
 }
-
 
 /* --- SECCIÓN NOVEDADES Y EVENTOS --- */
 .news-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 0 20px;
 }
 
 .news-card {
-    background-color: var(--card-background);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--box-shadow-sm);
-    transition: var(--transition);
+  background-color: var(--card-background);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow-sm);
+  transition: var(--transition);
 }
 
 .news-card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .news-card h3 {
-    color: var(--primary-color);
-    font-weight: 600;
-    font-size: 1.15rem;
-    margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
 }
 
 .news-card p {
-    color: var(--secondary-color);
-    font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
 }
 
 .news-date {
-    display: block;
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    color: #999;
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #999;
 }
-
 
 /* --- CARRUSEL (ÁREA DE PROMOCIONES DESTACADAS) --- */
 .carousel-wrapper {
@@ -149,7 +145,7 @@ body {
   overflow-x: scroll;
   padding: 0 20px 20px 20px;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory; 
+  scroll-snap-type: x mandatory;
 }
 
 .carousel-container {
@@ -160,24 +156,23 @@ body {
 
 /* Tarjetas (Diseño de Profundidad y Color de Rubro) */
 .carousel-card {
-   flex: 0 0 calc(33.333% - 1.2rem); 
-   min-width: 300px;
+  flex: 0 0 calc(33.333% - 1.2rem);
+  min-width: 300px;
   background: var(--card-background);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
-  box-shadow: var(--box-shadow); /* Sombra de profundidad */
+  box-shadow: var(--box-shadow);
   overflow: hidden;
   text-align: center;
   transition: var(--transition);
   margin: 0;
   scroll-snap-align: start;
-  
-  /* Barra de color del rubro por defecto */
-  border-left: 5px solid var(--border-color); 
+
+  border-left: 5px solid var(--border-color);
 }
 
 .carousel-card img {
-   width: 100%;
+  width: 100%;
   height: 200px;
   object-fit: cover;
   transition: var(--transition);
@@ -197,35 +192,35 @@ body {
 }
 
 .carousel-card strong {
-    color: var(--danger-color);
-    font-size: 1rem;
+  color: var(--danger-color);
+  font-size: 1rem;
 }
 
 .carousel-card:hover {
-  transform: translateY(-4px); 
-  box-shadow: var(--box-shadow-hover); /* Sombra más profunda al hacer hover */
-  border-color: var(--border-color); 
+  transform: translateY(-4px);
+  box-shadow: var(--box-shadow-hover);
+  border-color: var(--border-color);
 }
 
 .carousel-card:hover img {
-    transform: scale(1.03);
+  transform: scale(1.03);
 }
 
 /* CLASES PARA LA BARRA DE COLOR POR RUBRO (border-left-color) */
 .card-rubro-ropa {
-    border-left-color: var(--rubro-ropa);
+  border-left-color: var(--rubro-ropa);
 }
 .card-rubro-tecnologia {
-    border-left-color: var(--rubro-tecnologia);
+  border-left-color: var(--rubro-tecnologia);
 }
 .card-rubro-gastronomia {
-    border-left-color: var(--rubro-gastronomia);
+  border-left-color: var(--rubro-gastronomia);
 }
 .card-rubro-servicios {
-    border-left-color: var(--rubro-servicios);
+  border-left-color: var(--rubro-servicios);
 }
 .card-rubro-hogar {
-    border-left-color: var(--rubro-hogar);
+  border-left-color: var(--rubro-hogar);
 }
 
 /* Responsive */
@@ -240,61 +235,61 @@ body {
     flex: 0 0 100%;
   }
   .news-container {
-      grid-template-columns: 1fr;
-      padding: 0 10px;
+    grid-template-columns: 1fr;
+    padding: 0 10px;
   }
   .section-title {
-      font-size: 1.5rem;
-      padding: 0 10px;
+    font-size: 1.5rem;
+    padding: 0 10px;
   }
   .banner-content h1 {
-      font-size: 2.5rem;
+    font-size: 2.5rem;
   }
 }
 
 /* Ocultar barra de desplazamiento en el carrusel */
 .carousel-wrapper::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 .carousel-wrapper {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .news-section .section-title {
-    position: relative;
-    padding-bottom: 10px;
+  position: relative;
+  padding-bottom: 10px;
 }
 
 .news-section .section-title::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 60px;
-    height: 3px;
-    background-color: #0d6efd; /* Color principal */
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #0d6efd; /* Color principal */
 }
 
 .news-author-text {
-    font-size: 0.85rem;
-    font-style: italic;
-    display: block;
+  font-size: 0.85rem;
+  font-style: italic;
+  display: block;
 }
 
 .card {
-    transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 .card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .text-truncate-custom {
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Número de líneas que quieres mostrar */
-    -webkit-box-orient: vertical;  
-    line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Número de líneas que quieres mostrar */
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

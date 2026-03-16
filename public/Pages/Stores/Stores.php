@@ -122,7 +122,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
         <section class="stores-grid-container">
             <?php foreach ($filteredStores as $store): 
                 $isMine = in_array($store['id'], $myStoreIds);
-                renderStoreCard($store, $isMine); 
+                renderStoreCard($store, $isMine, $user); 
             endforeach; ?>
         </section>
 
@@ -298,6 +298,36 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
         </div>
     </div>
 
+    <div class="modal fade" id="deleteStoreModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle me-2"></i> Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-1 text-muted fw-bold text-uppercase" style="font-size: 0.8rem;">Estás por eliminar el local:</p>
+                    <h3 id="deleteStoreName" class="mb-3 text-dark"></h3>
+                    
+                    <div class="alert alert-warning small mb-0">
+                        <i class="fas fa-info-circle me-1"></i> 
+                        Esta acción es irreversible. Se eliminarán los datos del local y su vinculación con el dueño. Solo podra eliminarse un local que no tenga promociones asociadas.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 d-flex justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
+                    
+                    <form method="POST" action="">
+                        <input type="hidden" name="store_id" id="deleteStoreId">
+                        <button type="submit" name="btnDeleteStore" class="btn btn-danger px-4 shadow-sm">
+                            Confirmar Eliminación
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include_once __DIR__ . '/../../Components/footer/Footer.php'; ?>
 
     <script>
@@ -347,12 +377,45 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
             document.getElementById('edit_local_number').value = number;
             new bootstrap.Modal(document.getElementById('manageStoreModal')).show();
         }
+
+        function prepareDeleteModal(id, name) {
+            // Ponemos los datos en el modal
+            document.getElementById('deleteStoreId').value = id;
+            document.getElementById('deleteStoreName').innerText = name;
+            
+            // Mostramos el modal de Bootstrap
+            var myModal = new bootstrap.Modal(document.getElementById('deleteStoreModal'));
+            myModal.show();
+        }
+
+        // Reabrir modal si hay error de validación
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const openModal = urlParams.get('openModal');
+            
+            if (openModal === 'addStore') {
+                const modal = document.getElementById('addStoreModal');
+                if (modal) {
+                    // Activar modo "nuevo dueño" si veníamos de crear uno
+                    const newOwnerRadio = document.getElementById('owner_mode_new');
+                    if (newOwnerRadio) {
+                        newOwnerRadio.checked = true;
+                        toggleOwnerFields();
+                    }
+                    new bootstrap.Modal(modal).show();
+                    
+                    // Limpiar el parámetro de la URL sin recargar
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+            }
+        });
     </script>
 </body>
 </html>
 
 <?php
-function renderStoreCard($store, $isMine) {
+function renderStoreCard($store, $isMine, $user) {
     $logo_db = trim($store['logo'] ?? '');
     
     // Verificamos de forma robusta si es una URL externa (http o https)
@@ -384,10 +447,17 @@ function renderStoreCard($store, $isMine) {
             </div>
         </div>
         <div class="store-card-footer d-flex gap-2">
-            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>
-            <?php if($isMine): ?>
+            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>            <?php if($isMine): ?>
                 <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= addslashes($store['ubication']) ?>', '<?= addslashes($store['local_number']) ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
             <?php endif; ?>
+        <?php if($user && $user['type'] === 'admin'): ?>
+            <button type="button" 
+                    class="btn-modern btn-modern-danger" 
+                    onclick="prepareDeleteModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>')"
+                    title="Eliminar Local">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        <?php endif; ?>
         </div>
     </article>
 <?php } ?>

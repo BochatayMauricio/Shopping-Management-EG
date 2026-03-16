@@ -6,50 +6,21 @@ include_once __DIR__ . '/../../../app/controllers/news.controller.php';
 include_once __DIR__ . '/../../../app/controllers/promotion.controller.php';
 include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
-
-// --- LÓGICA DE CORRECCIÓN INTELIGENTE ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // SI ES OWNER CREANDO PROMO:
-    if (isset($_POST['btnCreatePromo'])) {
-        $_POST['id'] = $_POST['id_store']; // Adaptamos para el controlador
-        if(isset($_POST['discount'])) {
-            $_POST['discount'] = intval(preg_replace('/[^0-9]/', '', $_POST['discount']));
-        }
-
-        $storeId = isset($_POST['id_store']) ? intval($_POST['id_store']) : 0;
-        if ($storeId > 0) {
-            $promoData = [
-                'title'           => $_POST['title'],
-                'image'           => $_POST['image'],
-                'date_from'       => $_POST['date_from'],
-                'date_until'      => $_POST['date_until'],
-                'client_category' => $_POST['client_category'],
-                'week_days'       => $_POST['week_days'],
-                'discount'        => $_POST['discount'],
-                'price'           => $_POST['price'],
-                'original_price'  => !empty($_POST['original_price']) ? $_POST['original_price'] : 0,
-                'id_store'        => $storeId
-            ];
-            if (createPromotion($promoData)) {
-                header("Location: Promotions.php?status=submitted");
-                exit(); 
-            }
-        }
-    }
-    
-    // SI ES CLIENTE SOLICITANDO PROMO:
-    // Aseguramos que el controlador reciba 'id' que es lo que suele buscar
-    if (isset($_POST['btnRequestPromo'])) {
-        $_POST['id'] = $_POST['id_promotion'];
-    }
-}
+include_once __DIR__ . '/../../../app/Services/clientLevel.service.php';
 
 // Datos de BD
 $promotions = getPromotionsWithStoreData();
 $allStores = getAllStores();
 $myStores = ($user && $user['type'] === 'owner') ? getStoresByOwner($user['cod'] ?? $user['id']) : [];
 $today = date('Y-m-d');
+
+// Extraer IDs de mis locales para la validación de botones
+$myStoreIds = [];
+if (!empty($myStores)) {
+    foreach ($myStores as $ms) {
+        $myStoreIds[] = $ms['id'];
+    }
+}
 
 // --- LÓGICA DE NIVEL DINÁMICO ---
 $userWeight = 1;
@@ -59,10 +30,8 @@ if ($user && $user['type'] === 'client') {
     $userId = $user['cod'] ?? $user['id'];
     $progress = getClientLevelProgress($userId);
     
-    // Peso dinámico para bloquear/desbloquear cards
-    if ($progress['used'] >= 5) $userWeight = 3;
-    elseif ($progress['used'] >= 3) $userWeight = 2;
-    else $userWeight = 1;
+    // Peso dinámico usando ClientLevel
+    $userWeight = ClientLevel::getWeight(ClientLevel::calculateLevel($progress['used']));
 
     // Obtener las que ya usó para el check visual "YA UTILIZADA"
     $myPromos = getClientPromotions($userId);
@@ -74,7 +43,7 @@ if ($user && $user['type'] === 'client') {
     }
 }
 
-$levelWeights = ['inicial' => 1, 'medium' => 2, 'premium' => 3];
+$levelWeights = ClientLevel::WEIGHTS;
 
 // Filtros URL
 $filterCategory = isset($_GET['category']) ? trim($_GET['category']) : 'all';
@@ -227,9 +196,9 @@ function buildFilterUrl($paramName, $paramValue) {
                         <label for="dropdown-client-category" class="dropdown-toggle-custom">Categoría <i class="fas fa-chevron-down"></i></label>
                         <div class="dropdown-menu-custom">
                             <a href="<?php echo buildFilterUrl('client_category', 'all'); ?>" class="dropdown-item-custom">Todas</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'inicial'); ?>" class="dropdown-item-custom">Inicial</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'medium'); ?>" class="dropdown-item-custom">Medium</a>
-                            <a href="<?php echo buildFilterUrl('client_category', 'premium'); ?>" class="dropdown-item-custom">Premium</a>
+                            <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
+                                <a href="<?php echo buildFilterUrl('client_category', $value); ?>" class="dropdown-item-custom"><?php echo $label; ?></a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -252,9 +221,10 @@ function buildFilterUrl($paramName, $paramValue) {
                         <?php 
                             $promoCategory = strtolower($promo['client_category']);
                             $promoWeight = $levelWeights[$promoCategory] ?? 1;
+                            $isClientUser = ($user && $user['type'] === 'client');
                             
                             // LOGICA DINÁMICA
-                            $isLocked = ($userWeight < $promoWeight);
+                            $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
                         ?>
@@ -337,6 +307,12 @@ function buildFilterUrl($paramName, $paramValue) {
                                         <?php endif; ?>
                                     </form>
                                 <?php endif; ?>
+
+                                <?php if ($user && $user['type'] === 'owner' && in_array($promo['id_store'], $myStoreIds)): ?>
+                                    <button type="button" class="promo-request-btn mt-2 shadow-sm" style="background-color: #dc3545; border-color: #dc3545; color: white;" onclick="prepareDeletePromoModal('<?= $promo['id'] ?>', '<?= addslashes($promo['title']) ?>')">
+                                        <i class="fas fa-ban me-2"></i> Dar de baja
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -383,7 +359,6 @@ function buildFilterUrl($paramName, $paramValue) {
     <?php include_once '../../Components/footer/Footer.php'; ?>
 
     <?php if($user && $user['type'] === 'owner'): ?>
-    <!-- Modal movido fuera del main para evitar problemas de z-index -->
     <div class="modal fade" id="createPromoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content shadow-lg border-0 rounded-4">
@@ -417,15 +392,16 @@ function buildFilterUrl($paramName, $paramValue) {
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">% Descuento</label>
-                                <input type="number" name="discount" class="form-control" required>
+                                <input type="number" name="discount" id="promoDiscount" class="form-control" min="0" max="100" step="0.01" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Precio Promo</label>
-                                <input type="number" name="price" class="form-control" required>
+                                <label class="form-label fw-bold">Precio Promo (calculado)</label>
+                                <input type="text" id="promoCalculatedPrice" class="form-control" readonly>
+                                <input type="hidden" name="price" id="promoPriceHidden">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Precio Original</label>
-                                <input type="number" name="original_price" class="form-control">
+                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
                             </div>
                             <div class="col-12 mb-3">
                                 <label class="form-label fw-bold">URL Imagen</label>
@@ -434,9 +410,9 @@ function buildFilterUrl($paramName, $paramValue) {
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Categoría Cliente</label>
                                 <select name="client_category" class="form-select">
-                                    <option value="Inicial">Inicial</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Premium">Premium</option>
+                                    <?php foreach (ClientLevel::getSelectOptions() as $value => $label): ?>
+                                        <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -452,6 +428,82 @@ function buildFilterUrl($paramName, $paramValue) {
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deletePromoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Dar de baja Promoción</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-1 text-muted fw-bold small">Se cancelará la oferta:</p>
+                    <h4 id="deletePromoName" class="mb-3 text-dark"></h4>
+                    <div class="alert alert-warning small mb-0 text-start">
+                        <i class="fas fa-info-circle me-1"></i> 
+                        Esta acción cambiará el estado de la promoción a "Cancelada". Los clientes ya no podrán verla ni solicitarla, pero quedará en tu historial.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 d-flex justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Volver</button>
+                    <form method="POST" action="">
+                        <input type="hidden" name="promo_id" id="deletePromoId">
+                        <button type="submit" name="btnDeletePromo" class="btn btn-danger px-4 shadow-sm">
+                            Confirmar Baja
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prepareDeletePromoModal(id, name) {
+            document.getElementById('deletePromoId').value = id;
+            document.getElementById('deletePromoName').innerText = name;
+            new bootstrap.Modal(document.getElementById('deletePromoModal')).show();
+        }
+
+        (function () {
+            const discountInput = document.getElementById('promoDiscount');
+            const originalInput = document.getElementById('promoOriginalPrice');
+            const calculatedInput = document.getElementById('promoCalculatedPrice');
+            const hiddenPriceInput = document.getElementById('promoPriceHidden');
+            const arsFormatter = new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            if (!discountInput || !originalInput || !calculatedInput || !hiddenPriceInput) {
+                return;
+            }
+
+            function recalculatePromoPrice() {
+                const original = parseFloat(originalInput.value);
+                const discount = parseFloat(discountInput.value);
+
+                if (isNaN(original) || isNaN(discount)) {
+                    calculatedInput.value = '';
+                    hiddenPriceInput.value = '';
+                    return;
+                }
+
+                const boundedDiscount = Math.max(0, Math.min(100, discount));
+                const finalPrice = original * (1 - (boundedDiscount / 100));
+                const roundedNumeric = Math.max(0, finalPrice);
+                const rounded = roundedNumeric.toFixed(2);
+
+                calculatedInput.value = arsFormatter.format(roundedNumeric);
+                hiddenPriceInput.value = rounded;
+            }
+
+            discountInput.addEventListener('input', recalculatePromoPrice);
+            originalInput.addEventListener('input', recalculatePromoPrice);
+            recalculatePromoPrice();
+        })();
+    </script>
     <?php endif; ?>
 </body>
 </html>
