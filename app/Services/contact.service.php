@@ -15,13 +15,11 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody)
         $mail->isSMTP();
         $mail->Host       = env('SMTP_HOST'); 
         $mail->SMTPAuth   = true;
-        
-        // Usamos env() para leer las variables de entorno de Render
-        $mail->Username   = env('SMTP_USER'); 
-        $mail->Password   = env('SMTP_PASS'); 
-        
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->Username   = env('SMTP_USER');
+        $mail->Password   = env('SMTP_PASS');
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->SMTPDebug  = 2;
+        $mail->Port       = 465;
 
         // --- PARCHE CRÍTICO PARA DOCKER/RENDER ---
         // Esto evita el error "Network is unreachable" al saltarse la verificación de certificados interna del contenedor

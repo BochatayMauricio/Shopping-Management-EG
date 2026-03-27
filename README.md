@@ -20,6 +20,7 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
 | ---------------- | ------- | ------------------------------- |
 | **PHP**          | 7.4+    | Backend y lógica de servidor    |
 | **MySQL**        | 5.7+    | Base de datos relacional        |
+| **Composer**     | 2.x     | Gestor de dependencias de PHP   |
 | **HTML5/CSS3**   | -       | Estructura y estilos            |
 | **Bootstrap**    | 5.x     | Framework CSS responsivo        |
 | **XAMPP**        | 8.x     | Servidor local (Apache + MySQL) |
@@ -31,6 +32,7 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
 ## 📦 Requisitos
 
 - **XAMPP** (o similar con Apache + MySQL + PHP)
+- **Composer** instalado globalmente
 - **PHP 7.4** o superior
 - **MySQL 5.7** o superior
 - Navegador web moderno (Chrome, Firefox, Edge)
@@ -45,12 +47,15 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
    cd C:\xampp\htdocs
    git clone <url-del-repositorio> Shopping-Management-EG
    ```
-
-2. **Iniciar XAMPP** y activar los servicios:
+2.  **Instalar dependencias** Abre una terminal en la carpeta del proyecto y ejecuta:
+   - cd Shopping-Management-EG
+   - composer install
+   
+3. **Iniciar XAMPP** y activar los servicios:
    - Apache
    - MySQL
 
-3. **Configurar la base de datos** en `app/Config/config.php`:
+4. **Configurar la base de datos** en `app/Config/config.php`:
 
    ```php
    $hostname = "localhost";
@@ -60,7 +65,7 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
    $dbport = 3306;
    ```
 
-4. **Acceder a la aplicación**:
+5. **Acceder a la aplicación**:
 
    ```
    http://localhost/Shopping-Management-EG/
@@ -70,7 +75,28 @@ Sistema web de gestión de promociones y tiendas para centros comerciales. Permi
 
 ---
 
-## 🔐 Credenciales de Acceso
+## 🔐 Variables de Entorno
+El proyecto utiliza variables de entorno para manejar la conexión a la base de datos, las credenciales de correo y el modo de entorno (Local/Producción).
+
+Crea un archivo llamado .env en la raíz del proyecto (este archivo está ignorado por Git por seguridad) con la siguiente estructura:
+
+APP_ENV="development" # Cambiar a "production" al desplegar en Render
+BASE_URL="http://localhost/Shopping-Management-EG"
+
+# Base de Datos
+DB_HOST="localhost"
+DB_PORT=3306
+DB_NAME="shopping_management"
+DB_USER="root"
+DB_PASS="tu_contraseña"
+
+# Configuración SMTP (PHPMailer)
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=tu_correo@gmail.com
+SMTP_PASS=tu_contraseña_de_aplicacion_de_16_digitos
+
+---
+## 🔑 Credenciales de Acceso
 
 ### Administrador
 
@@ -127,6 +153,7 @@ Shopping-Management-EG/
 │
 ├── assets/                      # Recursos estáticos
 │   └── stores/                  # Imágenes de tiendas
+├── vendor/                      # Librerías de terceros (PHPMailer)
 │
 └── public/                      # Frontend
     ├── Components/              # Componentes reutilizables
@@ -160,6 +187,7 @@ Shopping-Management-EG/
 - Filtrar promociones por categoría
 - Canjear promociones según nivel de membresía (inicial/medium/premium)
 - Ver noticias y eventos del shopping
+- Enviar mensajes al administrador mediante formulario de contacto (con notificaciones por correo real).
 
 ### 🏪 Dueños de Tiendas
 
@@ -208,9 +236,33 @@ Shopping-Management-EG/
 ## 🔒 Seguridad
 
 - Contraseñas hasheadas con `password_hash()` (bcrypt)
+- Uso de Variables de Entorno (.env) para proteger credenciales sensibles de base de datos y servidores de correo
 - Validación de sesiones PHP
 - Escape de caracteres HTML para prevenir XSS
 - Queries parametrizadas para prevenir SQL Injection
+
+---
+
+## ☁️ Despliegue en Producción (Render)
+
+El proyecto está preparado para ser desplegado en plataformas en la nube como **Render**. Al no subir los archivos locales (`.env` y `/vendor`), el servidor de producción debe configurarse adecuadamente.
+
+### Pasos para el Deploy:
+
+1. **Crear un Nuevo Web Service** en el dashboard de Render y conectarlo a la rama principal de este repositorio en GitHub.
+2. **Comando de Construcción (Build Command):** Como el proyecto utiliza dependencias externas, debes indicarle a Render que las instale en cada despliegue:
+   ```bash
+   composer install --no-dev --optimize-autoloader
+3. **Comando de Inicio (Start Command)**:
+(Dependerá de la configuración del servidor web elegido en Render, habitualmente Apache o un contenedor Docker).
+4. **Configurar Variables de Entorno**:
+En la pestaña Environment del Web Service en Render, debes cargar manualmente todas las variables que usabas en tu .env local. Es crucial modificar los siguientes valores para producción:
+- APP_ENV="production" (Esto ajustará las rutas de la constante BASE_URL automáticamente).
+- BASE_URL="https://tu-dominio-en-render.onrender.com"
+- DB_HOST, DB_NAME, DB_USER, DB_PASS: Credenciales de tu base de datos MySQL alojada en la nube (Render ofrece PostgreSQL, por lo que MySQL suele alojarse en servicios externos como Aiven, PlanetScale o Railway).
+- SMTP_USER y SMTP_PASS: Tus credenciales de correo para que el formulario de contacto siga funcionando.
+
+⚠️ Importante: Jamás subas el archivo env.local.php ni la carpeta vendor al repositorio de GitHub. Las claves de producción solo deben existir en el panel seguro de Render.
 
 ---
 
@@ -227,5 +279,6 @@ Shopping-Management-EG/
 Este proyecto es de uso educativo / interno.
 
 ---
+
 
 **Desarrollado para Shopping Rosario** | v1.0.0
