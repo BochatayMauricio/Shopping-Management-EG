@@ -170,13 +170,14 @@ if ($userCount == 0) {
 
     // Insertar tiendas
     $stores = "INSERT INTO stores (name, logo, color, ubication, local_number, category, id_owner) VALUES 
-        ('Café Central', 'cafe_central.png', '#8B4513', 'Planta Baja', '101', 'gastronomia', 6),
-        ('Tech Store', 'tech_store.png', '#0066CC', 'Primer Piso', '201', 'tecnologia', 6),
-        ('Fashion Style', 'fashion_style.png', '#FF69B4', 'Segundo Piso', '301', 'ropa', 7),
-        ('Librería Cultura', 'libreria.png', '#228B22', 'Planta Baja', '102', 'libreria', 7),
-        ('Heladería Dulce', 'heladeria.png', '#FFA500', 'Patio de Comidas', '401', 'gastronomia', 6),
-        ('Sport Planet', 'sport_planet.png', '#1D4ED8', 'Segundo Piso', '305', 'deportes', 8),
-        ('Beauty Hub', 'beauty_hub.png', '#DB2777', 'Primer Piso', '210', 'belleza', 8)";
+        ('Café Central', 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400', '#8B4513', 'Planta Baja', '101', 'gastronomia', 6),
+        ('Tech Store', 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=400', '#0066CC', 'Primer Piso', '201', 'tecnologia', 6),
+        ('Fashion Style', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=400', '#FF69B4', 'Segundo Piso', '301', 'ropa', 7),
+        ('Librería Cultura', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=400', '#228B22', 'Planta Baja', '102', 'libreria', 7),
+        ('Heladería Dulce', 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?q=80&w=400', '#FFA500', 'Patio de Comidas', '401', 'gastronomia', 6),
+        ('Sport Planet', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400', '#1D4ED8', 'Segundo Piso', '305', 'deportes', 8),
+        ('Beauty Hub', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400', '#DB2777', 'Primer Piso', '210', 'belleza', 8);"
+        ;
 
     if (!$CONNECTION->query($stores)) {
         error_log("Error inserting stores: " . $CONNECTION->error);
@@ -184,13 +185,14 @@ if ($userCount == 0) {
 
     // Insertar promociones (client_category usa los mismos niveles)
     $promotions = "INSERT INTO promotions (title, description, image, date_from, date_until, client_category, week_days, status, discount, price, original_price, id_store) VALUES 
-        ('2x1 en Café', 'Llevá dos cafés por el precio de uno', 'promo_cafe.png', '2026-03-01', '2026-12-31', '$levelMedium', 'Lunes,Martes,Miércoles', 'active', 50.00, 500.00, 1000.00, 1),
-        ('20% en Electrónica', 'Descuento en toda la línea de smartphones', 'promo_tech.png', '2026-03-05', '2026-11-30', '$levelPremium', 'Todos', 'active', 20.00, 80000.00, 100000.00, 2),
-        ('Outlet de Ropa', 'Hasta 40% en ropa de temporada', 'promo_fashion.png', '2026-03-01', '2026-10-31', '$levelInicial', 'Viernes,Sábado,Domingo', 'active', 40.00, 6000.00, 10000.00, 3),
-        ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'promo_libros.png', '2026-03-10', '2026-09-30', '$levelMedium', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
-        ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'promo_helado.png', '2026-03-01', '2026-08-31', '$levelPremium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5),
-        ('25% Running', 'Descuento en zapatillas y accesorios running', 'promo_running.png', '2026-03-12', '2026-12-15', '$levelInicial', 'Jueves,Viernes,Sábado', 'active', 25.00, 22500.00, 30000.00, 6),
-        ('Combo Skincare', 'Rutina completa con precio promocional', 'promo_beauty.png', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";
+        ('2x1 en Café', 'Llevá dos cafés por el precio de uno', 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=600', '2026-03-01', '2026-12-31', '$levelMedium', 'Lunes,Martes,Miércoles', 'active', 50.00, 500.00, 1000.00, 1),
+        ('20% en Electrónica', 'Descuento en toda la línea de smartphones', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600', '2026-03-05', '2026-11-30', '$levelPremium', 'Todos', 'active', 20.00, 80000.00, 100000.00, 2),
+        ('Outlet de Ropa', 'Hasta 40% en ropa de temporada', 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=600', '2026-03-01', '2026-10-31', '$levelInicial', 'Viernes,Sábado,Domingo', 'active', 40.00, 6000.00, 10000.00, 3),
+        ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600', '2026-03-10', '2026-09-30', '$levelMedium', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
+        ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=600', '2026-03-01', '2026-08-31', '$levelPremium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5),
+        ('25% Running', 'Descuento en zapatillas y accesorios running', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600', '2026-03-12', '2026-12-15', '$levelInicial', 'Jueves,Viernes,Sábado', 'active', 25.00, 22500.00, 30000.00, 6),
+        ('Combo Skincare', 'Rutina completa con precio promocional', 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";
+        ;
 
     if (!$CONNECTION->query($promotions)) {
         error_log("Error inserting promotions: " . $CONNECTION->error);
@@ -198,12 +200,11 @@ if ($userCount == 0) {
 
     // Insertar noticias
     $news = "INSERT INTO news (title, description, image, author, date) VALUES 
-        ('¡Nuevo local de tecnología!', 'Tech Store abre sus puertas con increíbles ofertas de inauguración. Visitanos en el primer piso, local 201.', 'news_tech.png', 'Administración', '2026-03-15'),
-        ('Horario extendido fin de semana', 'Este fin de semana el shopping estará abierto hasta las 23hs. Aprovechá para recorrer todas las tiendas.', 'news_horario.png', 'Administración', '2026-03-18'),
-        ('Festival Gastronómico', 'Del 1 al 15 de abril, festival gastronómico en el patio de comidas con precios especiales.', 'news_gastro.png', 'Marketing', '2026-03-20'),
-        ('Semana del Deporte', 'Promociones en indumentaria y accesorios deportivos durante toda la semana.', 'news_sport.png', 'Marketing', '2026-03-22'),
-        ('Beauty Days en el Shopping', 'Nuevos combos de cuidado personal con descuentos por tiempo limitado.', 'news_beauty.png', 'Comercial', '2026-03-25')";
-
+        ('¡Nuevo local de tecnología!', 'Tech Store abre sus puertas con increíbles ofertas de inauguración. Visitanos en el primer piso, local 201.', 'https://images.unsplash.com/photo-1491933382434-500287f9b54b?q=80&w=800', 'Administración', '2026-03-15'),
+        ('Horario extendido fin de semana', 'Este fin de semana el shopping estará abierto hasta las 23hs. Aprovechá para recorrer todas las tiendas.', 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800', 'Administración', '2026-03-18'),
+        ('Festival Gastronómico', 'Del 1 al 15 de abril, festival gastronómico en el patio de comidas con precios especiales.', 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800', 'Marketing', '2026-03-20'),
+        ('Semana del Deporte', 'Promociones en indumentaria y accesorios deportivos durante toda la semana.', 'https://png.pngtree.com/background/20220729/original/pngtree-balls-for-different-team-sport-games-collected-in-center-of-stadium-picture-image_1865767.jpg', 'Marketing', '2026-03-22'),
+        ('Beauty Days en el Shopping', 'Nuevos combos de cuidado personal con descuentos por tiempo limitado.', 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=800', 'Comercial', '2026-03-25')";
     if (!$CONNECTION->query($news)) {
         error_log("Error inserting news: " . $CONNECTION->error);
     }
@@ -219,7 +220,7 @@ if ($userCount == 0) {
         (4, 2, '2026-03-02', 'used'),
         (4, 4, '2026-03-04', 'used'),
         (4, 5, '2026-03-06', 'used'),
-        (4, 6, '2026-03-11', 'used'),
+        (4, 6, '2026-03-11', 'cancelled'),
         (5, 1, '2026-03-12', 'rejected')";
 
     if (!$CONNECTION->query($userPromotions)) {

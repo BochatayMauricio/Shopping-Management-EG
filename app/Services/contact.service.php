@@ -16,8 +16,9 @@ function sendContactEmail($name, $clientEmail, $subject, $messageBody) {
         $mail->SMTPAuth   = true;
         $mail->Username   = env('SMTP_USER');
         $mail->Password   = env('SMTP_PASS');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->SMTPDebug  = 2;
+        $mail->Port       = 465;
 
         // El correo "sale" de tu cuenta para no ser Spam
         $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
