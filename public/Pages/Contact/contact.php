@@ -30,27 +30,27 @@ include_once __DIR__ . '/../../../app/controllers/contact.controller.php';
             </header>
 
             <section class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <form action="" method="POST">
+                <form action="contact.php" method="POST">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Nombre</label>
                             <input type="text" name="name" class="form-control rounded-pill px-3" required>
                         </div>
-<div class="col-md-6">
-    <label class="form-label small fw-bold">Correo Electrónico</label>
-    <?php if($user): ?>
-        <input type="email" name="email" 
-               class="form-control rounded-pill px-3 bg-light" 
-               readonly 
-               value="<?php echo htmlspecialchars($user['email']); ?>">
-        <small class="text-muted ms-2">Sesión iniciada como usuario registrado.</small>
-    <?php else: ?>
-        <input type="email" name="email" 
-               class="form-control rounded-pill px-3" 
-               required 
-               placeholder="tu@email.com">
-    <?php endif; ?>
-</div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Correo Electrónico</label>
+                            <?php if($user): ?>
+                                <input type="email" name="email" 
+                                    class="form-control rounded-pill px-3 bg-light" 
+                                    readonly 
+                                    value="<?php echo htmlspecialchars($user['email']); ?>">
+                                <small class="text-muted ms-2">Sesión iniciada como usuario registrado.</small>
+                            <?php else: ?>
+                                <input type="email" name="email" 
+                                    class="form-control rounded-pill px-3" 
+                                    required 
+                                    placeholder="tu@email.com">
+                            <?php endif; ?>
+                        </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Asunto</label>
                             <select name="subject" class="form-select rounded-pill px-3">

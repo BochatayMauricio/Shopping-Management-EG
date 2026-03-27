@@ -1,5 +1,4 @@
 <?php
-// Inicialización (sesión, logout, usuario)
 include_once __DIR__ . '/../../../app/init.php';
 include_once __DIR__ . '/../../../app/Services/promotions.services.php';
 
@@ -13,8 +12,8 @@ $messageType = "";
 
 if (isset($_POST['btnRedeem'])) {
     $code = trim($_POST['promo_code']);
-    $result = redeemPromotionCode($code); // Llamamos a la función anterior
-    
+    $result = redeemPromotionCode($code);
+
     $message = $result['message'];
     $messageType = $result['success'] ? "success" : "danger";
 }
@@ -22,6 +21,7 @@ if (isset($_POST['btnRedeem'])) {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Canjear Código - Shopping Rosario</title>
@@ -31,6 +31,7 @@ if (isset($_POST['btnRedeem'])) {
     <link rel="stylesheet" href="../../Shared/globalStyles.css">
 
 </head>
+
 <body class="bg-light">
     <?php include_once '../../Components/navbar/NavBar.php'; ?>
 
@@ -55,17 +56,18 @@ if (isset($_POST['btnRedeem'])) {
 
                     <form action="" method="POST" class="text-center">
                         <div class="mb-4">
-                            <input type="text" name="promo_code" class="form-control form-control-lg text-center fw-bold" 
-                                   placeholder="SR-0000" required maxlength="20" style="letter-spacing: 2px;">
+                            <input type="text" name="promo_code" class="form-control form-control-lg text-center fw-bold"
+                                placeholder="SR-0000" required maxlength="20" style="letter-spacing: 2px;">
                         </div>
                         <button type="submit" name="btnRedeem" class="btn btn-dark btn-lg w-100 rounded-pill">
                             Confirmar Canje
                         </button>
                     </form>
                 </div>
-                
+
             </div>
         </div>
     </div>
 </body>
+
 </html>
