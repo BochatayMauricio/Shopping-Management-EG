@@ -21,7 +21,7 @@
         
         <form id="registerForm" method="POST" action="">
             <div class="form-group">
-                <label for="userName">Nombre Completo</label>
+                <label for="userName">Nombre de Usuario</label>
                 <div class="input-wrapper">
                     <i class="fas fa-user"></i>
                     <input 
@@ -29,7 +29,7 @@
                         id="userName" 
                         name="userName" 
                         class="form-control" 
-                        placeholder="Tu nombre y apellido"
+                        placeholder="Tu nombre de usuario"
                         value="<?php echo htmlspecialchars($_POST['userName'] ?? ''); ?>"
                         required
                     >
@@ -131,7 +131,7 @@
             
             if (pass !== confirm) {
                 e.preventDefault();
-                toastr("Las contraseñas no coinciden.");
+                AlertService::show("Las contraseñas no coinciden.");
             }
         };
     </script>

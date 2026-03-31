@@ -7,7 +7,7 @@
 class ValidationService {
     
     // Constantes de configuración
-    const PASSWORD_MIN_LENGTH = 6;
+    const PASSWORD_MIN_LENGTH = 8;
     const PASSWORD_MAX_LENGTH = 20;
     const USERNAME_MIN_LENGTH = 3;
     const USERNAME_MAX_LENGTH = 50;
@@ -22,7 +22,7 @@ class ValidationService {
     }
 
     /**
-     * Valida la longitud de la contraseña (entre 6 y 20 caracteres)
+     * Valida la longitud de la contraseña (entre 8 y 20 caracteres)
      * @param string $password
      * @return bool
      */
@@ -89,7 +89,7 @@ class ValidationService {
      * @return string
      */
     public static function getPasswordErrorMessage() {
-        return 'La contraseña debe tener entre ' . self::PASSWORD_MIN_LENGTH . ' y ' . self::PASSWORD_MAX_LENGTH . ' caracteres.';
+        return 'La contraseña debe tener entre ' . self::PASSWORD_MIN_LENGTH . ' y ' . self::PASSWORD_MAX_LENGTH . ' caracteres y al menos una mayúscula, una minúscula y un número.';
     }
 
     /**

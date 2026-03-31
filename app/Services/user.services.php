@@ -3,10 +3,9 @@ require_once __DIR__ . '/../Config/config.php';
 require_once __DIR__ . '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 include_once __DIR__ . '/clientLevel.service.php';
+include_once __DIR__ . '/email.service.php';
 
-/**
- * Función Base: Solo inserta en la DB y devuelve el array del usuario
- */
+
 function insertUserDatabase($userName, $email, $password, $type = 'client')
 {
     global $CONNECTION;
@@ -29,8 +28,10 @@ function insertUserDatabase($userName, $email, $password, $type = 'client')
     // 2. Insertar
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
     $initialLevel = ClientLevel::INICIAL;
-    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $userName, $email, $passwordHashed, $type, $initialLevel);
+    $token = bin2hex(random_bytes(32));
+    $isVerified = 0;
+    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category,verification_token, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssi", $userName, $email, $passwordHashed, $type, $initialLevel, $token, $isVerified);
 
     if (!$stmt->execute()) return false;
 
@@ -42,9 +43,6 @@ function insertUserDatabase($userName, $email, $password, $type = 'client')
     return $getUser->get_result()->fetch_assoc();
 }
 
-/**
- * Función Pública: La que usarás en tus formularios
- */
 function registerUser($userName, $email, $password, $type = 'client')
 {
     $userData = insertUserDatabase($userName, $email, $password, $type);
@@ -53,11 +51,7 @@ function registerUser($userName, $email, $password, $type = 'client')
     if ($userData === "email_exists") return "email_exists";
     if (!$userData) return false;
 
-    // Solo si es cliente se loguea automáticamente
-    if ($type === 'client') {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        $_SESSION['user'] = $userData;
-    }
+    EmailService::sendVerificationEmail($userData['email'], $userData['verification_token']);
 
     return true;
 }
@@ -189,74 +183,90 @@ function updateUserPassword($userId, $currentPassword, $newPassword)
     return false;
 }
 
-/**
- * Busca un usuario por su email para iniciar el proceso de recuperación.
- * @param string $email
- * @return array|false Datos del usuario o false si no existe.
- */
-function getUserByEmail($email) {
+function verifyUserByToken($token)
+{
     global $CONNECTION;
-    
-    $email = strtolower(trim($email));
-    $stmt = $CONNECTION->prepare("SELECT cod, name, email FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+
+    if (!$CONNECTION) return false;
+
+    // 1. Buscar usuario por token
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE verification_token = ? AND is_verified = 0");
+    $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
-    
-    if ($result->num_rows === 1) {
-        return $result->fetch_assoc();
+
+    if ($result->num_rows === 0) {
+        return "El token es inválido o la cuenta ya ha sido verificada.";
     }
-    return false;
+
+    $userData = $result->fetch_assoc();
+    $userId = $userData['cod'];
+
+    // 2. Marcar como verificado y limpiar el token
+    $updateStmt = $CONNECTION->prepare("UPDATE users SET is_verified = 1, verification_token = NULL WHERE cod = ?");
+    $updateStmt->bind_param("i", $userId);
+
+    if ($updateStmt->execute()) {
+        return true;
+    }
+
+    return "Error al verificar la cuenta. Intente más tarde.";
 }
 
 /**
- * Guarda el token temporal de recuperación para un usuario.
- * @param int $userId ID del usuario (cod)
- * @param string $token Token aleatorio
- * @param string $expires Fecha y hora de expiración
- * @return bool
+ * Obtiene un usuario por su correo electrónico
  */
-function savePasswordResetToken($userId, $token, $expires) {
+function getUserByEmail($email)
+{
     global $CONNECTION;
-    
+    $stmt = $CONNECTION->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+}
+
+/**
+ * Guarda el token de recuperación y su expiración en el usuario
+ */
+function savePasswordResetToken($userId, $token, $expires)
+{
+    global $CONNECTION;
     $stmt = $CONNECTION->prepare("UPDATE users SET reset_token = ?, token_expires = ? WHERE cod = ?");
     $stmt->bind_param("ssi", $token, $expires, $userId);
     return $stmt->execute();
 }
 
 /**
- * Verifica si un token es válido y no ha expirado.
- * @param string $token
- * @return int|false Retorna el ID del usuario (cod) si el token es válido, false en caso contrario.
+ * Verifica si un token de recuperación es válido y no expiró
+ * Retorna el ID del usuario si es exitoso, o false si falla.
  */
-function verifyPasswordResetToken($token) {
+function verifyPasswordResetToken($token)
+{
     global $CONNECTION;
-    
-    // Comprueba que el token coincida y que la fecha de expiración sea mayor a la actual (ahora)
-    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires > NOW()");
+    // Comprobamos que el token coincida y que la fecha de expiración sea mayor o igual a la actual
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires >= NOW()");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($result->num_rows === 1) {
-        return $result->fetch_assoc()['cod'];
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        return $user['cod'];
     }
+    
     return false;
 }
 
 /**
- * Actualiza la contraseña usando un token de recuperación y lo invalida.
- * @param int $userId
- * @param string $newPassword
- * @return bool
+ * Actualiza la contraseña del usuario y limpia los tokens de recuperación
  */
-function resetUserPassword($userId, $newPassword) {
+function resetUserPassword($userId, $newPassword)
+{
     global $CONNECTION;
-    
-    $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
-    // Actualiza la contraseña y anula el token al mismo tiempo
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+    // Cambiamos la clave y anulamos el token para que no se pueda volver a usar
     $stmt = $CONNECTION->prepare("UPDATE users SET password = ?, reset_token = NULL, token_expires = NULL WHERE cod = ?");
-    $stmt->bind_param("si", $newHash, $userId);
-    
+    $stmt->bind_param("si", $hashedPassword, $userId);
     return $stmt->execute();
 }

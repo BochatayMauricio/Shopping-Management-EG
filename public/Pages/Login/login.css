@@ -20,6 +20,23 @@
             margin: 0;
         }
 
+    /* Accesibilidad: Skip link (Saltar al contenido principal) */
+    .skip-link {
+        position: absolute;
+        top: -50px;
+        left: 0;
+        background: #0d6efd;
+        color: white;
+        padding: 10px 20px;
+        z-index: 9999;
+        transition: top 0.3s ease;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .skip-link:focus {
+        top: 0;
+    }
+
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -111,7 +128,10 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #999;
+            color: #555; /* Mejor contraste WCAG */
+            background: none;
+            border: none;
+            padding: 0;
             font-size: 1.1rem;
             transition: color 0.3s ease;
         }
@@ -142,6 +162,16 @@
 
         .login-button:active {
             transform: translateY(0);
+        }
+
+        /* Accesibilidad: Alto contraste en botones deshabilitados */
+        .login-button:disabled,
+        .login-button[disabled] {
+            background: #4a5568; /* Gris oscuro para mantener alto contraste */
+            color: #ffffff;
+            cursor: not-allowed;
+            opacity: 0.95;
+            box-shadow: none;
         }
 
         .login-button.loading {
@@ -300,7 +330,7 @@
 
             .form-control {
                 padding: 12px 12px 12px 40px;
-                font-size: 16px; /* Previene zoom en iOS */
+            font-size: 1rem; /* Accesibilidad: Unidades relativas requeridas por WCAG */
             }
 
             .login-button {

@@ -574,9 +574,10 @@ body {
 
 /* Botón deshabilitado */
 .btn-locked {
-  background-color: #6c757d !important;
-  border-color: #6c757d !important;
-  opacity: 0.8;
+  background-color: #4b5563 !important; /* Gris oscuro para mantener alto contraste */
+  border-color: #4b5563 !important;
+  color: #ffffff !important;
+  opacity: 1 !important; /* Remover opacidad para no violar la legibilidad */
   pointer-events: none;
 }
 
@@ -588,17 +589,27 @@ body {
 .btn-obtained {
   background-color: #10b981 !important; /* Verde esmeralda */
   border-color: #10b981 !important;
-  color: white !important;
+  color: #022c22 !important; /* Texto verde súper oscuro para pasar el ratio WCAG */
   cursor: default;
   opacity: 1 !important;
 }
 
 /* Botón cuando ya se usó */
 .btn-used {
-  background-color: #94a3b8 !important; /* Gris azulado */
-  border-color: #94a3b8 !important;
-  color: white !important;
+  background-color: #475569 !important; /* Gris oscuro para contraste contra texto blanco */
+  border-color: #475569 !important;
+  color: #ffffff !important;
   cursor: not-allowed;
+  opacity: 1 !important;
+}
+
+/* Botón de solicitud rechazada */
+.btn-rejected {
+  background-color: #b91c1c !important; /* Rojo oscuro para ratio 4.5:1 contra blanco */
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+  cursor: not-allowed;
+  opacity: 1 !important;
 }
 
 /* Animación sutil para el check */

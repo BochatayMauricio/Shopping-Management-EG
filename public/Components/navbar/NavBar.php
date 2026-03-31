@@ -85,6 +85,7 @@
     </nav>
     
 <?php 
+
 // RENDERIZADO GLOBAL DE ALERTAS
 // Al estar aquí, cualquier redirección que traiga una alerta en $_SESSION la mostrará justo debajo del navbar.
 if (class_exists('AlertService')) {
@@ -108,7 +109,7 @@ if (class_exists('AlertService')) {
         }
     }
 
-    // Función para auto-cerrar la alerta después de 5 segundos
+    // Función para cerrar la alerta después de 5 segundos
     document.addEventListener('DOMContentLoaded', () => {
         const alertBox = document.getElementById('flash-alert');
         if (alertBox && alertBox.getAttribute('data-auto-hide') === 'true') {

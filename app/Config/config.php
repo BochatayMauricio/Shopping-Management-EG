@@ -66,6 +66,8 @@ $tables = [
         password VARCHAR(100) NOT NULL,
         type VARCHAR(15) NOT NULL,
         category VARCHAR(10) NOT NULL,
+        verification_token VARCHAR(255) NULL,
+        is_verified TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )",
     "CREATE TABLE IF NOT EXISTS stores (
@@ -176,8 +178,7 @@ if ($userCount == 0) {
         ('Librería Cultura', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=400', '#228B22', 'Planta Baja', '102', 'libreria', 7),
         ('Heladería Dulce', 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?q=80&w=400', '#FFA500', 'Patio de Comidas', '401', 'gastronomia', 6),
         ('Sport Planet', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400', '#1D4ED8', 'Segundo Piso', '305', 'deportes', 8),
-        ('Beauty Hub', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400', '#DB2777', 'Primer Piso', '210', 'belleza', 8);"
-        ;
+        ('Beauty Hub', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400', '#DB2777', 'Primer Piso', '210', 'belleza', 8);";
 
     if (!$CONNECTION->query($stores)) {
         error_log("Error inserting stores: " . $CONNECTION->error);
@@ -191,8 +192,7 @@ if ($userCount == 0) {
         ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600', '2026-03-10', '2026-09-30', '$levelMedium', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
         ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=600', '2026-03-01', '2026-08-31', '$levelPremium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5),
         ('25% Running', 'Descuento en zapatillas y accesorios running', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600', '2026-03-12', '2026-12-15', '$levelInicial', 'Jueves,Viernes,Sábado', 'active', 25.00, 22500.00, 30000.00, 6),
-        ('Combo Skincare', 'Rutina completa con precio promocional', 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";
-        ;
+        ('Combo Skincare', 'Rutina completa con precio promocional', 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";;
 
     if (!$CONNECTION->query($promotions)) {
         error_log("Error inserting promotions: " . $CONNECTION->error);

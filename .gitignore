@@ -12,3 +12,5 @@ composer.phar
 .dockerignore
 
 docker-compose.yml
+
+GEMINI.md

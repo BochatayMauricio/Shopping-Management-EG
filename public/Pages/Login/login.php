@@ -13,12 +13,12 @@
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <div class="login-container">
+    <main id="main-content" class="login-container">
         <div class="login-header">
             <h1><i class="fas fa-store"></i> Shopping Rosario</h1>
             <p class="shopping-subtitle">Sistema de Gestión de Promociones</p>
         </div>
-        <form id="loginForm" method="POST" action="">
+        <form id="loginForm" method="POST" action="" novalidate>
             <div class="form-group">
                 <label for="userName">Nombre de Usuario</label>
                 <div class="input-wrapper">
@@ -54,12 +54,11 @@
                         autocomplete="current-password"
                         aria-describedby="password-error"
                     >
-                    <span class="password-toggle" onclick="togglePassword()" aria-label="Mostrar/ocultar contraseña">
+                    <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Mostrar/ocultar contraseña">
                         <i class="fas fa-eye" id="toggleIcon"></i>
-                    </span>
+                    </button>
                 </div>
                 <div id="password-error" class="sr-only" role="alert"></div>
-                <div id="userName-error" class="sr-only" role="alert"></div>
             </div>
 
             <button type="submit" class="login-button" id="loginBtn" name="loginBtn">
@@ -74,15 +73,17 @@
             </div>
         </form>
 
-        <div class="divider">
-            <span>¿Eres nuevo?</span>
-        </div>
-
         <div class="register-link">
-            <p>¿No tienes una cuenta?</p>
+            <p>¿Eres nuevo?</p>
             <a href="../User Register/userRegister.php">Regístrate aquí</a>
         </div>
-    </div>
+
+        <div class="back-to-home" style="text-align: center; margin-top: 1.5rem;">
+            <a href="../Home/home.php" style="color: #6c757d; text-decoration: none; font-size: 0.9rem;">
+                <i class="fas fa-arrow-left"></i> Volver al inicio
+            </a>
+        </div>
+    </main>
     <?php include_once '../../Components/alert/alert.php' ?>
     
     <script>

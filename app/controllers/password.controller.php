@@ -1,8 +1,11 @@
 <?php
-// app/controllers/forgotPassword.controller.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include_once __DIR__ . '/../Config/config.php';
 include_once __DIR__ . '/../Services/user.services.php';
-include_once __DIR__ . '/../Services/contact.service.php';
+include_once __DIR__ . '/../Services/email.service.php';
 include_once __DIR__ . '/../Services/alert.service.php';
 include_once __DIR__ . '/../Services/validation.service.php';
 
@@ -25,12 +28,12 @@ if (isset($_POST['btnRecoverPassword'])) {
             // 3. Guardamos en la BD usando el servicio[cite: 5]
             if (savePasswordResetToken($user['cod'], $token, $expires)) {
                 // 4. Enviamos el mail
-                sendPasswordResetEmail($email, $token);
+                EmailService::sendPasswordResetEmail($email, $token);
             }
         }
 
         // 5. Mensaje genérico de éxito por seguridad
-        AlertService::success('Si el correo está registrado, enviamos un enlace de recuperación (revisá aloivicente@gmail.com).');
+        AlertService::success('Si el correo está registrado, hemos enviado un enlace de recuperación a tu bandeja.');
     }
 }
 

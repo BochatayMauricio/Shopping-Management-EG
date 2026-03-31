@@ -223,12 +223,19 @@ function buildFilterUrl($paramName, $paramValue) {
                             $promoWeight = $levelWeights[$promoCategory] ?? 1;
                             $isClientUser = ($user && $user['type'] === 'client');
                             
+                            // Consultar el estado antes de renderizar la tarjeta
+                            $requestStatus = '';
+                            if ($isClientUser) {
+                                $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']);
+                            }
+
                             // LOGICA DINÁMICA
                             $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
+                            $isPending = ($requestStatus === 'pending');
                         ?>
-                        <div class="promo-card <?php echo ($isLocked || $isAlreadyUsed) ? 'promo-locked' : ''; ?>">
+                        <div class="promo-card <?php echo ($isLocked || $isAlreadyUsed || $isPending) ? 'promo-locked' : ''; ?>">
                             <div class="promo-image-container">
                                 <?php 
                                     $badge_color = '#000000';
@@ -241,6 +248,11 @@ function buildFilterUrl($paramName, $paramValue) {
                                     <div class="promo-lock-overlay" style="background: rgba(25, 135, 84, 0.75);">
                                         <i class="fas fa-check-circle mb-2"></i>
                                         <span class="small fw-bold">YA UTILIZADA</span>
+                                    </div>
+                                <?php elseif ($isPending): ?>
+                                    <div class="promo-lock-overlay">
+                                        <i class="fas fa-clock mb-2" style="font-size: 1.5rem;"></i>
+                                        <span class="small fw-bold">PENDIENTE</span>
                                     </div>
                                 <?php elseif ($isLocked): ?>
                                     <div class="promo-lock-overlay">
@@ -282,22 +294,21 @@ function buildFilterUrl($paramName, $paramValue) {
                                 </div>
 
                                 <?php if ($user && $user['type'] === 'client'): ?>
-                                    <?php $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']); ?>
                                     <form action="" method="POST">
                                         <input type="hidden" name="id_promotion" value="<?php echo $promo['id']; ?>">
                                         
                                         <?php if ($isAlreadyUsed): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #198754; border-color: #198754; color: white;" disabled>
+                                            <button type="button" class="promo-request-btn btn-used" disabled>
                                                 Utilizada con éxito
                                             </button>
-                                        <?php elseif ($requestStatus === 'pending'): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #ffc107; border-color: #ffc107; color: #212529;" disabled>
+                                        <?php elseif ($isPending): ?>
+                                            <button type="button" class="promo-request-btn btn-locked" disabled>
                                                 <i class="fas fa-clock me-1"></i>Pendiente de aprobación
                                             </button>
                                         <?php elseif ($requestStatus === 'active'): ?>
                                             <button type="button" class="promo-request-btn btn-obtained" disabled>Promoción Obtenida</button>
                                         <?php elseif ($requestStatus === 'rejected'): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #dc3545; border-color: #dc3545; color: white;" disabled>
+                                            <button type="button" class="promo-request-btn btn-rejected" disabled>
                                                 <i class="fas fa-times-circle me-1"></i>Solicitud Rechazada
                                             </button>
                                         <?php elseif ($isLocked): ?>

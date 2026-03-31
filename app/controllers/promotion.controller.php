@@ -67,7 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Protección contra manipulación
         if (!$currentUser || $currentUser['type'] !== 'client') {
-            header("Location: Promotions.php?request=denied");
+            AlertService::error("No tienes permisos para solicitar esta promoción.");
+            header("Location: Promotions.php");
             exit();
         }
 
@@ -89,7 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $promoLevel = strtolower(trim($currentPromo['client_category']));
 
             if (!ClientLevel::canAccess($dynamicUserLevel, $promoLevel)) {
-                header("Location: Promotions.php?request=level_low");
+                AlertService::warning("Nivel insuficiente. Esta promoción requiere nivel " . ucfirst($promoLevel) . ".");
+                header("Location: Promotions.php");
                 exit();
             }
         }
@@ -98,11 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = requestPromotion($clientId, $promoId);
 
         if ($result === true) {
-            header("Location: Promotions.php?request=success");
+            AlertService::success("¡Promoción solicitada con éxito! Espera la aprobación del local.");
+            header("Location: Promotions.php");
         } elseif ($result === "already_requested") {
-            header("Location: Promotions.php?request=duplicate");
+            AlertService::info("Ya has solicitado esta promoción anteriormente.");
+            header("Location: Promotions.php");
         } else {
-            header("Location: Promotions.php?request=error");
+            AlertService::error("Ocurrió un error al solicitar la promoción. Intenta nuevamente.");
+            header("Location: Promotions.php");
         }
         exit();
     }

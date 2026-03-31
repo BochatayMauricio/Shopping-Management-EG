@@ -3,22 +3,11 @@ require_once __DIR__ . '/../Config/config.php';
 require_once __DIR__ . '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 
-/**
- * Función para validar email
- * @param string $email
- * @return bool
- */
 function validateEmail($email)
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-/**
- * Función para autenticar usuario
- * @param string $userName
- * @param string $password
- * @return User|false
- */
 function authenticateUser($userName, $password)
 {
     global $CONNECTION;
@@ -28,24 +17,29 @@ function authenticateUser($userName, $password)
         return false;
     }
 
-    $userName = strtolower($userName);
-    $query = "SELECT * FROM users WHERE name = '$userName'";
+    $userName = strtolower(trim($userName));
 
-    $result = mysqli_query($CONNECTION, $query);
-
-    if (!$result) {
-        error_log("Error en la consulta: " . mysqli_error($CONNECTION));
-        return false;
-    }
+    $stmt = $CONNECTION->prepare("SELECT * FROM users WHERE name = ?");
+    $stmt->bind_param("s", $userName);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        AlertService::error("Usuario incorrecto.");
+        AlertService::error("Usuario o contraseña incorrectos.");
         return false;
     }
 
     $userData = $result->fetch_assoc();
+
+    // 1. Verificar contraseña
     if (!password_verify($password, $userData['password'])) {
-        AlertService::error("Contraseña incorrecta.");
+        AlertService::error("Usuario o contraseña incorrectos.");
+        return false;
+    }
+
+    // 2. Verificar si la cuenta está validada por email
+    if ((int)$userData['is_verified'] !== 1) {
+        AlertService::error("Tu cuenta aún no ha sido verificada. Por favor, revisa tu correo electrónico.");
         return false;
     }
 
@@ -57,14 +51,10 @@ function authenticateUser($userName, $password)
     // Guardamos el array en sesión para evitar problemas de serialización
     $_SESSION['user'] = $userData;
 
-    AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
-    return User::fromArray($userData); // Devolvemos modelo User para consistencia
+    AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userData['name']) . "!");
+    return $userData;
 }
 
-/**
- * Obtiene el usuario actual de la sesión
- * @return User|null Retorna modelo User para consistencia con convención de servicios
- */
 function getCurrentUser()
 {
     $userData = $_SESSION['user'] ?? null;

@@ -1,8 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include_once __DIR__ . '/../Config/config.php';
 include_once __DIR__ . '/../Services/user.services.php';
 include_once __DIR__ . '/../Services/alert.service.php';
 include_once __DIR__ . '/../Services/validation.service.php';
+include_once __DIR__ . '/../Services/email.service.php';
 
 // Procesar el formulario de login
 if (isset($_POST['btnRegister'])) {
@@ -29,7 +34,7 @@ if (isset($_POST['btnRegister'])) {
         $result = registerUser($userName, $email, $password, 'client');
 
         if ($result === true) {
-            $loginSuccess = 'Registro exitoso. ¡Bienvenido!';
+            $loginSuccess = 'Correo enviado con éxito. Por favor, revisá tu bandeja para verificar tu cuenta.';
             AlertService::success($loginSuccess);
 
             // Redirigir al Login
@@ -57,7 +62,7 @@ if (isset($_POST['btnChangePassword']) && $user) {
     if (!ValidationService::areFieldsNotEmpty([$currentPassword, $newPassword, $confirmNewPassword])) {
         AlertService::error(ValidationService::getEmptyFieldsMessage());
     } elseif (!ValidationService::isValidPassword($newPassword)) {
-        AlertService::error('La nueva contraseña debe tener entre 6 y 20 caracteres.');
+        AlertService::error('La nueva contraseña debe tener entre 8 y 20 caracteres, al menos una mayúscula, una minúscula y un número.');
     } elseif (!ValidationService::passwordsMatch($newPassword, $confirmNewPassword)) {
         AlertService::error('Las contraseñas nuevas no coinciden.');
     } else {
@@ -75,44 +80,5 @@ if (isset($_POST['btnChangePassword']) && $user) {
         } else {
             AlertService::error('Error al actualizar la contraseña. Intenta nuevamente.');
         }
-    }
-}
-
-if (isset($_POST['btnRecoverPassword'])) {
-    $email = trim($_POST['email']);
-
-    if (empty($email)) {
-        AlertService::warning('Por favor, ingresá un correo electrónico.');
-    } else {
-        // 1. Buscamos si el usuario realmente existe en la base de datos
-        $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            $userId = $user['cod'];
-
-            // 2. Generamos un Token aleatorio e indescifrable
-            $token = bin2hex(random_bytes(32));
-            
-            // 3. Le damos 1 hora de vida útil al token
-            $expires = date("Y-m-d H:i:s", strtotime('+1 hour'));
-
-            // 4. Guardamos el token en la tabla del usuario
-            $updateStmt = $CONNECTION->prepare("UPDATE users SET reset_token = ?, token_expires = ? WHERE cod = ?");
-            $updateStmt->bind_param("ssi", $token, $expires, $userId);
-            
-            if ($updateStmt->execute()) {
-                // 5. Disparamos el mail hacia tu casilla de Gmail
-                sendPasswordResetEmail($email, $token);
-            }
-        }
-
-        // 6. REGLA DE SEGURIDAD VITAL: 
-        // Siempre decimos que "si el correo existe, se envió el mail". 
-        // Si decís "Este correo no existe", los hackers pueden usar el formulario para adivinar qué correos están registrados.
-        AlertService::success('Si el correo está registrado, hemos enviado un enlace de recuperación. (Revisá tu bandeja de aloivicente@gmail.com)');
     }
 }

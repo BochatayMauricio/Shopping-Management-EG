@@ -21,7 +21,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
-    <div class="login-container">
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+    <main id="main-content" class="login-container">
         <div class="login-header">
             <h1><i class="fas fa-shield-alt"></i> Nueva Contraseña</h1>
             <p class="shopping-subtitle">Creá una contraseña segura para tu cuenta</p>
@@ -41,12 +42,14 @@
                         name="newPassword" 
                         class="form-control" 
                         placeholder="Mínimo 8 caracteres, mayúscula y número"
+                        aria-describedby="newPassword-error"
                         required
                     >
-                    <span class="password-toggle" onclick="togglePassword('newPassword', 'toggleIcon1')">
+                    <button type="button" class="password-toggle" onclick="togglePassword('newPassword', 'toggleIcon1')" aria-label="Mostrar/ocultar contraseña">
                         <i class="fas fa-eye" id="toggleIcon1"></i>
-                    </span>
+                    </button>
                 </div>
+                <div id="newPassword-error" class="sr-only" role="alert"></div>
             </div>
 
             <div class="form-group">
@@ -59,19 +62,21 @@
                         name="confirmPassword" 
                         class="form-control" 
                         placeholder="Repetí tu nueva contraseña"
+                        aria-describedby="confirmPassword-error"
                         required
                     >
-                    <span class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')" aria-label="Mostrar/ocultar contraseña">
                         <i class="fas fa-eye" id="toggleIcon2"></i>
-                    </span>
+                    </button>
                 </div>
+                <div id="confirmPassword-error" class="sr-only" role="alert"></div>
             </div>
 
             <button type="submit" class="login-button" name="btnResetPassword">
                 <span class="btn-text">Actualizar Contraseña</span>
             </button>
         </form>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
