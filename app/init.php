@@ -1,9 +1,4 @@
 <?php
-/**
- * Archivo de inicialización de sesión y manejo de logout
- * Incluir al inicio de TODAS las páginas, ANTES de cualquier HTML
- */
-
 // Cargar el modelo User ANTES de session_start para evitar __PHP_Incomplete_Class
 require_once __DIR__ . '/models/User.php';
 include_once __DIR__ . '/Config/config.php';
@@ -27,4 +22,3 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
 // Obtener usuario actual
 $user = getCurrentUser();
-?>

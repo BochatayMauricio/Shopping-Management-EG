@@ -10,3 +10,5 @@ env.local.php
 composer.phar
 
 docker-compose.yml
+
+GEMINI.md

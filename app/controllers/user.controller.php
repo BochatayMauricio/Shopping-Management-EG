@@ -9,7 +9,7 @@ if (isset($_POST['btnRegister'])) {
 
     // Captura y limpieza de datos
     $userName = trim($_POST['userName']);
-    $email = trim($_POST['email']); // <--- Agregamos el email
+    $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $confirmPassword = trim($_POST['confirmPassword']);
 
@@ -24,15 +24,14 @@ if (isset($_POST['btnRegister'])) {
     } elseif (!ValidationService::passwordsMatch($password, $confirmPassword)) {
         AlertService::error(ValidationService::getPasswordMismatchMessage());
     } else {
-        // Intentar registrar usuario
-        // Pasamos por defecto 'client' como tipo de usuario
+
         $result = registerUser($userName, $email, $password, 'client');
 
         if ($result === true) {
-            $loginSuccess = 'Registro exitoso. ¡Bienvenido!';
+            $loginSuccess = 'Registro exitoso. Por favor, revisa tu correo electrónico para verificar tu cuenta antes de iniciar sesión.';
             AlertService::success($loginSuccess);
 
-            // Redirigir al Login
+            // Redirigir a la Home
             $baseUrl = defined('BASE_URL') ? BASE_URL : '';
             header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
             exit();
