@@ -26,9 +26,16 @@ class ValidationService {
      * @param string $password
      * @return bool
      */
+    
     public static function isValidPassword($password) {
-        $length = strlen($password);
-        return $length >= self::PASSWORD_MIN_LENGTH && $length <= self::PASSWORD_MAX_LENGTH;
+        if (strlen($password) < 8 || strlen($password) > 20) {
+        return false;
+        }
+        // Verifica que contenga al menos una mayúscula, una minúscula y un número
+        if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -145,6 +145,7 @@ function getClientLevelProgress($userId)
  * @param string $newPassword La nueva contraseña elegida.
  * @return bool|string true en éxito, "incorrect_password" si falla la validación, false en error.
  */
+
 function updateUserPassword($userId, $currentPassword, $newPassword)
 {
     global $CONNECTION;
@@ -186,4 +187,76 @@ function updateUserPassword($userId, $currentPassword, $newPassword)
     }
 
     return false;
+}
+
+/**
+ * Busca un usuario por su email para iniciar el proceso de recuperación.
+ * @param string $email
+ * @return array|false Datos del usuario o false si no existe.
+ */
+function getUserByEmail($email) {
+    global $CONNECTION;
+    
+    $email = strtolower(trim($email));
+    $stmt = $CONNECTION->prepare("SELECT cod, name, email FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        return $result->fetch_assoc();
+    }
+    return false;
+}
+
+/**
+ * Guarda el token temporal de recuperación para un usuario.
+ * @param int $userId ID del usuario (cod)
+ * @param string $token Token aleatorio
+ * @param string $expires Fecha y hora de expiración
+ * @return bool
+ */
+function savePasswordResetToken($userId, $token, $expires) {
+    global $CONNECTION;
+    
+    $stmt = $CONNECTION->prepare("UPDATE users SET reset_token = ?, token_expires = ? WHERE cod = ?");
+    $stmt->bind_param("ssi", $token, $expires, $userId);
+    return $stmt->execute();
+}
+
+/**
+ * Verifica si un token es válido y no ha expirado.
+ * @param string $token
+ * @return int|false Retorna el ID del usuario (cod) si el token es válido, false en caso contrario.
+ */
+function verifyPasswordResetToken($token) {
+    global $CONNECTION;
+    
+    // Comprueba que el token coincida y que la fecha de expiración sea mayor a la actual (ahora)
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires > NOW()");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        return $result->fetch_assoc()['cod'];
+    }
+    return false;
+}
+
+/**
+ * Actualiza la contraseña usando un token de recuperación y lo invalida.
+ * @param int $userId
+ * @param string $newPassword
+ * @return bool
+ */
+function resetUserPassword($userId, $newPassword) {
+    global $CONNECTION;
+    
+    $newHash = password_hash($newPassword, PASSWORD_BCRYPT);
+    // Actualiza la contraseña y anula el token al mismo tiempo
+    $stmt = $CONNECTION->prepare("UPDATE users SET password = ?, reset_token = NULL, token_expires = NULL WHERE cod = ?");
+    $stmt->bind_param("si", $newHash, $userId);
+    
+    return $stmt->execute();
 }

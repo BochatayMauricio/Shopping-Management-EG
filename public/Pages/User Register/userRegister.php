@@ -62,6 +62,9 @@
                         name="password" 
                         class="form-control" 
                         placeholder="Tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
@@ -81,6 +84,9 @@
                         name="confirmPassword" 
                         class="form-control" 
                         placeholder="Confirma tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
@@ -125,7 +131,7 @@
             
             if (pass !== confirm) {
                 e.preventDefault();
-                alert("Las contraseñas no coinciden.");
+                toastr("Las contraseñas no coinciden.");
             }
         };
     </script>

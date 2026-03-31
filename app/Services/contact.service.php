@@ -5,64 +5,113 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function sendContactEmail($name, $clientEmail, $subject, $messageBody)
-{
-    // true habilita las excepciones para atrapar errores
-    $mail = new PHPMailer(true);
-
-    try {
-        // --- CONFIGURACIÓN PARA PRODUCCIÓN (DOCKER/RENDER) ---
-        $mail->isSMTP();
-        $mail->Host       = env('SMTP_HOST'); 
-        $mail->SMTPAuth   = true;
-        $mail->Username   = env('SMTP_USER');
-        $mail->Password   = env('SMTP_PASS');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->SMTPDebug  = 2;
-        $mail->Port       = 465;
-
-        // --- PARCHE CRÍTICO PARA DOCKER/RENDER ---
-        // Esto evita el error "Network is unreachable" al saltarse la verificación de certificados interna del contenedor
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
-
-        // El correo "sale" de tu cuenta (usamos getenv)
-        $mail->setFrom(env('SMTP_USER'), 'Shopping Rosario Web');
-
-        // El correo "llega" a tu cuenta (usamos getenv)
-        $mail->addAddress(env('SMTP_USER'), 'Admin Shopping');
-
-        // Si le das a "Responder", le contestas al cliente
-        $mail->addReplyTo($clientEmail, $name);
-
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = 'Nuevo mensaje web: ' . $subject;
-
-        // Cuerpo HTML del mensaje
-        $mail->Body = "
-            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
-                <h3 style='color: #0d6efd;'>Nuevo mensaje de contacto</h3>
-                <p><strong>De:</strong> {$name}</p>
-                <p><strong>Email:</strong> {$clientEmail}</p>
-                <p><strong>Asunto:</strong> {$subject}</p>
-                <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
+function sendContactEmail($userName, $userEmail, $subject, $message) {
+    // 1. Obtenés la clave API desde Render
+    $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY'); 
+    
+    // 2. Configurás el paquete de datos
+    $data = [
+        // 'from': En la versión gratis de Resend, tiene que ser este por defecto
+        'from' => 'Web Shopping Rosario <onboarding@resend.dev>', 
+        
+        // 'to': SIEMPRE a tu correo personal
+        'to' => ['aloivicente@gmail.com'], 
+        
+        // 'reply_to': ¡El truco mágico! Si le das a responder en tu Gmail, va al cliente
+        'reply_to' => $userEmail, 
+        
+        'subject' => "Consulta Web: " . $subject,
+        
+        // 'html': El diseño del correo que vas a recibir vos
+        'html' => "
+            <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                <h2 style='color: #0d6efd;'>Nuevo mensaje desde la web</h2>
+                <p><strong>Nombre del cliente:</strong> {$userName}</p>
+                <p><strong>Email del cliente:</strong> {$userEmail}</p>
+                <hr>
                 <p><strong>Mensaje:</strong></p>
-                <p style='background: #f8f9fa; padding: 15px; border-radius: 5px; color: #333;'>" . nl2br($messageBody) . "</p>
+                <p style='background-color: #f8f9fa; padding: 15px; border-radius: 5px;'>
+                    " . nl2br(htmlspecialchars($message)) . "
+                </p>
             </div>
-        ";
+        "
+    ];
 
-        $mail->send();
+    // 3. Hacés la petición a la API (Esto salta el bloqueo de puertos de Render)
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $apiKey,
+        'Content-Type: application/json'
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode == 200) {
         return true;
-    } catch (Exception $e) {
-        // En producción es mejor no usar die() para no romper la estética del sitio,
-        // pero para debuguear el error de Render está bien.
-        die("Ocurrió un error con el servidor de correos: " . $mail->ErrorInfo);
+    } else {
+        error_log("Error de Resend: " . $response); // Queda registrado en los logs de Render
         return false;
     }
+}
+
+function sendPasswordResetEmail($userEmailToReset, $token) {
+    // Obtener la API Key
+    $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY'); 
+    
+    // URL base (Ajustar según entorno - Render o Localhost)
+    $baseUrl = defined('BASE_URL') ? BASE_URL : 'http://localhost:8080';
+    
+    // 1. Detectamos si estamos usando HTTP o HTTPS seguro (Render usa HTTPS)
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+    // 2. Agarramos el host (ej: "localhost" o "tu-app.onrender.com")
+    $host = $_SERVER['HTTP_HOST'];
+
+    // 3. Armamos la ruta dinámica combinando el protocolo, el host y tu BASE_URL
+    $fullBaseUrl = $protocol . $host . BASE_URL; 
+
+    // 4. Generamos el link final
+    $resetLink = $fullBaseUrl . "/public/Pages/PasswordRecovery/resetPassword.php?token=" . $token;
+
+    $data = [
+        'from' => 'Shopping Rosario <onboarding@resend.dev>', 
+        'to' => ['aloivicente@gmail.com'], // Siempre a tu correo
+        'subject' => "Recuperación de clave solicitada para: " . $userEmailToReset,
+        'html' => "
+            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 10px;'>
+                <h2 style='color: #0d6efd;'>Token de Recuperación</h2>
+                <p>Alguien solicitó restablecer la contraseña desde la web.</p>
+                <p><strong>Cuenta solicitada:</strong> <span style='color: #dc3545;'>{$userEmailToReset}</span></p>
+                <hr>
+                <p>Para procesar el cambio de contraseña, hacé clic en el siguiente enlace seguro:</p>
+                <br>
+                <a href='{$resetLink}' style='background-color: #0d6efd; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Restablecer Contraseña</a>
+                <br><br>
+                <p><small style='color: #6c757d;'>* Este enlace expirará en 1 hora.</small></p>
+            </div>
+        "
+    ];
+
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $apiKey,
+        'Content-Type: application/json'
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode != 200) {
+        error_log("Error de Resend: " . $response);
+    }
+    return $httpCode == 200;
 }

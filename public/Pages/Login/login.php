@@ -48,6 +48,8 @@
                         name="password" 
                         class="form-control" 
                         placeholder="Tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
                         required
                         autocomplete="current-password"
                         aria-describedby="password-error"
@@ -68,7 +70,7 @@
             <div class="role-indicator" id="roleIndicator"></div>
 
             <div class="forgot-password">
-                <a href="#">¿Olvidaste tu contraseña?</a>
+                <a href="../PasswordRecovery/forgotPassword.php">¿Olvidaste tu contraseña?</a>
             </div>
         </form>
 
