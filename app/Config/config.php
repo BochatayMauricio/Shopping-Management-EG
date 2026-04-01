@@ -2,12 +2,14 @@
 // Cargar autoload de Composer
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+// Cargar configuración y servicios necesarios
 $envFile = __DIR__ . '/../../.env';
 if (file_exists($envFile)) {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
     $dotenv->load();
 }
 
+// Aseguramos que las variables de entorno estén disponibles incluso si no se usa Dotenv
 function env($key, $default = null)
 {
     return $_ENV[$key] ?? getenv($key) ?: $default;
@@ -18,10 +20,11 @@ define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
 
-// // Detectar BASE_URL automáticamente
+// Detectar BASE_URL automáticamente
 $isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
 define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
 
+// Cargar configuración de la base de datos y conexión
 $envFilePath = __DIR__ . '/../../env.local.php';
 if (file_exists($envFilePath)) {
     include_once $envFilePath;
@@ -30,9 +33,7 @@ if (file_exists($envFilePath)) {
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
 
-/**
- * Conexion a la base de datos
- */
+/* Conexion a la base de datos */
 $hostname = env('DB_HOST');
 $username = env('DB_USER');
 $password = env('DB_PASS');
@@ -44,6 +45,7 @@ if (!$hostname || !$username) {
     die("Error: Faltan las variables de entorno para la base de datos. Verifica tu docker-compose o el panel de Render.");
 }
 
+// Establecer conexión
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
     die("Connection failed: " . $CONNECTION->connect_error);
@@ -61,11 +63,13 @@ if (!$CONNECTION->select_db($dbname)) {
 $tables = [
     "CREATE TABLE IF NOT EXISTS users (
         cod INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
+        name VARCHAR(100) UNIQUE NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(100) NOT NULL,
         type VARCHAR(15) NOT NULL,
         category VARCHAR(10) NOT NULL,
+        verification_token VARCHAR(255) NULL,
+        is_verified TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )",
     "CREATE TABLE IF NOT EXISTS stores (
@@ -136,14 +140,13 @@ foreach ($tables as $table) {
 // SEED DATA - Datos iniciales
 // ============================================
 
-// Verificar si ya hay datos insertados
 $checkUsers = $CONNECTION->query("SELECT COUNT(*) as total FROM users");
 $userCount = $checkUsers->fetch_assoc()['total'];
 
 if ($userCount == 0) {
-    $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-    $clientPassword = password_hash('cliente123', PASSWORD_DEFAULT);
-    $ownerPassword = password_hash('tienda123', PASSWORD_DEFAULT);
+    $adminPassword = password_hash('Admin123', PASSWORD_DEFAULT);
+    $clientPassword = password_hash('Cliente123', PASSWORD_DEFAULT);
+    $ownerPassword = password_hash('Tienda123', PASSWORD_DEFAULT);
 
     $levelInicial = 'inicial';
     $levelMedium = 'medium';
@@ -151,15 +154,15 @@ if ($userCount == 0) {
 
     // Insertar usuarios
     $users = [
-        "INSERT INTO users (name, email, password, type, category) VALUES 
-            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', '$levelPremium'),
-            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', '$levelMedium'),
-            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', '$levelInicial'),
-            ('cliente3', 'cliente3@email.com', '$clientPassword', 'client', '$levelPremium'),
-            ('cliente4', 'cliente4@email.com', '$clientPassword', 'client', '$levelInicial'),
-            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', '$levelPremium'),
-            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', '$levelInicial'),
-            ('tienda3', 'tienda3@shopping.com', '$ownerPassword', 'owner', '$levelMedium')"
+        "INSERT INTO users (name, email, password, type, category, is_verified) VALUES 
+            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', '$levelPremium', 1),
+            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', '$levelMedium', 1),
+            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', '$levelInicial', 1),
+            ('cliente3', 'cliente3@email.com', '$clientPassword', 'client', '$levelPremium', 1),
+            ('cliente4', 'cliente4@email.com', '$clientPassword', 'client', '$levelInicial', 1),
+            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', '$levelPremium', 1),
+            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', '$levelInicial',1),
+            ('tienda3', 'tienda3@shopping.com', '$ownerPassword', 'owner', '$levelMedium',1)"
     ];
 
     foreach ($users as $sql) {
@@ -176,8 +179,7 @@ if ($userCount == 0) {
         ('Librería Cultura', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=400', '#228B22', 'Planta Baja', '102', 'libreria', 7),
         ('Heladería Dulce', 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?q=80&w=400', '#FFA500', 'Patio de Comidas', '401', 'gastronomia', 6),
         ('Sport Planet', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400', '#1D4ED8', 'Segundo Piso', '305', 'deportes', 8),
-        ('Beauty Hub', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400', '#DB2777', 'Primer Piso', '210', 'belleza', 8);"
-        ;
+        ('Beauty Hub', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=400', '#DB2777', 'Primer Piso', '210', 'belleza', 8);";
 
     if (!$CONNECTION->query($stores)) {
         error_log("Error inserting stores: " . $CONNECTION->error);
@@ -191,8 +193,7 @@ if ($userCount == 0) {
         ('3x2 en Libros', 'Llevá 3 libros y pagá solo 2', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600', '2026-03-10', '2026-09-30', '$levelMedium', 'Todos', 'active', 33.33, 2000.00, 3000.00, 4),
         ('Helado Gratis', 'Por compras mayores a $2000, helado de regalo', 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=600', '2026-03-01', '2026-08-31', '$levelPremium', 'Lunes,Martes', 'active', 100.00, 0.00, 800.00, 5),
         ('25% Running', 'Descuento en zapatillas y accesorios running', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600', '2026-03-12', '2026-12-15', '$levelInicial', 'Jueves,Viernes,Sábado', 'active', 25.00, 22500.00, 30000.00, 6),
-        ('Combo Skincare', 'Rutina completa con precio promocional', 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";
-        ;
+        ('Combo Skincare', 'Rutina completa con precio promocional', 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600', '2026-03-15', '2026-11-20', '$levelMedium', 'Todos', 'pending', 30.00, 17500.00, 25000.00, 7)";;
 
     if (!$CONNECTION->query($promotions)) {
         error_log("Error inserting promotions: " . $CONNECTION->error);
@@ -217,10 +218,10 @@ if ($userCount == 0) {
         (3, 3, '2026-03-09', 'active'),
         (3, 6, '2026-03-10', 'pending'),
         (4, 1, '2026-03-01', 'used'),
-        (4, 2, '2026-03-02', 'used'),
+        (4, 2, '2026-03-02', 'approve'),
         (4, 4, '2026-03-04', 'used'),
         (4, 5, '2026-03-06', 'used'),
-        (4, 6, '2026-03-11', 'cancelled'),
+        (4, 6, '2026-03-11', 'rejected'),
         (5, 1, '2026-03-12', 'rejected')";
 
     if (!$CONNECTION->query($userPromotions)) {

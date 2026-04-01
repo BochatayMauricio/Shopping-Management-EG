@@ -55,6 +55,8 @@ $clientStatsRaw = getClientsStatsByLevel();
 $clientLabels = array_map('ucfirst', array_column($clientStatsRaw, 'level'));
 $clientValues = array_column($clientStatsRaw, 'total');
 $totalClients = array_sum($clientValues);
+
+$ownersDirectory = getOwnersWithStoresAndPromotions();
 ?>
 
 <!DOCTYPE html>
@@ -141,6 +143,87 @@ $totalClients = array_sum($clientValues);
                         <canvas id="clientsChart"></canvas>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="mt-5 mb-5">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fas fa-address-book fa-2x text-dark me-3"></i>
+                <h3 class="fw-bold mb-0 text-dark">Directorio de Dueños y Locales</h3>
+            </div>
+
+            <div class="accordion shadow-sm" id="ownersAccordion">
+                <?php if(empty($ownersDirectory)): ?>
+                    <div class="alert alert-info border-0 rounded-4">No hay dueños registrados en el sistema.</div>
+                <?php else: ?>
+                    <?php foreach ($ownersDirectory as $ownerId => $ownerData): ?>
+                        <div class="accordion-item border-0 mb-2 rounded-3 overflow-hidden">
+                            <h2 class="accordion-header" id="heading-owner-<?= $ownerId ?>">
+                                <button class="accordion-button collapsed fw-bold bg-white text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-owner-<?= $ownerId ?>" aria-expanded="false" aria-controls="collapse-owner-<?= $ownerId ?>">
+                                    <i class="fas fa-user-tie text-primary me-2"></i> 
+                                    <?= htmlspecialchars($ownerData['name']) ?> 
+                                    <span class="text-muted fw-normal ms-2 small">(<?= htmlspecialchars($ownerData['email']) ?>)</span>
+                                </button>
+                            </h2>
+                            <div id="collapse-owner-<?= $ownerId ?>" class="accordion-collapse collapse" aria-labelledby="heading-owner-<?= $ownerId ?>" data-bs-parent="#ownersAccordion">
+                                <div class="accordion-body bg-light">
+                                    
+                                    <?php if(empty($ownerData['stores'])): ?>
+                                        <p class="text-muted small mb-0"><i class="fas fa-info-circle me-1"></i> Este dueño aún no tiene locales asignados.</p>
+                                    <?php else: ?>
+                                        <div class="row g-4">
+                                            <?php foreach ($ownerData['stores'] as $storeId => $storeData): ?>
+                                                <div class="col-md-6">
+                                                    <div class="card border-0 shadow-sm h-100 rounded-4">
+                                                        <div class="card-body">
+                                                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                                                                <i class="fas fa-store text-warning me-2"></i> <?= htmlspecialchars($storeData['name']) ?> 
+                                                                <span class="badge bg-secondary ms-1 fw-normal">Local <?= htmlspecialchars($storeData['local_number']) ?></span>
+                                                            </h6>
+                                                            
+                                                            <?php if(empty($storeData['promotions'])): ?>
+                                                                <p class="text-muted small mb-0">No hay promociones registradas en este local.</p>
+                                                            <?php else: ?>
+                                                                <ul class="list-group list-group-flush">
+                                                                    <?php foreach ($storeData['promotions'] as $promo): 
+                                                                        // Definir colores y etiquetas para las píldoras según el estado
+                                                                        $badgeClass = 'bg-secondary';
+                                                                        $statusLabel = 'Desconocido';
+                                                                        
+                                                                        if ($promo['status'] === 'active') {
+                                                                            $badgeClass = 'bg-success';
+                                                                            $statusLabel = 'Activa';
+                                                                        } elseif ($promo['status'] === 'pending') {
+                                                                            $badgeClass = 'bg-warning text-dark';
+                                                                            $statusLabel = 'Pendiente';
+                                                                        } elseif ($promo['status'] === 'cancelled') {
+                                                                            $badgeClass = 'bg-danger';
+                                                                            $statusLabel = 'Cancelada';
+                                                                        }
+                                                                    ?>
+                                                                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-light">
+                                                                            <span class="small fw-medium text-secondary text-truncate pe-2" style="max-width: 70%;" title="<?= htmlspecialchars($promo['title']) ?>">
+                                                                                <?= htmlspecialchars($promo['title']) ?> (<?= intval($promo['discount']) ?>%)
+                                                                            </span>
+                                                                            <span class="badge <?= $badgeClass ?> rounded-pill" style="font-size: 0.7rem;">
+                                                                                <?= $statusLabel ?>
+                                                                            </span>
+                                                                        </li>
+                                                                    <?php endforeach; ?>
+                                                                </ul>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 

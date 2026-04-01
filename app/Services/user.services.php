@@ -3,10 +3,9 @@ require_once __DIR__ . '/../Config/config.php';
 require_once __DIR__ . '/../models/User.php';
 include_once __DIR__ . '/alert.service.php';
 include_once __DIR__ . '/clientLevel.service.php';
+include_once __DIR__ . '/email.service.php';
 
-/**
- * Función Base: Solo inserta en la DB y devuelve el array del usuario
- */
+
 function insertUserDatabase($userName, $email, $password, $type = 'client')
 {
     global $CONNECTION;
@@ -29,8 +28,10 @@ function insertUserDatabase($userName, $email, $password, $type = 'client')
     // 2. Insertar
     $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
     $initialLevel = ClientLevel::INICIAL;
-    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $userName, $email, $passwordHashed, $type, $initialLevel);
+    $token = bin2hex(random_bytes(32));
+    $isVerified = 0;
+    $stmt = $CONNECTION->prepare("INSERT INTO users (name, email, password, type, category,verification_token, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssi", $userName, $email, $passwordHashed, $type, $initialLevel, $token, $isVerified);
 
     if (!$stmt->execute()) return false;
 
@@ -42,9 +43,6 @@ function insertUserDatabase($userName, $email, $password, $type = 'client')
     return $getUser->get_result()->fetch_assoc();
 }
 
-/**
- * Función Pública: La que usarás en tus formularios
- */
 function registerUser($userName, $email, $password, $type = 'client')
 {
     $userData = insertUserDatabase($userName, $email, $password, $type);
@@ -53,11 +51,7 @@ function registerUser($userName, $email, $password, $type = 'client')
     if ($userData === "email_exists") return "email_exists";
     if (!$userData) return false;
 
-    // Solo si es cliente se loguea automáticamente
-    if ($type === 'client') {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        $_SESSION['user'] = $userData;
-    }
+    EmailService::sendVerificationEmail($userData['email'], $userData['verification_token']);
 
     return true;
 }
@@ -145,6 +139,7 @@ function getClientLevelProgress($userId)
  * @param string $newPassword La nueva contraseña elegida.
  * @return bool|string true en éxito, "incorrect_password" si falla la validación, false en error.
  */
+
 function updateUserPassword($userId, $currentPassword, $newPassword)
 {
     global $CONNECTION;
@@ -186,4 +181,139 @@ function updateUserPassword($userId, $currentPassword, $newPassword)
     }
 
     return false;
+}
+
+function verifyUserByToken($token)
+{
+    global $CONNECTION;
+
+    if (!$CONNECTION) return false;
+
+    // 1. Buscar usuario por token
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE verification_token = ? AND is_verified = 0");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        return "El token es inválido o la cuenta ya ha sido verificada.";
+    }
+
+    $userData = $result->fetch_assoc();
+    $userId = $userData['cod'];
+
+    // 2. Marcar como verificado y limpiar el token
+    $updateStmt = $CONNECTION->prepare("UPDATE users SET is_verified = 1, verification_token = NULL WHERE cod = ?");
+    $updateStmt->bind_param("i", $userId);
+
+    if ($updateStmt->execute()) {
+        return true;
+    }
+
+    return "Error al verificar la cuenta. Intente más tarde.";
+}
+
+/**
+ * Obtiene un usuario por su correo electrónico
+ */
+function getUserByEmail($email)
+{
+    global $CONNECTION;
+    $stmt = $CONNECTION->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+}
+
+/**
+ * Guarda el token de recuperación y su expiración en el usuario
+ */
+function savePasswordResetToken($userId, $token, $expires)
+{
+    global $CONNECTION;
+    $stmt = $CONNECTION->prepare("UPDATE users SET reset_token = ?, token_expires = ? WHERE cod = ?");
+    $stmt->bind_param("ssi", $token, $expires, $userId);
+    return $stmt->execute();
+}
+
+/**
+ * Verifica si un token de recuperación es válido y no expiró
+ * Retorna el ID del usuario si es exitoso, o false si falla.
+ */
+function verifyPasswordResetToken($token)
+{
+    global $CONNECTION;
+    // Comprobamos que el token coincida y que la fecha de expiración sea mayor o igual a la actual
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires >= NOW()");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        return $user['cod'];
+    }
+    
+    return false;
+}
+
+/**
+ * Actualiza la contraseña del usuario y limpia los tokens de recuperación
+ */
+function resetUserPassword($userId, $newPassword)
+{
+    global $CONNECTION;
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+    // Cambiamos la clave y anulamos el token para que no se pueda volver a usar
+    $stmt = $CONNECTION->prepare("UPDATE users SET password = ?, reset_token = NULL, token_expires = NULL WHERE cod = ?");
+    $stmt->bind_param("si", $hashedPassword, $userId);
+    return $stmt->execute();
+}
+
+/**
+ * Obtiene el directorio completo: Dueños -> Sus Locales -> Sus Promociones (Para el Admin Report)
+ */
+function getOwnersWithStoresAndPromotions(){
+    global $CONNECTION;
+    $query = "
+        SELECT 
+            u.cod as owner_id, u.name as owner_name, u.email as owner_email,
+            s.id as store_id, s.name as store_name, s.local_number, s.category as store_category,
+            p.id as promo_id, p.title as promo_title, p.status as promo_status, p.discount
+        FROM users u
+        LEFT JOIN stores s ON u.cod = s.id_owner
+        LEFT JOIN promotions p ON s.id = p.id_store
+        WHERE u.type = 'owner'
+        ORDER BY u.name ASC, s.name ASC, p.id DESC
+    ";
+    
+    $result = mysqli_query($CONNECTION, $query);
+    $data = [];
+    
+    if (!$result) return $data;
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $ownerId = $row['owner_id'];
+        $storeId = $row['store_id'];
+        $promoId = $row['promo_id'];
+        
+        if (!isset($data[$ownerId])) {
+            $data[$ownerId] = ['name' => $row['owner_name'], 'email' => $row['owner_email'], 'stores' => []];
+        }
+        
+        if ($storeId && !isset($data[$ownerId]['stores'][$storeId])) {
+            $data[$ownerId]['stores'][$storeId] = [
+                'name' => $row['store_name'], 'local_number' => $row['local_number'], 
+                'category' => $row['store_category'], 'promotions' => []
+            ];
+        }
+        
+        if ($promoId) {
+            $data[$ownerId]['stores'][$storeId]['promotions'][] = [
+                'title' => $row['promo_title'], 'status' => $row['promo_status'], 'discount' => $row['discount']
+            ];
+        }
+    }
+    return $data;
 }

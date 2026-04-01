@@ -21,7 +21,7 @@
         
         <form id="registerForm" method="POST" action="">
             <div class="form-group">
-                <label for="userName">Nombre Completo</label>
+                <label for="userName">Nombre de Usuario</label>
                 <div class="input-wrapper">
                     <i class="fas fa-user"></i>
                     <input 
@@ -29,7 +29,7 @@
                         id="userName" 
                         name="userName" 
                         class="form-control" 
-                        placeholder="Tu nombre y apellido"
+                        placeholder="Tu nombre de usuario"
                         value="<?php echo htmlspecialchars($_POST['userName'] ?? ''); ?>"
                         required
                     >
@@ -62,6 +62,9 @@
                         name="password" 
                         class="form-control" 
                         placeholder="Tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
@@ -81,6 +84,9 @@
                         name="confirmPassword" 
                         class="form-control" 
                         placeholder="Confirma tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
@@ -125,7 +131,7 @@
             
             if (pass !== confirm) {
                 e.preventDefault();
-                alert("Las contraseñas no coinciden.");
+                AlertService::show("Las contraseñas no coinciden.");
             }
         };
     </script>

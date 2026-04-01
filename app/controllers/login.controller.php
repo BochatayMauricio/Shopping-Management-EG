@@ -28,15 +28,13 @@
             // Verificar credenciales
             $user = authenticateUser($userName, $password);
             if ($user) {
-                $loginSuccess = 'Inicio de sesión exitoso. Redirigiendo...';
-                AlertService::success($loginSuccess);
+                AlertService::success('Inicio de sesión exitoso. Redirigiendo...');
                 
                 $baseUrl = defined('BASE_URL') ? BASE_URL : '';
                 header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
                 exit();
             } else {
-                $loginError = 'Credenciales incorrectas. Verifica tu email y contraseña.';
-                AlertService::error($loginError);
+                AlertService::error('Credenciales incorrectas. Verifica tu email y contraseña.');
             }
         }
     }
