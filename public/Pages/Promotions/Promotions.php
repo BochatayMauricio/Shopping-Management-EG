@@ -406,13 +406,13 @@ function buildFilterUrl($paramName, $paramValue) {
                                 <input type="number" name="discount" id="promoDiscount" class="form-control" min="0" max="100" step="0.01" required>
                             </div>
                             <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Precio Original</label>
+                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Precio Promo (calculado)</label>
                                 <input type="text" id="promoCalculatedPrice" class="form-control" readonly>
                                 <input type="hidden" name="price" id="promoPriceHidden">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Precio Original</label>
-                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
                             </div>
                             <div class="col-12 mb-3">
                                 <label class="form-label fw-bold">URL Imagen</label>
@@ -513,6 +513,36 @@ function buildFilterUrl($paramName, $paramValue) {
             discountInput.addEventListener('input', recalculatePromoPrice);
             originalInput.addEventListener('input', recalculatePromoPrice);
             recalculatePromoPrice();
+
+            // Validación dinámica de fechas
+            const dateFromInput = document.querySelector('input[name="date_from"]');
+            const dateUntilInput = document.querySelector('input[name="date_until"]');
+
+            if (dateFromInput && dateUntilInput) {
+                function updateMinDateUntil() {
+                    if (dateFromInput.value) {
+                        const dateParts = dateFromInput.value.split('-');
+                        const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                        date.setDate(date.getDate() + 1);
+                        const nextDay = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+                        dateUntilInput.min = nextDay;
+                    }
+                }
+
+                function validateDates() {
+                    if (dateFromInput.value && dateUntilInput.value) {
+                        if (dateUntilInput.value <= dateFromInput.value) {
+                            dateUntilInput.setCustomValidity('La fecha de fin debe ser estrictamente posterior a la fecha de inicio.');
+                        } else {
+                            dateUntilInput.setCustomValidity('');
+                        }
+                    }
+                }
+
+                dateFromInput.addEventListener('change', () => { updateMinDateUntil(); validateDates(); });
+                dateUntilInput.addEventListener('change', validateDates);
+                updateMinDateUntil(); // Inicializar el atributo min al cargar la vista
+            }
         })();
     </script>
     <?php endif; ?>

@@ -270,3 +270,50 @@ function resetUserPassword($userId, $newPassword)
     $stmt->bind_param("si", $hashedPassword, $userId);
     return $stmt->execute();
 }
+
+/**
+ * Obtiene el directorio completo: Dueños -> Sus Locales -> Sus Promociones (Para el Admin Report)
+ */
+function getOwnersWithStoresAndPromotions(){
+    global $CONNECTION;
+    $query = "
+        SELECT 
+            u.cod as owner_id, u.name as owner_name, u.email as owner_email,
+            s.id as store_id, s.name as store_name, s.local_number, s.category as store_category,
+            p.id as promo_id, p.title as promo_title, p.status as promo_status, p.discount
+        FROM users u
+        LEFT JOIN stores s ON u.cod = s.id_owner
+        LEFT JOIN promotions p ON s.id = p.id_store
+        WHERE u.type = 'owner'
+        ORDER BY u.name ASC, s.name ASC, p.id DESC
+    ";
+    
+    $result = mysqli_query($CONNECTION, $query);
+    $data = [];
+    
+    if (!$result) return $data;
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $ownerId = $row['owner_id'];
+        $storeId = $row['store_id'];
+        $promoId = $row['promo_id'];
+        
+        if (!isset($data[$ownerId])) {
+            $data[$ownerId] = ['name' => $row['owner_name'], 'email' => $row['owner_email'], 'stores' => []];
+        }
+        
+        if ($storeId && !isset($data[$ownerId]['stores'][$storeId])) {
+            $data[$ownerId]['stores'][$storeId] = [
+                'name' => $row['store_name'], 'local_number' => $row['local_number'], 
+                'category' => $row['store_category'], 'promotions' => []
+            ];
+        }
+        
+        if ($promoId) {
+            $data[$ownerId]['stores'][$storeId]['promotions'][] = [
+                'title' => $row['promo_title'], 'status' => $row['promo_status'], 'discount' => $row['discount']
+            ];
+        }
+    }
+    return $data;
+}

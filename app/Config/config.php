@@ -2,12 +2,14 @@
 // Cargar autoload de Composer
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+// Cargar configuración y servicios necesarios
 $envFile = __DIR__ . '/../../.env';
 if (file_exists($envFile)) {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
     $dotenv->load();
 }
 
+// Aseguramos que las variables de entorno estén disponibles incluso si no se usa Dotenv
 function env($key, $default = null)
 {
     return $_ENV[$key] ?? getenv($key) ?: $default;
@@ -18,10 +20,11 @@ define('APP_NAME', 'Shopping Rosario');
 define('APP_VERSION', '1.0.0');
 define('TIMEZONE', 'America/Argentina/Buenos_Aires');
 
-// // Detectar BASE_URL automáticamente
+// Detectar BASE_URL automáticamente
 $isProduction = env('APP_ENV', 'production') === 'production' || !str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost');
 define('BASE_URL', $isProduction ? '' : '/Shopping-Management-EG');
 
+// Cargar configuración de la base de datos y conexión
 $envFilePath = __DIR__ . '/../../env.local.php';
 if (file_exists($envFilePath)) {
     include_once $envFilePath;
@@ -30,9 +33,7 @@ if (file_exists($envFilePath)) {
 // Configurar zona horaria
 date_default_timezone_set(TIMEZONE);
 
-/**
- * Conexion a la base de datos
- */
+/* Conexion a la base de datos */
 $hostname = env('DB_HOST');
 $username = env('DB_USER');
 $password = env('DB_PASS');
@@ -44,6 +45,7 @@ if (!$hostname || !$username) {
     die("Error: Faltan las variables de entorno para la base de datos. Verifica tu docker-compose o el panel de Render.");
 }
 
+// Establecer conexión
 $CONNECTION = new mysqli($hostname, $username, $password, $dbname, $dbport);
 if ($CONNECTION->connect_error) {
     die("Connection failed: " . $CONNECTION->connect_error);
@@ -153,15 +155,15 @@ if ($userCount == 0) {
 
     // Insertar usuarios
     $users = [
-        "INSERT INTO users (name, email, password, type, category) VALUES 
-            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', '$levelPremium'),
-            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', '$levelMedium'),
-            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', '$levelInicial'),
-            ('cliente3', 'cliente3@email.com', '$clientPassword', 'client', '$levelPremium'),
-            ('cliente4', 'cliente4@email.com', '$clientPassword', 'client', '$levelInicial'),
-            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', '$levelPremium'),
-            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', '$levelInicial'),
-            ('tienda3', 'tienda3@shopping.com', '$ownerPassword', 'owner', '$levelMedium')"
+        "INSERT INTO users (name, email, password, type, category, is_verified) VALUES 
+            ('admin', 'admin@shopping.com', '$adminPassword', 'admin', '$levelPremium', 1),
+            ('cliente1', 'cliente1@email.com', '$clientPassword', 'client', '$levelMedium', 1),
+            ('cliente2', 'cliente2@email.com', '$clientPassword', 'client', '$levelInicial', 1),
+            ('cliente3', 'cliente3@email.com', '$clientPassword', 'client', '$levelPremium', 1),
+            ('cliente4', 'cliente4@email.com', '$clientPassword', 'client', '$levelInicial', 1),
+            ('tienda1', 'tienda1@shopping.com', '$ownerPassword', 'owner', '$levelPremium', 1),
+            ('tienda2', 'tienda2@shopping.com', '$ownerPassword', 'owner', '$levelInicial',1),
+            ('tienda3', 'tienda3@shopping.com', '$ownerPassword', 'owner', '$levelMedium',1)"
     ];
 
     foreach ($users as $sql) {
