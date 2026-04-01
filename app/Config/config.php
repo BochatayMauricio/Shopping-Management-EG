@@ -63,7 +63,7 @@ if (!$CONNECTION->select_db($dbname)) {
 $tables = [
     "CREATE TABLE IF NOT EXISTS users (
         cod INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
+        name VARCHAR(100) UNIQUE NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(100) NOT NULL,
         type VARCHAR(15) NOT NULL,
@@ -140,14 +140,13 @@ foreach ($tables as $table) {
 // SEED DATA - Datos iniciales
 // ============================================
 
-// Verificar si ya hay datos insertados
 $checkUsers = $CONNECTION->query("SELECT COUNT(*) as total FROM users");
 $userCount = $checkUsers->fetch_assoc()['total'];
 
 if ($userCount == 0) {
-    $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-    $clientPassword = password_hash('cliente123', PASSWORD_DEFAULT);
-    $ownerPassword = password_hash('tienda123', PASSWORD_DEFAULT);
+    $adminPassword = password_hash('Admin123', PASSWORD_DEFAULT);
+    $clientPassword = password_hash('Cliente123', PASSWORD_DEFAULT);
+    $ownerPassword = password_hash('Tienda123', PASSWORD_DEFAULT);
 
     $levelInicial = 'inicial';
     $levelMedium = 'medium';
@@ -219,10 +218,10 @@ if ($userCount == 0) {
         (3, 3, '2026-03-09', 'active'),
         (3, 6, '2026-03-10', 'pending'),
         (4, 1, '2026-03-01', 'used'),
-        (4, 2, '2026-03-02', 'used'),
+        (4, 2, '2026-03-02', 'approve'),
         (4, 4, '2026-03-04', 'used'),
         (4, 5, '2026-03-06', 'used'),
-        (4, 6, '2026-03-11', 'cancelled'),
+        (4, 6, '2026-03-11', 'rejected'),
         (5, 1, '2026-03-12', 'rejected')";
 
     if (!$CONNECTION->query($userPromotions)) {

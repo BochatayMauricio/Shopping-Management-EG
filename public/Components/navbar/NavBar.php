@@ -62,7 +62,7 @@
                             
                             <div class="user-info">
                                 <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
-                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['type']).'-'.htmlspecialchars($user['category']); ?></small>
+                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['type']).' - '.htmlspecialchars($user['category']); ?></small>
                             </div>
                         </a>
                         <ul class="dropdown-menu">
