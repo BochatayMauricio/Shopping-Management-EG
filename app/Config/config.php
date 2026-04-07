@@ -145,9 +145,9 @@ $checkUsers = $CONNECTION->query("SELECT COUNT(*) as total FROM users");
 $userCount = $checkUsers->fetch_assoc()['total'];
 
 if ($userCount == 0) {
-    $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-    $clientPassword = password_hash('cliente123', PASSWORD_DEFAULT);
-    $ownerPassword = password_hash('tienda123', PASSWORD_DEFAULT);
+    $adminPassword = password_hash('Admin123', PASSWORD_DEFAULT);
+    $clientPassword = password_hash('Cliente123', PASSWORD_DEFAULT);
+    $ownerPassword = password_hash('Tienda123', PASSWORD_DEFAULT);
 
     $levelInicial = 'inicial';
     $levelMedium = 'medium';
