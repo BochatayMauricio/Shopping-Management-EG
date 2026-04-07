@@ -34,7 +34,7 @@ if (isset($_POST['btnRegister'])) {
             AlertService::success($loginSuccess);
 
             $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-            header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
+            header("Location: " . $baseUrl . "/public/Pages/Login/login.php");
             exit();
         } elseif ($result === "username_exists") {
             AlertService::error(ValidationService::getUsernameExistsMessage());

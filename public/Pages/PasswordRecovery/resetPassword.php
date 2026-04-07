@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
     <main id="main-content" class="login-container">
         <div class="login-header">
             <h1><i class="fas fa-shield-alt"></i> Nueva Contraseña</h1>
