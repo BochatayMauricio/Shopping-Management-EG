@@ -9,6 +9,19 @@ include_once __DIR__ . '/../Services/alert.service.php';
 include_once __DIR__ . '/../Services/validation.service.php';
 include_once __DIR__ . '/../Services/email.service.php';
 
+// Procesar el cierre de sesión (Logout)
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    logoutUser(); // Llamamos al servicio purgado
+    
+    // El controlador dispara la alerta amarilla
+    AlertService::warning('Has cerrado sesión correctamente.');
+    
+    // Redireccionamos
+    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+    header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
+    exit();
+}
+
 // Procesar el formulario de login
 if (isset($_POST['btnRegister'])) {
 
