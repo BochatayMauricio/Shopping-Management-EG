@@ -43,6 +43,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promo</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/ownerReports/ownerReports.php">Reportes</a>
+                    </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">

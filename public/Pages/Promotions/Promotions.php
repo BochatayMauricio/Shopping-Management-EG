@@ -226,7 +226,7 @@ function buildFilterUrl($paramName, $paramValue) {
                                 $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']);
                             }
 
-                            // LOGICA DINÁMICA
+                            // LOGICA DINÁMICA DE BLOQUEOS
                             $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
@@ -234,9 +234,21 @@ function buildFilterUrl($paramName, $paramValue) {
                             $isObtained = ($requestStatus === 'active');
                             $isRejected = ($requestStatus === 'rejected');
                             $showBlockedState = ($isLocked || $isAlreadyUsed || $isPending || $isObtained || $isRejected);
+
+                            // LÓGICA DE TARJETA PREMIUM
+                            $isPremium = (isset($promo['isPremiumOwner']) && $promo['isPremiumOwner'] == true);
+                            $premiumClass = $isPremium ? 'promo-card-premium' : '';
                         ?>
-                        <div class="promo-card <?php echo $showBlockedState ? 'promo-locked' : ''; ?>">
+                        
+                        <div class="promo-card <?php echo $showBlockedState ? 'promo-locked' : ''; ?> <?php echo $premiumClass; ?>">
                             <div class="promo-image-container">
+                                
+                                <?php if ($isPremium): ?>
+                                    <div class="premium-ribbon">
+                                        <i class="fas fa-crown"></i> Destacado
+                                    </div>
+                                <?php endif; ?>
+
                                 <?php 
                                     $badge_color = '#000000';
                                     $discount_val = intval(preg_replace('/[^0-9]/', '', $promo['discount_label']));
@@ -534,7 +546,7 @@ function buildFilterUrl($paramName, $paramValue) {
                 function updateMinDateUntil() {
                     if (dateFromInput.value) {
                         const dateParts = dateFromInput.value.split('-');
-                        const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                        const date = new Date(dateParts, dateParts[1] - 1, dateParts[2]);
                         date.setDate(date.getDate() + 1);
                         const nextDay = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
                         dateUntilInput.min = nextDay;
