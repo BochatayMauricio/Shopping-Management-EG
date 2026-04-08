@@ -115,17 +115,27 @@ if (isset($_POST['btnCreateStore'])) {
 
 if (isset($_POST['btnUpdateStore'])) {
     $id = $_POST['store_id'];
-    $name = $_POST['name'];
+    $name = trim($_POST['name']);
     $floor = $_POST['ubication'];
-    $local_number = $_POST['local_number'];
+    $local_number = trim($_POST['local_number']);
+    $category = $_POST['category'];
+    $color = $_POST['color'];
+    
+    // Lógica del logo: Mantenemos el viejo por defecto
+    $logo_name = $_POST['current_logo']; 
+    $logo_url = trim($_POST['logo_icon'] ?? '');
 
-    if (updateStore($id, $name, $floor, $local_number)) {
-        // Redirigir con éxito
-        header("Location: " . $_SERVER['HTTP_REFERER'] . "?success=updated");
-    } else {
-        // Redirigir con error
-        header("Location: " . $_SERVER['HTTP_REFERER'] . "?error=update_failed");
+    // Si escribió una URL nueva válida, pisamos el viejo
+    if (!empty($logo_url) && filter_var($logo_url, FILTER_VALIDATE_URL)) {
+        $logo_name = $logo_url;
     }
+
+    if (updateStore($id, $name, $floor, $local_number, $category, $color, $logo_name)) {
+        AlertService::success("Datos del local actualizados correctamente.");
+    } else {
+        AlertService::error("No se pudieron actualizar los datos del local.");
+    }
+    header("Location: Stores.php");
     exit();
 }
 

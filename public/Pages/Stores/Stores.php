@@ -210,7 +210,7 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                                     <div class="col-md-12">
                                         <label class="form-label small fw-bold">Color de Marca</label>
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-0" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer;">
+                                            <input type="color" id="input_color" name="color" class="form-control form-control-color rounded-circle border-1" value="#0d6efd" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer; border-color: #000000;">
                                             <small class="text-muted">Se usará en el borde de la tarjeta.</small>
                                         </div>
                                     </div>
@@ -238,15 +238,36 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                                         </div>
 
                                         <div id="div_new_owner" class="d-none">
-                                            <div class="row g-2">
-                                                <div class="col-md-6">
-                                                    <input type="text" name="new_owner_name" id="new_owner_name" class="form-control rounded-pill px-3" placeholder="Nombre completo">
+                                            <div class="row g-3">
+                                                <div class="col-md-12">
+                                                    <label for="new_owner_name" class="form-label fw-medium">Nombre completo</label>
+                                                    <input type="text" name="new_owner_name" id="new_owner_name" class="form-control px-3" placeholder="Ej: Juan Pérez" required>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <input type="email" name="new_owner_email" id="new_owner_email" class="form-control rounded-pill px-3" placeholder="Correo electrónico">
+                                                
+                                                <div class="col-md-12">
+                                                    <label for="new_owner_email" class="form-label fw-medium">Correo electrónico</label>
+                                                    <input type="email" name="new_owner_email" id="new_owner_email" class="form-control px-3" placeholder="Ej: correo@ejemplo.com" required>
                                                 </div>
-                                                <div class="col-12 mt-2">
-                                                    <input type="password" name="new_owner_password" id="new_owner_password" class="form-control rounded-pill px-3" placeholder="Contraseña provisoria (Mín. 6 caract.)">
+                                                
+                                                <div class="col-md-12">
+                                                    <label for="new_owner_password" class="form-label fw-medium">Contraseña segura</label>
+                                                    <div class="input-group has-validation">
+                                                        <input 
+                                                            type="password" 
+                                                            name="new_owner_password" 
+                                                            id="new_owner_password" 
+                                                            class="form-control px-3"
+                                                            placeholder="Ingresá tu contraseña"
+                                                            aria-describedby="passwordHelp"
+                                                            required>
+                                                        <button class="btn btn-outline-secondary px-3" type="button" id="toggleOwnerPassword" aria-label="Mostrar u ocultar contraseña">
+                                                            <i class="fas fa-eye" id="toggleOwnerIcon"></i>
+                                                        </button>
+                                                        <div class="invalid-feedback" id="passwordFeedback"></div>
+                                                    </div>
+                                                    <div id="passwordHelp" class="form-text small text-muted">
+                                                        La contraseña debe tener entre 8 y 20 caracteres, incluir una mayúscula, una minúscula y un número.
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -265,32 +286,68 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
     <?php endif; ?>
 
     <div class="modal fade" id="manageStoreModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow rounded-4">
                 <form action="" method="POST">
-                    <div class="modal-header bg-dark text-white">
+                    <div class="modal-header bg-dark text-white p-4">
                         <h5 class="modal-title fw-bold">Gestionar Local</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body p-4">
                         <input type="hidden" name="store_id" id="edit_store_id">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Nombre del Local</label>
-                            <input type="text" name="name" id="edit_name" class="form-control rounded-pill" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Ubicación</label>
-                            <select name="ubication" id="edit_ubication" class="form-select rounded-pill">
-                                <option value="Planta Baja">Planta Baja</option>
-                                <option value="Primer Piso">Primer Piso</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Número de Local</label>
-                            <input type="text" name="local_number" id="edit_local_number" class="form-control rounded-pill">
+                        <input type="hidden" name="current_logo" id="edit_current_logo">
+                        
+                        <div class="row g-4">
+                            <div class="col-md-4 text-center border-end d-flex flex-column align-items-center">
+                                <div id="editLogoPreview" class="rounded-4 border bg-light mb-2 d-flex align-items-center justify-content-center" style="width:150px; height:150px; overflow:hidden;">
+                                    <i class="fas fa-image text-muted fa-3x"></i>
+                                </div>
+                                <small class="text-muted">Logo actual</small>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="edit_logo_icon" class="form-label small fw-bold">Nueva URL del Logo (Opcional)</label>
+                                        <input type="url" name="logo_icon" id="edit_logo_icon" class="form-control rounded-pill px-3" placeholder="Si lo dejás vacío, se mantiene el actual">
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label for="edit_name" class="form-label fw-bold small">Nombre del Local</label>
+                                        <input type="text" name="name" id="edit_name" class="form-control rounded-pill px-3" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="edit_category" class="form-label fw-bold small">Rubro / Categoría</label>
+                                        <select name="category" id="edit_category" class="form-select rounded-pill px-3" required>
+                                            <option value="tecnologia">Tecnología</option>
+                                            <option value="gastronomia">Gastronomía</option>
+                                            <option value="ropa">Ropa</option>
+                                            <option value="hogar">Hogar</option>
+                                            <option value="otros">Otros</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_ubication" class="form-label fw-bold small">Ubicación</label>
+                                        <select name="ubication" id="edit_ubication" class="form-select rounded-pill px-3">
+                                            <option value="Planta Baja">Planta Baja</option>
+                                            <option value="Primer Piso">Primer Piso</option>
+                                            <option value="Segundo Piso">Segundo Piso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_local_number" class="form-label fw-bold small">Número de Local</label>
+                                        <input type="text" name="local_number" id="edit_local_number" class="form-control rounded-pill px-3" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="edit_color" class="form-label small fw-bold">Color de Marca</label>
+                                        <div class="d-flex align-items-center gap-2"">
+                                            <input type="color" id="edit_color" name="color" class="form-control form-control-color rounded-circle border-1" title="Elegí el color del local" style="width: 45px; height: 45px; cursor: pointer; border-color: #000000;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-0">
+                    <div class="modal-footer border-0 p-4">
                         <button type="submit" name="btnUpdateStore" class="btn btn-dark rounded-pill px-4">Guardar Cambios</button>
                     </div>
                 </form>
@@ -370,13 +427,45 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
         }
 
         // Abrir modal de gestión
-        function openManageModal(id, name, ubication, number) {
+        function openManageModal(id, name, ubication, number, category, color, logo) {
             document.getElementById('edit_store_id').value = id;
             document.getElementById('edit_name').value = name;
             document.getElementById('edit_ubication').value = ubication;
             document.getElementById('edit_local_number').value = number;
+            document.getElementById('edit_category').value = category.toLowerCase();
+            document.getElementById('edit_color').value = color;
+            document.getElementById('edit_current_logo').value = logo;
+            document.getElementById('edit_logo_icon').value = ''; // Limpiamos el input
+            
+            // Cargar previsualización del logo actual
+            const preview = document.getElementById('editLogoPreview');
+            const defaultPlaceholder = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkxvZ288L3RleHQ+PC9zdmc+";
+            
+            if (logo.startsWith('http')) {
+                preview.innerHTML = `<img src="${logo}" style="width:100%; height:100%; object-fit:contain;" onerror="this.onerror=null; this.src='${defaultPlaceholder}';">`;
+            } else {
+                let localPath = `../../../assets/stores/${logo || 'default_logo.png'}`;
+                preview.innerHTML = `<img src="${localPath}" style="width:100%; height:100%; object-fit:contain;" onerror="this.onerror=null; this.src='${defaultPlaceholder}';">`;
+            }
+
             new bootstrap.Modal(document.getElementById('manageStoreModal')).show();
         }
+
+        // Lógica para que la vista previa cambie si el usuario tipea una URL nueva
+        document.getElementById('edit_logo_icon').addEventListener('input', function() {
+            const preview = document.getElementById('editLogoPreview');
+            if(this.value) {
+                preview.innerHTML = `<img src="${this.value}" style="width:100%; height:100%; object-fit:contain;">`;
+            } else {
+                // Si borra la URL, vuelve a mostrar el logo que ya tenía en la base de datos
+                const logo = document.getElementById('edit_current_logo').value;
+                if (logo.startsWith('http')) {
+                    preview.innerHTML = `<img src="${logo}" style="width:100%; height:100%; object-fit:contain;">`;
+                } else {
+                    preview.innerHTML = `<img src="../../../assets/stores/${logo || 'default_logo.png'}" style="width:100%; height:100%; object-fit:contain;">`;
+                }
+            }
+        });
 
         function prepareDeleteModal(id, name) {
             // Ponemos los datos en el modal
@@ -408,6 +497,46 @@ $hay_filtros = ($filterCategory !== 'all' || $filterFloor !== 'all' || !empty($s
                     const newUrl = window.location.pathname;
                     window.history.replaceState({}, document.title, newUrl);
                 }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a los elementos
+            const togglePasswordBtn = document.getElementById('toggleOwnerPassword');
+            const passwordInput = document.getElementById('new_owner_password');
+            const toggleIcon = document.getElementById('toggleOwnerIcon');
+
+            if (togglePasswordBtn && passwordInput) {
+                // Lógica del Toggle (Mostrar/Ocultar Contraseña)
+                togglePasswordBtn.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Alternar ícono de FontAwesome
+                    toggleIcon.classList.toggle('fa-eye');
+                    toggleIcon.classList.toggle('fa-eye-slash');
+                });
+
+                // Validación Dinámica
+                passwordInput.addEventListener('input', function() {
+                    const val = this.value;
+                    // Expresión regular: 8-20 caracteres, al menos 1 mayúscula, 1 minúscula y 1 número
+                    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/;
+                    const feedback = document.getElementById('passwordFeedback');
+                    
+                    if (!regex.test(val)) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('border-primary');
+                        feedback.textContent = 'La contraseña no cumple con los requisitos de seguridad.';
+                        // Bloquea el envío del formulario nativamente
+                        this.setCustomValidity('Invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        feedback.textContent = '';
+                        this.setCustomValidity('');
+                    }
+                });
             }
         });
     </script>
@@ -443,21 +572,24 @@ function renderStoreCard($store, $isMine, $user) {
                     <?php if($isMine): ?> <span class="badge rounded-pill bg-warning text-dark" style="font-size: 0.6rem;">MÍO</span> <?php endif; ?>
                 </div>
                 <div class="store-info-meta small text-muted"><i class="fas fa-map-marker-alt me-1"></i> <?= htmlspecialchars($store['ubication']) ?></div>
-                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i> L-<?= htmlspecialchars($store['local_number']) ?></div>
+                <div class="store-info-meta small text-muted"><i class="fas fa-door-open me-1"></i><?= htmlspecialchars($store['local_number']) ?></div>
             </div>
         </div>
         <div class="store-card-footer d-flex gap-2">
-            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a>            <?php if($isMine): ?>
-                <button onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= addslashes($store['ubication']) ?>', '<?= addslashes($store['local_number']) ?>')" class="btn-modern btn-modern-dark">Gestionar</button>
+            <a href="../Promotions/Promotions.php?store=<?= urlencode($store['name']) ?>" class="btn-modern btn-modern-primary flex-grow-1">Ver Promociones</a> 
+            <?php if($user && $user['type'] === 'admin'): ?>
+                <button type="button" 
+                        class="btn-modern btn-modern-dark" 
+                        onclick="openManageModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>', '<?= addslashes($store['ubication']) ?>', '<?= addslashes($store['local_number']) ?>', '<?= addslashes($store['category']) ?>', '<?= addslashes($store['color']) ?>', '<?= addslashes($store['logo']) ?>')"                        title="Modificar datos del local">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" 
+                        class="btn-modern btn-modern-danger" 
+                        onclick="prepareDeleteModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>')"
+                        title="Eliminar Local">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             <?php endif; ?>
-        <?php if($user && $user['type'] === 'admin'): ?>
-            <button type="button" 
-                    class="btn-modern btn-modern-danger" 
-                    onclick="prepareDeleteModal('<?= $store['id'] ?>', '<?= addslashes($store['name']) ?>')"
-                    title="Eliminar Local">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        <?php endif; ?>
         </div>
     </article>
 <?php } ?>

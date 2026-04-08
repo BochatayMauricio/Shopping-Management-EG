@@ -1,24 +1,13 @@
 <?php
 require_once __DIR__ . '/../Config/config.php';
 require_once __DIR__ . '/../models/User.php';
-include_once __DIR__ . '/alert.service.php';
+// Ya no necesitamos llamar a AlertService acá, lo hará el controlador
 
-/**
- * Función para validar email
- * @param string $email
- * @return bool
- */
 function validateEmail($email)
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-/**
- * Función para autenticar usuario
- * @param string $userName
- * @param string $password
- * @return User|false
- */
 function authenticateUser($userName, $password)
 {
     global $CONNECTION;
@@ -28,48 +17,45 @@ function authenticateUser($userName, $password)
         return false;
     }
 
-    $userName = strtolower($userName);
-    $query = "SELECT * FROM users WHERE name = '$userName'";
+    $userName = strtolower(trim($userName));
 
-    $result = mysqli_query($CONNECTION, $query);
-
-    if (!$result) {
-        error_log("Error en la consulta: " . mysqli_error($CONNECTION));
-        return false;
-    }
+    $stmt = $CONNECTION->prepare("SELECT * FROM users WHERE name = ?");
+    $stmt->bind_param("s", $userName);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        AlertService::error("Usuario incorrecto.");
-        return false;
+        return "invalid"; // Usuario no existe
     }
 
     $userData = $result->fetch_assoc();
+
+    // 1. Verificar contraseña
     if (!password_verify($password, $userData['password'])) {
-        AlertService::error("Contraseña incorrecta.");
-        return false;
+        return "invalid"; // Contraseña mal
     }
 
-    // Iniciar sesión si no está iniciada
+    // 2. Verificar si la cuenta está validada por email
+    // A los administradores (si los hay) normalmente no se les pide verificar, 
+    // pero si querés que aplique a todos, dejamos la validación tal cual.
+    if ((int)$userData['is_verified'] !== 1) {
+        return "unverified"; // Falta verificar email
+    }
+
+    // 3. Todo correcto: Iniciar sesión
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Guardamos el array en sesión para evitar problemas de serialización
+    // Guardamos el array en sesión
     $_SESSION['user'] = $userData;
 
-    AlertService::success("Inicio de sesión exitoso. ¡Bienvenido, " . htmlspecialchars($userName) . "!");
-    return User::fromArray($userData); // Devolvemos modelo User para consistencia
+    return $userData; // Retornamos los datos
 }
 
-/**
- * Obtiene el usuario actual de la sesión
- * @return User|null Retorna modelo User para consistencia con convención de servicios
- */
 function getCurrentUser()
 {
     $userData = $_SESSION['user'] ?? null;
-
-    // Validar que es un array válido y convertir a modelo
     return is_array($userData) ? User::fromArray($userData) : null;
 }
 
@@ -78,16 +64,13 @@ function getUserRole()
     return $_SESSION['user']['role'] ?? 'guest';
 }
 
-// Función en local
-function logout()
+function logoutUser()
 {
-    // Solo destruir si hay sesión activa
     if (session_status() === PHP_SESSION_ACTIVE) {
         session_unset();
         session_destroy();
     }
-
-    $redirectUrl = BASE_URL . '/public/Pages/Home/home.php';
+    $redirectUrl = defined('BASE_URL') ? BASE_URL . '/public/Pages/Home/home.php' : '/public/Pages/Home/home.php';
     header("Location: " . $redirectUrl);
     exit();
 }

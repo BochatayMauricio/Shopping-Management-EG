@@ -205,12 +205,10 @@ function deleteStore($storeId)
  * Obtiene todos los usuarios que son de tipo 'owner' para el select del formulario
  * @return User[]
  */
-function getAllOwners()
-{
+function getAllOwners(){
     global $CONNECTION;
     $query = "SELECT * FROM users WHERE type = 'owner'";
     $result = mysqli_query($CONNECTION, $query);
-
     $owners = [];
     while ($row = mysqli_fetch_assoc($result)) {
         $owners[] = User::fromArray($row);
@@ -218,29 +216,19 @@ function getAllOwners()
     return $owners;
 }
 
-function updateStore($id, $name, $ubication, $local_number)
-{
+function updateStore($id, $name, $ubication, $local_number, $category, $color, $logo){
     global $CONNECTION;
-
-    $sql = "UPDATE stores SET name = ?, ubication = ?, local_number = ? WHERE id = ?";
-
-    // 1. Preparamos la sentencia
+    $sql = "UPDATE stores SET name = ?, ubication = ?, local_number = ?, category = ?, color = ?, logo = ? WHERE id = ?";
     $stmt = mysqli_prepare($CONNECTION, $sql);
-
     if ($stmt) {
-        // 2. Vinculamos los parámetros
-        // "sssi" significa: string, string, string, integer (el ID suele ser entero)
-        mysqli_stmt_bind_param($stmt, "sssi", $name, $ubication, $local_number, $id);
+        // "ssssssi" significa: 6 strings y 1 integer (el ID)
+        mysqli_stmt_bind_param($stmt, "ssssssi", $name, $ubication, $local_number, $category, $color, $logo, $id);
 
-        // 3. Ejecutamos
         $result = mysqli_stmt_execute($stmt);
-
-        // 4. Cerramos la sentencia
         mysqli_stmt_close($stmt);
 
         return $result;
     }
-
     return false;
 }
 

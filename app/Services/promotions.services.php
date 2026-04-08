@@ -20,6 +20,7 @@ function getPromotionsWithStoreData()
 {
     global $CONNECTION;
 
+    // La consulta cruza Promociones + Locales + Dueños y trae el isPremiumOwner
     $query = "SELECT 
                 p.id, 
                 p.title, 
@@ -40,11 +41,13 @@ function getPromotionsWithStoreData()
                 s.logo as store_logo, 
                 s.color as store_color,
                 s.local_number,
-                s.category as store_category
+                s.category as store_category,
+                u.isPremiumOwner
               FROM promotions p
               JOIN stores s ON p.id_store = s.id
+              JOIN users u ON s.id_owner = u.cod
               WHERE p.status = 'active'
-              ORDER BY p.created_at DESC";
+              ORDER BY u.isPremiumOwner DESC, p.created_at DESC";
 
     $result = mysqli_query($CONNECTION, $query);
 
@@ -54,7 +57,9 @@ function getPromotionsWithStoreData()
 
     $promotions = [];
     while ($row = mysqli_fetch_assoc($result)) {
-        $promotions[] = Promotion::fromArray($row);
+        // En lugar de pasarlo por el modelo que nos borra el dato, 
+        // guardamos directamente el array de la base de datos.
+        $promotions[] = $row;
     }
     return $promotions;
 }
@@ -403,4 +408,65 @@ function deletePromotion($promoId)
     $stmt->bind_param("i", $promoId);
 
     return $stmt->execute();
+}
+
+/**
+ * 1. Rendimiento de Promociones Activas de un Dueño (Para Gráfico de Barras)
+ */
+function getOwnerPromotionsPerformance($ownerId)
+{
+    global $CONNECTION;
+    $query = "SELECT p.title, COUNT(up.id_client) as used_count
+              FROM promotions p
+              JOIN stores s ON p.id_store = s.id
+              LEFT JOIN user_promotions up ON p.id = up.id_promotion AND up.status = 'used'
+              WHERE s.id_owner = ? AND p.status = 'active'
+              GROUP BY p.id, p.title
+              ORDER BY used_count DESC";
+              
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $ownerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * 2. Estado de todas las Promociones de un Dueño (Para Gráfico de Dona)
+ */
+function getOwnerPromotionsStatusStats($ownerId)
+{
+    global $CONNECTION;
+    $query = "SELECT p.status, COUNT(*) as total
+              FROM promotions p
+              JOIN stores s ON p.id_store = s.id
+              WHERE s.id_owner = ?
+              GROUP BY p.status";
+              
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $ownerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * 3. Tipos de Clientes que usan sus promociones (Para Gráfico de Torta)
+ */
+function getOwnerClientsLevelStats($ownerId)
+{
+    global $CONNECTION;
+    $query = "SELECT u.category as level, COUNT(DISTINCT u.cod) as total
+              FROM user_promotions up
+              JOIN promotions p ON up.id_promotion = p.id
+              JOIN stores s ON p.id_store = s.id
+              JOIN users u ON up.id_client = u.cod
+              WHERE s.id_owner = ? AND up.status = 'used'
+              GROUP BY u.category";
+              
+    $stmt = mysqli_prepare($CONNECTION, $query);
+    mysqli_stmt_bind_param($stmt, "i", $ownerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }

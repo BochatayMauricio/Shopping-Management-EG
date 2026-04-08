@@ -43,6 +43,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promo</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/ownerReports/ownerReports.php">Reportes</a>
+                    </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">
@@ -62,13 +65,13 @@
                             
                             <div class="user-info">
                                 <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
-                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['type']).'-'.htmlspecialchars($user['category']); ?></small>
+                                <small class="user-role d-block text-muted"><?php echo htmlspecialchars($user['type']).' - '.htmlspecialchars($user['category']); ?></small>
                             </div>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="../../Pages/User Portal/userPortal.php"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
+                            <li><a class="dropdown-item text-danger" href="../../../app/controllers/login.controller.php?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>
@@ -85,6 +88,7 @@
     </nav>
     
 <?php 
+
 // RENDERIZADO GLOBAL DE ALERTAS
 // Al estar aquí, cualquier redirección que traiga una alerta en $_SESSION la mostrará justo debajo del navbar.
 if (class_exists('AlertService')) {
@@ -108,7 +112,7 @@ if (class_exists('AlertService')) {
         }
     }
 
-    // Función para auto-cerrar la alerta después de 5 segundos
+    // Función para cerrar la alerta después de 5 segundos
     document.addEventListener('DOMContentLoaded', () => {
         const alertBox = document.getElementById('flash-alert');
         if (alertBox && alertBox.getAttribute('data-auto-hide') === 'true') {

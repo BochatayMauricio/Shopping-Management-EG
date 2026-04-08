@@ -21,7 +21,7 @@
         
         <form id="registerForm" method="POST" action="">
             <div class="form-group">
-                <label for="userName">Nombre Completo</label>
+                <label for="userName">Nombre de Usuario</label>
                 <div class="input-wrapper">
                     <i class="fas fa-user"></i>
                     <input 
@@ -29,7 +29,7 @@
                         id="userName" 
                         name="userName" 
                         class="form-control" 
-                        placeholder="Tu nombre y apellido"
+                        placeholder="Tu nombre de usuario"
                         value="<?php echo htmlspecialchars($_POST['userName'] ?? ''); ?>"
                         required
                     >
@@ -51,7 +51,6 @@
                     >
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="password">Contraseña</label>
                 <div class="input-wrapper">
@@ -62,12 +61,15 @@
                         name="password" 
                         class="form-control" 
                         placeholder="Tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
-                    <span class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')" aria-label="Mostrar u ocultar contraseña">
                         <i class="fas fa-eye" id="toggleIcon1"></i>
-                    </span>
+                    </button>
                 </div>
             </div>
 
@@ -81,12 +83,15 @@
                         name="confirmPassword" 
                         class="form-control" 
                         placeholder="Confirma tu contraseña"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+                        minlength="8"
                         required
                         autocomplete="new-password"
                     >
-                    <span class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')" aria-label="Mostrar u ocultar contraseña">
                         <i class="fas fa-eye" id="toggleIcon2"></i>
-                    </span>
+                    </button>
                 </div>
             </div>
 
@@ -104,7 +109,7 @@
     <?php include_once '../../../public/Components/alert/alert.php' ?>
     
     <script>
-        // Función mejorada para alternar visibilidad de contraseña por ID
+        // Función para alternar visibilidad de contraseña por ID
         function togglePassword(inputId, iconId) {
             const passwordInput = document.getElementById(inputId);
             const toggleIcon = document.getElementById(iconId);
@@ -118,14 +123,20 @@
             }
         }
 
-        // Validación básica de coincidencia de contraseñas antes de enviar
+        // Validación usando Toastr en lugar de sintaxis PHP
         document.getElementById('registerForm').onsubmit = function(e) {
             const pass = document.getElementById('password').value;
             const confirm = document.getElementById('confirmPassword').value;
             
             if (pass !== confirm) {
-                e.preventDefault();
-                alert("Las contraseñas no coinciden.");
+                e.preventDefault(); // Frenamos el envío
+                
+                // Usamos Toastr (que asumo está cargado por tu alert.php)
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Las contraseñas no coinciden.');
+                } else {
+                    alert('Las contraseñas no coinciden.');
+                }
             }
         };
     </script>

@@ -9,4 +9,8 @@ env.local.php
 # Composer local
 composer.phar
 
+.dockerignore
+
 docker-compose.yml
+
+GEMINI.md

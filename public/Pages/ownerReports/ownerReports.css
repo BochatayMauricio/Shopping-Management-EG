@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Dashboard de Dueños (Owner Reports)
+   ========================================================================== */
+   
+body {
+    background-color: #f8fafc;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+}
+
+.card-title {
+    color: #334155;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+}
+
+/* Ajustes de alerta para tarjetas vacías */
+.alert-info {
+    background-color: #eff6ff;
+    border: 1px dashed #bfdbfe;
+    color: #1e40af;
+    border-radius: 12px;
+}

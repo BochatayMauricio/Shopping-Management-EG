@@ -8,7 +8,7 @@ include_once __DIR__ . '/../../../app/Services/stores.services.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
 include_once __DIR__ . '/../../../app/Services/clientLevel.service.php';
 
-// Datos de BD
+
 $promotions = getPromotionsWithStoreData();
 $allStores = getAllStores();
 $myStores = ($user && $user['type'] === 'owner') ? getStoresByOwner($user['cod'] ?? $user['id']) : [];
@@ -22,7 +22,6 @@ if (!empty($myStores)) {
     }
 }
 
-// --- LÓGICA DE NIVEL DINÁMICO ---
 $userWeight = 1;
 $myUsedPromoIds = []; 
 
@@ -30,10 +29,8 @@ if ($user && $user['type'] === 'client') {
     $userId = $user['cod'] ?? $user['id'];
     $progress = getClientLevelProgress($userId);
     
-    // Peso dinámico usando ClientLevel
     $userWeight = ClientLevel::getWeight(ClientLevel::calculateLevel($progress['used']));
 
-    // Obtener las que ya usó para el check visual "YA UTILIZADA"
     $myPromos = getClientPromotions($userId);
     foreach ($myPromos as $mp) {
         // El modelo Promotion usa 'status' para el estado de la solicitud
@@ -223,13 +220,35 @@ function buildFilterUrl($paramName, $paramValue) {
                             $promoWeight = $levelWeights[$promoCategory] ?? 1;
                             $isClientUser = ($user && $user['type'] === 'client');
                             
-                            // LOGICA DINÁMICA
+                            // Consultar el estado antes de renderizar la tarjeta
+                            $requestStatus = '';
+                            if ($isClientUser) {
+                                $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']);
+                            }
+
+                            // LOGICA DINÁMICA DE BLOQUEOS
                             $isLocked = $isClientUser && ($userWeight < $promoWeight);
                             $isAlreadyUsed = in_array($promo['id'], $myUsedPromoIds);
                             $isExpired = ($promo['date_until'] < $today);
+                            $isPending = ($requestStatus === 'pending');
+                            $isObtained = ($requestStatus === 'active');
+                            $isRejected = ($requestStatus === 'rejected');
+                            $showBlockedState = ($isLocked || $isAlreadyUsed || $isPending || $isObtained || $isRejected);
+
+                            // LÓGICA DE TARJETA PREMIUM
+                            $isPremium = (isset($promo['isPremiumOwner']) && $promo['isPremiumOwner'] == true);
+                            $premiumClass = $isPremium ? 'promo-card-premium' : '';
                         ?>
-                        <div class="promo-card <?php echo ($isLocked || $isAlreadyUsed) ? 'promo-locked' : ''; ?>">
+                        
+                        <div class="promo-card <?php echo $showBlockedState ? 'promo-locked' : ''; ?> <?php echo $premiumClass; ?>">
                             <div class="promo-image-container">
+                                
+                                <?php if ($isPremium): ?>
+                                    <div class="premium-ribbon">
+                                        <i class="fas fa-crown"></i> Destacado
+                                    </div>
+                                <?php endif; ?>
+
                                 <?php 
                                     $badge_color = '#000000';
                                     $discount_val = intval(preg_replace('/[^0-9]/', '', $promo['discount_label']));
@@ -238,9 +257,24 @@ function buildFilterUrl($paramName, $paramValue) {
                                 ?>
 
                                 <?php if ($isAlreadyUsed): ?>
-                                    <div class="promo-lock-overlay" style="background: rgba(25, 135, 84, 0.75);">
+                                    <div class="promo-lock-overlay" style="background: rgba(37, 99, 235, 0.65);">
                                         <i class="fas fa-check-circle mb-2"></i>
-                                        <span class="small fw-bold">YA UTILIZADA</span>
+                                        <span class="small fw-bold">Ya Utilizada</span>
+                                    </div>
+                                <?php elseif ($isPending): ?>
+                                    <div class="promo-lock-overlay">
+                                        <i class="fas fa-clock mb-2" style="font-size: 1.5rem;"></i>
+                                        <span class="small fw-bold">Pendiente de Aprobacion</span>
+                                    </div>
+                                <?php elseif ($isObtained): ?>
+                                    <div class="promo-lock-overlay" style="background: rgba(16, 185, 129, 0.6);">
+                                        <i class="fas fa-lock mb-2"></i>
+                                        <span class="small fw-bold">Promocion Obtenida</span>
+                                    </div>
+                                <?php elseif ($isRejected): ?>
+                                    <div class="promo-lock-overlay" style="background: rgba(185, 28, 28, 0.65);">
+                                        <i class="fas fa-lock mb-2"></i>
+                                        <span class="small fw-bold">Solicitud Rechazada</span>
                                     </div>
                                 <?php elseif ($isLocked): ?>
                                     <div class="promo-lock-overlay">
@@ -282,26 +316,27 @@ function buildFilterUrl($paramName, $paramValue) {
                                 </div>
 
                                 <?php if ($user && $user['type'] === 'client'): ?>
-                                    <?php $requestStatus = getPromotionRequestStatus($user['cod'] ?? $user['id'], $promo['id']); ?>
                                     <form action="" method="POST">
                                         <input type="hidden" name="id_promotion" value="<?php echo $promo['id']; ?>">
                                         
                                         <?php if ($isAlreadyUsed): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #198754; border-color: #198754; color: white;" disabled>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn btn-used btn-locked" disabled>
                                                 Utilizada con éxito
                                             </button>
-                                        <?php elseif ($requestStatus === 'pending'): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #ffc107; border-color: #ffc107; color: #212529;" disabled>
+                                        <?php elseif ($isPending): ?>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn btn-pending btn-locked" disabled>
                                                 <i class="fas fa-clock me-1"></i>Pendiente de aprobación
                                             </button>
-                                        <?php elseif ($requestStatus === 'active'): ?>
-                                            <button type="button" class="promo-request-btn btn-obtained" disabled>Promoción Obtenida</button>
-                                        <?php elseif ($requestStatus === 'rejected'): ?>
-                                            <button type="button" class="promo-request-btn" style="background-color: #dc3545; border-color: #dc3545; color: white;" disabled>
+                                        <?php elseif ($isObtained): ?>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn btn-obtained btn-locked" disabled>
+                                                Promoción Obtenida
+                                            </button>
+                                        <?php elseif ($isRejected): ?>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn btn-rejected btn-locked" disabled>
                                                 <i class="fas fa-times-circle me-1"></i>Solicitud Rechazada
                                             </button>
                                         <?php elseif ($isLocked): ?>
-                                            <button type="button" class="promo-request-btn btn-locked" disabled>Bloqueado (Nivel <?= ucfirst($promo['client_category']) ?>)</button>
+                                            <button type="submit" name="btnRequestPromo" class="promo-request-btn btn-locked" disabled>Bloqueado (Nivel <?= ucfirst($promo['client_category']) ?>)</button>
                                         <?php else: ?>
                                             <button type="submit" name="btnRequestPromo" class="promo-request-btn">Solicitar Promoción</button>
                                         <?php endif; ?>
@@ -395,13 +430,13 @@ function buildFilterUrl($paramName, $paramValue) {
                                 <input type="number" name="discount" id="promoDiscount" class="form-control" min="0" max="100" step="0.01" required>
                             </div>
                             <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Precio Original</label>
+                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Precio Promo (calculado)</label>
                                 <input type="text" id="promoCalculatedPrice" class="form-control" readonly>
                                 <input type="hidden" name="price" id="promoPriceHidden">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Precio Original</label>
-                                <input type="number" name="original_price" id="promoOriginalPrice" class="form-control" min="0" step="0.01" required>
                             </div>
                             <div class="col-12 mb-3">
                                 <label class="form-label fw-bold">URL Imagen</label>
@@ -502,6 +537,36 @@ function buildFilterUrl($paramName, $paramValue) {
             discountInput.addEventListener('input', recalculatePromoPrice);
             originalInput.addEventListener('input', recalculatePromoPrice);
             recalculatePromoPrice();
+
+            // Validación dinámica de fechas
+            const dateFromInput = document.querySelector('input[name="date_from"]');
+            const dateUntilInput = document.querySelector('input[name="date_until"]');
+
+            if (dateFromInput && dateUntilInput) {
+                function updateMinDateUntil() {
+                    if (dateFromInput.value) {
+                        const dateParts = dateFromInput.value.split('-');
+                        const date = new Date(dateParts, dateParts[1] - 1, dateParts[2]);
+                        date.setDate(date.getDate() + 1);
+                        const nextDay = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+                        dateUntilInput.min = nextDay;
+                    }
+                }
+
+                function validateDates() {
+                    if (dateFromInput.value && dateUntilInput.value) {
+                        if (dateUntilInput.value <= dateFromInput.value) {
+                            dateUntilInput.setCustomValidity('La fecha de fin debe ser estrictamente posterior a la fecha de inicio.');
+                        } else {
+                            dateUntilInput.setCustomValidity('');
+                        }
+                    }
+                }
+
+                dateFromInput.addEventListener('change', () => { updateMinDateUntil(); validateDates(); });
+                dateUntilInput.addEventListener('change', validateDates);
+                updateMinDateUntil(); // Inicializar el atributo min al cargar la vista
+            }
         })();
     </script>
     <?php endif; ?>
