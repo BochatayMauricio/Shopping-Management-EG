@@ -1,5 +1,10 @@
 <?php
-    // Cargar User antes de session_start para evitar __PHP_Incomplete_Class
+    // Mostrar errores temporalmente (salvavidas contra la pantalla blanca)
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
+    // Cargar User antes de session_start para evitar problemas
     require_once __DIR__ . '/../models/User.php';
     
     if (session_status() === PHP_SESSION_NONE) {
@@ -11,30 +16,52 @@
     include_once __DIR__ . '/../Services/alert.service.php';
     include_once __DIR__ . '/../Services/validation.service.php';
 
-    // Procesar el formulario de login
-    if (!empty($_POST)) {
+
+    // ====================================================
+    // 1. PROCESAR LOGOUT (Viene del enlace de la NavBar)
+    // ====================================================
+    if (isset($_GET['action']) && $_GET['action'] === 'logout') {
         
+        logoutUser(); // Función limpia en el servicio
+        
+        // Verificamos si lograste crear la función 'warning' en AlertService.
+        // Si no existe, usamos 'success' como respaldo para que no explote.
+        if (method_exists('AlertService', 'warning')) {
+            AlertService::warning('Has cerrado sesión correctamente.');
+        } else {
+            AlertService::success('Has cerrado sesión correctamente.');
+        }
+        
+        // Redirigir al inicio
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+        header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
+        exit();
+    }
+
+
+    // ====================================================
+    // 2. PROCESAR LOGIN (Viene del formulario)
+    // ====================================================
+    if (!empty($_POST)) {
         $userName = trim($_POST['userName']);
         $password = trim($_POST['password']);
         
-        // Validar campos
         if (!isset($userName) || !isset($password)) {
-            $loginError = ValidationService::getEmptyFieldsMessage();
-            AlertService::error($loginError);
+            AlertService::error(ValidationService::getEmptyFieldsMessage());
         } elseif (!ValidationService::isValidPassword($password)) {
-            $loginError = ValidationService::getPasswordErrorMessage();
-            AlertService::error($loginError);
+            AlertService::error(ValidationService::getPasswordErrorMessage());
         } else {
-            // Verificar credenciales
-            $user = authenticateUser($userName, $password);
-            if ($user) {
-                AlertService::success('Inicio de sesión exitoso. Redirigiendo...');
-                
+            $userResult = authenticateUser($userName, $password);
+            
+            if (is_array($userResult)) {
+                AlertService::success('Inicio de sesión exitoso. ¡Bienvenido, ' . htmlspecialchars($userResult['name']) . '!');
                 $baseUrl = defined('BASE_URL') ? BASE_URL : '';
                 header("Location: " . $baseUrl . "/public/Pages/Home/home.php");
                 exit();
+            } elseif ($userResult === "unverified") {
+                AlertService::error('Tu cuenta aún no ha sido verificada. Por favor, revisá tu bandeja de entrada.');
             } else {
-                AlertService::error('Credenciales incorrectas. Verifica tu email y contraseña.');
+                AlertService::error('Usuario o contraseña incorrectos.');
             }
         }
     }

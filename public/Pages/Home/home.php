@@ -20,6 +20,7 @@ $news = getNews();
 <body style="background-color: #ffffff;">
 
     <?php include_once __DIR__ . '/../../Components/navbar/NavBar.php'; ?>
+    <?php include_once '../../Components/alert/alert.php'; ?>
 
     <header class="main-banner">
         <div class="banner-content">

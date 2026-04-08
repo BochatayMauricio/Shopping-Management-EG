@@ -43,6 +43,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="../../Pages/Redeem Promo/redeemPromo.php">Activar Promo</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../Pages/ownerReports/ownerReports.php">Reportes</a>
+                    </li>
                 <?php endif; ?>
                 <?php if ($user && $user['type'] === 'admin'): ?>
                     <li class="nav-item">
@@ -68,7 +71,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="../../Pages/User Portal/userPortal.php"><i class="fas fa-user me-2"></i>Mi perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
+                            <li><a class="dropdown-item text-danger" href="../../../app/controllers/login.controller.php?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>
