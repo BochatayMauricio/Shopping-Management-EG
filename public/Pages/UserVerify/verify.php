@@ -3,6 +3,9 @@ include_once __DIR__ . '/../../../app/Config/config.php';
 include_once __DIR__ . '/../../../app/Services/user.services.php';
 include_once __DIR__ . '/../../../app/Services/alert.service.php';
 
+// Capturamos la BASE_URL para armar links a prueba de fallos
+$baseUrl = defined('BASE_URL') ? BASE_URL : '';
+
 $token = $_GET['token'] ?? '';
 $verificationResult = null;
 
@@ -20,8 +23,7 @@ if (!empty($token)) {
     <title>Shopping Rosario - Verificación de Cuenta</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../Shared/globalStyles.css">
-    <!-- Enlace a su propio archivo CSS -->
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/public/Shared/globalStyles.css">
     <link rel="stylesheet" href="verify.css">
 </head>
 <body>
@@ -38,7 +40,7 @@ if (!empty($token)) {
                 Ya podés acceder a todas nuestras promociones y beneficios exclusivos.
             </p>
             
-            <a href="../Login/login.php" class="login-button" style="text-decoration: none; display: block; text-align: center;">
+            <a href="<?php echo $baseUrl; ?>/public/Pages/Login/login.php" class="login-button" style="text-decoration: none; display: block; text-align: center;">
                 <span class="btn-text">Iniciar Sesión</span>
             </a>
             
@@ -55,7 +57,7 @@ if (!empty($token)) {
                 Si creés que esto es un error, por favor intentá registrarte nuevamente o contactá a soporte.
             </p>
             
-            <a href="../Home/home.php" class="login-button" style="background: #4a5568; text-decoration: none; display: block; text-align: center;">
+            <a href="<?php echo $baseUrl; ?>/public/Pages/Home/home.php" class="login-button" style="background: #4a5568; text-decoration: none; display: block; text-align: center;">
                 <span class="btn-text">Volver al Inicio</span>
             </a>
         <?php endif; ?>

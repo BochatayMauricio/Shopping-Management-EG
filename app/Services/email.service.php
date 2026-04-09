@@ -54,7 +54,7 @@ class EmailService
         $baseUrl = defined('BASE_URL') ? BASE_URL : '';
         $host = $_SERVER['HTTP_HOST'];
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-        $verifyLink = "{$protocol}://{$host}{$baseUrl}/public/Pages/User Verify/verify.php?token={$token}";
+        $verifyLink = "{$protocol}://{$host}{$baseUrl}/public/Pages/UserVerify/verify.php?token={$token}";
 
         $subject = 'Verifica tu cuenta en Shopping Rosario';
         $body = "
