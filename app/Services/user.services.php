@@ -56,8 +56,6 @@ function registerUser($userName, $email, $password, $type = 'client')
     return true;
 }
 
-
-
 function getClientsStatsByLevel()
 {
     global $CONNECTION;
@@ -244,9 +242,13 @@ function savePasswordResetToken($userId, $token, $expires)
 function verifyPasswordResetToken($token)
 {
     global $CONNECTION;
-    // Comprobamos que el token coincida y que la fecha de expiración sea mayor o igual a la actual
-    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires >= NOW()");
-    $stmt->bind_param("s", $token);
+    
+    // 1. Le preguntamos a PHP qué hora es exactamente AHORA
+    $now = date("Y-m-d H:i:s");
+    
+    // 2. Comparamos el vencimiento contra el reloj de PHP (pasando $now en lugar de usar NOW())
+    $stmt = $CONNECTION->prepare("SELECT cod FROM users WHERE reset_token = ? AND token_expires >= ?");
+    $stmt->bind_param("ss", $token, $now);
     $stmt->execute();
     $result = $stmt->get_result();
     

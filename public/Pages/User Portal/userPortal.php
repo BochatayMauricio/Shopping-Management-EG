@@ -62,19 +62,50 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST">
+                    <form method="POST" id="changePasswordForm">
+                        
                         <div class="mb-3">
                             <label for="currentPassword" class="form-label fw-semibold small">Contraseña Actual</label>
-                            <input type="password" class="form-control bg-light" id="currentPassword" name="currentPassword" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control bg-light border-end-0" id="currentPassword" name="currentPassword" required>
+                                <span class="input-group-text bg-light cursor-pointer toggle-password" data-target="currentPassword" style="cursor: pointer;">
+                                    <i class="fas fa-eye text-muted"></i>
+                                </span>
+                            </div>
                         </div>
+                        
                         <div class="mb-3">
                             <label for="newPassword" class="form-label fw-semibold small">Nueva Contraseña</label>
-                            <input type="password" class="form-control bg-light" id="newPassword" name="newPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control bg-light border-end-0" id="newPassword" name="newPassword" 
+                                    placeholder="Ej: Shopping2026" 
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+                                    title="Debe contener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número"
+                                    required>
+                                <span class="input-group-text bg-light cursor-pointer toggle-password" data-target="newPassword" style="cursor: pointer;">
+                                    <i class="fas fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                            <div class="form-text text-muted mb-0" style="font-size: 0.8rem;">
+                                Mínimo 8 caracteres, 1 mayúscula, 1 minúscula y 1 número.
+                            </div>
                         </div>
+                        
                         <div class="mb-4">
                             <label for="confirmNewPassword" class="form-label fw-semibold small">Confirmar Nueva Contraseña</label>
-                            <input type="password" class="form-control bg-light" id="confirmNewPassword" name="confirmNewPassword" minlength="6" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control bg-light border-end-0" id="confirmNewPassword" name="confirmNewPassword" 
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                                    required>
+                                <span class="input-group-text bg-light cursor-pointer toggle-password" data-target="confirmNewPassword" style="cursor: pointer;">
+                                    <i class="fas fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                            <div id="passwordMismatchError" class="text-danger mt-1 d-none" style="font-size: 0.8rem;">
+                                <i class="fas fa-exclamation-circle"></i> Las contraseñas no coinciden.
+                            </div>
                         </div>
+                        
                         <div class="d-grid">
                             <button type="submit" name="btnChangePassword" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
                                 Actualizar Contraseña
@@ -358,3 +389,42 @@ $progress = ($user['type'] === 'client') ? getClientLevelProgress($userId) : nul
     <?php include_once '../../Components/footer/Footer.php'; ?>
 </body>
 </html>
+
+<script>
+    // 1. Lógica para el ojito (Mostrar/Ocultar contraseña)
+    document.querySelectorAll('.toggle-password').forEach(function(element) {
+        element.addEventListener('click', function() {
+            // Buscamos el input asociado usando el atributo data-target
+            const targetId = this.getAttribute('data-target');
+            const inputField = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            // Alternamos el tipo de input y el ícono
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                inputField.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+
+    // 2. Lógica para validar que las contraseñas coincidan
+    document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmNewPassword').value;
+        const errorDiv = document.getElementById('passwordMismatchError');
+
+        if (newPassword !== confirmPassword) {
+            event.preventDefault(); 
+            errorDiv.classList.remove('d-none');
+            document.getElementById('confirmNewPassword').classList.add('is-invalid');
+        } else {
+            errorDiv.classList.add('d-none');
+            document.getElementById('confirmNewPassword').classList.remove('is-invalid');
+        }
+    });
+</script>
